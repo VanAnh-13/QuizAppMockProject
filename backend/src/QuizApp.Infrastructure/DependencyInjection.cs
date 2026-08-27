@@ -26,6 +26,9 @@ public static class DependencyInjection
             .AddEntityFrameworkStores<AppDbContext>()
             .AddDefaultTokenProviders();
 
+        services.AddSingleton<QuizApp.Application.Interfaces.IJwtTokenService, Identity.JwtTokenService>();
+        services.AddSingleton<QuizApp.Application.Interfaces.IFileStorage, Storage.LocalFileStorage>();
+
         return services;
     }
 }

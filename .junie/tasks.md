@@ -27,7 +27,7 @@ T2 + T4 + T5 → T6 (angular integration) ──┴→ T7 (manager screens + pac
   - Startup connection retry for slow SQL Server boot
 
 ### T2 — Authentication, authorization and account APIs (spec Step 2)
-- Status: TODO
+- Status: ✅ DONE
 - Depends on: T1
 - Done when: register/login/me/change-password/avatar endpoints work; JWT bearer + policies enforced; deactivated users blocked.
 - Deliverables:
