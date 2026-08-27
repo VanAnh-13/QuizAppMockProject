@@ -14,7 +14,7 @@ T2 + T4 + T5 → T6 (angular integration) ──┴→ T7 (manager screens + pac
 ## Tasks
 
 ### T1 — Backend foundation: solution, SQL Server container, domain model, seeded database (spec Step 1)
-- Status: TODO
+- Status: ✅ DONE
 - Depends on: —
 - Done when: `dotnet build` passes; `docker compose up` starts SQL Server; initial migration + seed applied on API startup.
 - Deliverables:

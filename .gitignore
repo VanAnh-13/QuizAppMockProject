@@ -24,6 +24,10 @@ npm-debug.log*
 # Runtime data
 backend/data/
 avatars/
+.run/
+*.log
+api.log
+api.err.log
 
 # OS
 Thumbs.db

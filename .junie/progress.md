@@ -7,8 +7,8 @@ Last updated: 2026-08-27
 
 | Task | Description | Status |
 | --- | --- | --- |
-| T1 | Backend foundation (solution, mssql compose, domain, migrations, seed) | 🔄 IN PROGRESS |
-| T2 | Authentication, authorization & account APIs | ⏳ TODO |
+| T1 | Backend foundation (solution, mssql compose, domain, migrations, seed) | ✅ DONE |
+| T2 | Authentication, authorization & account APIs | 🔄 IN PROGRESS |
 | T3 | Content management APIs (quiz/question/user/role/feedback) | ⏳ TODO |
 | T4 | Quiz-taking API (codes, attempts, scoring) | ⏳ TODO |
 | T5 | Angular shell (layouts, routing, shared components, forms) | ⏳ TODO |
@@ -22,4 +22,7 @@ Last updated: 2026-08-27
 - Environment verified: .NET SDK 10.0.303 (also 8.0.424), Node v24.18.0, npm 11.16.0, Docker 29.7.2 + Compose v5.4.0 (daemon running).
 - `.gitignore` added; spec `.docx` files committed unchanged.
 - Task graph created from spec Delivery Steps (T1–T7).
-- Started T1.
+- **T1 DONE**: `backend/QuizApp.sln` (net10.0) with Domain/Application/Infrastructure/Api; tool manifest pinned at `backend/.config/dotnet-tools.json` (dotnet-ef 10.0.11); EF Core 10.0.11 packages; full domain model (10 entities + 2 enums); `AppDbContext` with per-entity configurations; `docker-compose.yml` (mssql 2022 + healthcheck, healthy) + `.env.example`; `InitialCreate` migration; `DbSeeder` (3 roles, admin + demo user from config, 4 quizzes/8 questions/19 answers); startup connection retry.
+  - Fixes along the way: SQL Server error 1785 (multiple cascade paths) → `UserAnswer` snapshot FKs use `ClientSetNull`; tool manifest moved to `.config/`; `QuizApp.Api` converted to Web SDK; parallel racing builds caused a missing-migration DLL → clean rebuild fixed it.
+  - Verified: `dotnet build` green; `GET /health` → `{"status":"healthy"}`; DB row counts confirmed via sqlcmd.
+- Started T2.
