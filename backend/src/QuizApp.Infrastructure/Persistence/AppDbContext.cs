@@ -1,10 +1,11 @@
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using QuizApp.Application.Interfaces;
 using QuizApp.Domain.Entities;
 
 namespace QuizApp.Infrastructure.Persistence;
 
-public class AppDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, Guid>
+public class AppDbContext : IdentityDbContext<ApplicationUser, ApplicationRole, Guid>, IAppDbContext
 {
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {

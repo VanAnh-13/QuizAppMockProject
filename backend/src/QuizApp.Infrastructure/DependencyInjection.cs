@@ -11,10 +11,15 @@ public static class DependencyInjection
 {
     public static IServiceCollection AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
     {
-        var connectionString = configuration.GetConnectionString("DefaultConnection")
-            ?? throw new InvalidOperationException("Connection string 'DefaultConnection' is not configured.");
-
-        services.AddDbContext<AppDbContext>(options => options.UseSqlServer(connectionString));
+        // Resolve the connection string when the context is built (post-Build),
+        // so host-level overrides (WebApplicationFactory, containers) apply.
+        services.AddDbContext<AppDbContext>((sp, options) =>
+        {
+            var cs = sp.GetRequiredService<IConfiguration>().GetConnectionString("DefaultConnection")
+                     ?? throw new InvalidOperationException("Connection string 'DefaultConnection' is not configured.");
+            options.UseSqlServer(cs);
+        });
+        services.AddScoped<QuizApp.Application.Interfaces.IAppDbContext>(sp => sp.GetRequiredService<AppDbContext>());
 
         services.AddIdentity<ApplicationUser, ApplicationRole>(options =>
             {

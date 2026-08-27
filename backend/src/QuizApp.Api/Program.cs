@@ -41,25 +41,29 @@ builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<ProblemDetailsExceptionHandler>();
 
 // JWT bearer authentication (key/issuer/audience/lifetime from configuration, never hardcoded).
-var jwtKey = builder.Configuration["Jwt:Key"]
-             ?? throw new InvalidOperationException("Jwt:Key is not configured. Set it via environment variable Jwt__Key.");
-
+// Validation parameters are bound post-Build via IConfigureOptions so host-level
+// configuration overrides (integration tests, containers) stay in sync with issuance.
 builder.Services.AddAuthentication(options =>
     {
         options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
         options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
         options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
     })
-    .AddJwtBearer(options =>
+    .AddJwtBearer();
+
+builder.Services.AddOptions<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme)
+    .Configure<IConfiguration>((options, configuration) =>
     {
+        var key = configuration["Jwt:Key"]
+                  ?? throw new InvalidOperationException("Jwt:Key is not configured. Set it via environment variable Jwt__Key.");
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
-            ValidIssuer = builder.Configuration["Jwt:Issuer"] ?? "QuizApp.Api",
+            ValidIssuer = configuration["Jwt:Issuer"] ?? "QuizApp.Api",
             ValidateAudience = true,
-            ValidAudience = builder.Configuration["Jwt:Audience"] ?? "QuizApp.Web",
+            ValidAudience = configuration["Jwt:Audience"] ?? "QuizApp.Web",
             ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key)),
             ValidateLifetime = true,
             ClockSkew = TimeSpan.FromSeconds(30)
         };
@@ -151,3 +155,6 @@ static async Task ApplyDatabaseAsync(WebApplication app)
     }
 }
 
+
+// Exposed for WebApplicationFactory in integration tests.
+public partial class Program { }

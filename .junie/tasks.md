@@ -38,7 +38,7 @@ T2 + T4 + T5 → T6 (angular integration) ──┴→ T7 (manager screens + pac
   - `IsActive = false` login blocked with clear message
 
 ### T3 — Content management APIs: quizzes, question bank, users, roles, feedback (spec Step 3)
-- Status: TODO
+- Status: ✅ DONE
 - Depends on: T2
 - Done when: CRUD + assignment + publish rules + paging/search/sort on all management lists; feedback endpoint persists.
 - Deliverables:

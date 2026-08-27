@@ -12,6 +12,12 @@ public static class DependencyInjection
         services.AddValidatorsFromAssembly(typeof(DependencyInjection).Assembly);
 
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IQuizService, QuizService>();
+        services.AddScoped<IQuestionService, QuestionService>();
+        services.AddScoped<IAnswerService, AnswerService>();
+        services.AddScoped<IUserService, UserService>();
+        services.AddScoped<IRoleService, RoleService>();
+        services.AddScoped<IFeedbackService, FeedbackService>();
 
         return services;
     }
