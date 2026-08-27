@@ -1,0 +1,30 @@
+# .NET
+bin/
+obj/
+out/
+*.user
+.vs/
+.idea/
+TestResults/
+appsettings.*.local.json
+
+# Node / Angular
+node_modules/
+.npm-cache/
+.npm-logs/
+.angular/
+dist/
+coverage/
+npm-debug.log*
+
+# Environment & secrets
+.env
+*.env.local
+
+# Runtime data
+backend/data/
+avatars/
+
+# OS
+Thumbs.db
+.DS_Store
