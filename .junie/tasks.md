@@ -50,7 +50,7 @@ T2 + T4 + T5 → T6 (angular integration) ──┴→ T7 (manager screens + pac
   - Integration tests: CRUD round-trips, assignment/removal, publish rejection, paging over 25 seeded quizzes
 
 ### T4 — Quiz-taking API: codes, attempts, server-side scoring (spec Step 4)
-- Status: TODO
+- Status: ✅ DONE
 - Depends on: T3
 - Done when: full code → prepare → take → submit → history path works; take payload has no `isCorrect`; scoring rules unit-tested.
 - Deliverables:

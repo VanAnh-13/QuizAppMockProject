@@ -1,7 +1,7 @@
 # Progress Log — Quiz Application
 
 Spec: `.junie/plans/quiz-app-angular-aspnet.md` · Tasks: `.junie/tasks.md`
-Last updated: 2026-08-27
+Last updated: 2026-08-28
 
 ## Status Board
 
@@ -10,7 +10,7 @@ Last updated: 2026-08-27
 | T1 | Backend foundation (solution, mssql compose, domain, migrations, seed) | ✅ DONE |
 | T2 | Authentication, authorization & account APIs | ✅ DONE |
 | T3 | Content management APIs (quiz/question/user/role/feedback) | ✅ DONE |
-| T4 | Quiz-taking API (codes, attempts, scoring) | 🔄 IN PROGRESS |
+| T4 | Quiz-taking API (codes, attempts, scoring) | ✅ DONE |
 | T5 | Angular shell (layouts, routing, shared components, forms) | ⏳ TODO |
 | T6 | Angular API integration & customer quiz journey | ⏳ TODO |
 | T7 | Management screens & full-stack packaging | ⏳ TODO |
@@ -33,4 +33,17 @@ Last updated: 2026-08-27
   - New `QuizApp.Api.IntegrationTests` (xunit + WebApplicationFactory, isolated per-run DB created+migrated+seeded then dropped): 12 tests — 401/403/201 authz matrix, quiz CRUD round-trip, publish rejection, assign/remove, paging/search/sort/clamping over 25 quizzes, delete-warning, deactivated-user 403, duplicate-register 409.
   - Root-caused two subtle bugs: (1) `Guid.ToString()` inside EF projections → SQL `CONVERT` returns UPPERCASE (materialize before mapping); (2) WebApplicationFactory's deferred host applies `ConfigureAppConfiguration` after the entry point configures services → connection string + JWT params are now read post-Build via DI/options pattern; entry-point auto-migrate disabled under the factory, which migrates+seeds itself in `InitializeAsync`.
   - Verified: **12/12 integration tests green**.
-- Started T4.
+
+### 2026-08-28
+- **T4 DONE**: Quiz-taking API fully implemented.
+  - New DTOs: `QuizCodeDtos.cs` (prepare/take/submit/result/bulk-code shapes), `AttemptDtos.cs` (history + detail).
+  - New interfaces: `IQuizCodeService`, `IQuizAttemptService`, `IScoringService`.
+  - `ScoringService` — pure logic, no I/O: SingleChoice/TrueFalse (exact match), MultipleChoice (all-or-nothing set equality), FillInTheBlanks/ShortAnswer (trimmed case-insensitive text), LongAnswer (stored for manual review, excluded from denominator). `Score = round(correct/gradable*100)`.
+  - `QuizCodeService` — self-issue (reuses existing unused code), validate (owner/used/expiry checks), bulk generate for admin sessions. Code length and expiry TTL are configuration-driven (`QuizCode:Length`, `QuizCode:ExpiryHours`).
+  - `QuizAttemptService` — state machine `Prepared → InProgress → Submitted | Expired`; StartTime/Deadline recorded server-side on Take; `QuizForTestViewModel` projection deliberately omits `isCorrect`; `UserAnswer` rows snapshotted at submission with content for history; repeat-submit returns 409.
+  - Extended `QuizzesController` with self-issue, bulk-generate, prepare, take, submit endpoints; new `AttemptsController` for `GET /api/attempts/me` and `GET /api/attempts/{id}` (owner or manager).
+  - New `QuizApp.Application.Tests` project: **17/17 scoring unit tests** covering all 6 question types + edge cases.
+  - New `QuizTakingTests` integration suite: **4 new tests** (full journey + repeat-submit 409 + cross-user code 403 + detail auth 403). Fixed repeat-submit check to inspect completed attempts before active ones.
+  - Fix: repeat-submit was returning 404 instead of 409 because the query only searched `InProgress/Prepared` states — resolved by checking `Submitted/Expired` first.
+  - **Total: 33/33 tests green** (17 unit + 16 integration).
+

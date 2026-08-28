@@ -19,6 +19,11 @@ public static class DependencyInjection
         services.AddScoped<IRoleService, RoleService>();
         services.AddScoped<IFeedbackService, FeedbackService>();
 
+        // T4: quiz-taking services
+        services.AddScoped<IScoringService, ScoringService>();
+        services.AddScoped<IQuizCodeService, QuizCodeService>();
+        services.AddScoped<IQuizAttemptService, QuizAttemptService>();
+
         return services;
     }
 }
