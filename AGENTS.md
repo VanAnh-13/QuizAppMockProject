@@ -8,7 +8,16 @@ These instructions apply to the entire Quizapp repository. Follow any more speci
 2. Read the affected implementation and its tests before proposing a change. State a short plan, then keep edits scoped to the request.
 3. For environment setup, migration commands, local URLs, or Docker work, read `D:/Homeworks/c#/Quizapp/README.md`. Recheck the relevant project/configuration files before changing dependencies or documenting capabilities.
 
-The current application is a .NET 10 backend foundation, not a complete quiz service. The API host exposes development OpenAPI/Swagger but has no business endpoints or configured authentication pipeline. DTOs, validators, and the JWT package do not establish an implemented HTTP workflow. Update this note and the README when that changes.
+This is a monorepo. The .NET solution lives in `D:/Homeworks/c#/Quizapp/backend`; shared documentation and repository configuration stay at the root. A future web client belongs in its own top-level directory, not inside the .NET solution tree.
+
+The current application is a .NET 10 backend foundation, not a complete quiz service. The API host exposes development OpenAPI/Swagger but has no business endpoints or configured authentication pipeline. DTOs, validators, and the JWT package do not establish an implemented HTTP workflow. There is no frontend yet. Update this note and the README when that changes.
+
+## Branching model
+
+- `main` is deploy-only. Do not commit or push to it directly; it advances through reviewed pull requests from `dev` and carries release tags.
+- `dev` is the integration and testing branch. It is the base for feature work and the default pull-request target.
+- Feature work happens on short-lived branches merged into `dev` through pull requests. Scope the name so backend and frontend work stay distinguishable, for example `feature/api-auth-login` or `feature/web-quiz-list`.
+- Build and test successfully before opening a pull request. Never commit secrets or machine-specific credentials.
 
 ## Mandatory skill usage
 
@@ -39,7 +48,7 @@ Boundary and registration checks live in `D:/Homeworks/c#/Quizapp/tests/Quizapp.
 - Use existing packages and abstractions. Inspect the affected `.csproj` before adding dependencies; avoid introducing a new architectural pattern for a small change.
 - Shared field lengths belong in `D:/Homeworks/c#/Quizapp/Quizapp/Quizapp.Domain/Constants/FieldLimits.cs`. Keep DTO validators and EF column constraints consistent with those limits.
 - Add validators alongside the matching DTO feature under Application. `AddApplication()` discovers validators by assembly scanning; verify new validators resolve through DI with scoped lifetime.
-- Keep warnings-as-errors enabled in `D:/Homeworks/c#/Quizapp/Directory.Build.props`. Investigate Rider unused-code findings against DTO serialization, DI, and reflection before removing a type.
+- There is no shared `Directory.Build.props` yet. Treat compiler warnings as potential issues and keep the build warning-free.
 - The custom JetBrains `PublicAPI`/`UsedImplicitly` attributes and their imported source links were intentionally removed. Do not reintroduce them merely to suppress inspection warnings.
 - Limit source searches to relevant projects. Exclude generated/build/tool directories such as `bin`, `obj`, and `.artifacts`; keep their contents out of source edits.
 

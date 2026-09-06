@@ -1,0 +1,7 @@
+﻿services:
+  quizapp:
+    image: quizapp
+    build:
+      context: ./backend
+      dockerfile: Quizapp/Quizapp.Api/Dockerfile
+
