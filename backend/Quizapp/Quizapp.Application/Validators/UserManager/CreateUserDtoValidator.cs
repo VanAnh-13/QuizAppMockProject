@@ -11,7 +11,7 @@ public sealed class CreateUserDtoValidator : AbstractValidator<CreateUserDto>
         RuleFor(dto => dto.Username).NotEmpty().MaximumLength(FieldLimits.NameLength);
         RuleFor(dto => dto.Email).NotEmpty().EmailAddress().MaximumLength(FieldLimits.EmailLength);
         RuleFor(dto => dto.Profile).NotNull().SetValidator(new UserProfileDtoValidator());
-        RuleFor(dto => dto.Password).NotEmpty();
+        RuleFor(dto => dto.Password).NotEmpty().MinimumLength(PasswordLimits.MinimumLength).MaximumLength(PasswordLimits.MaximumLength);
         RuleFor(dto => dto.ConfirmPassword).NotEmpty().Equal(dto => dto.Password);
     }
 }
