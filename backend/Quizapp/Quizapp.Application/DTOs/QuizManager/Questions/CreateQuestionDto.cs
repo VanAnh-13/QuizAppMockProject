@@ -9,6 +9,7 @@ public class CreateQuestionDto
     public QuestionLevel Level { get; set; }
     public QuestionType QuestionType { get; set; }
     public bool IsActive { get; set; }
+    public List<CreateQuestionAnswerDto> Answers { get; set; } = [];
 
     public sealed class Builder
     {
@@ -45,9 +46,17 @@ public class CreateQuestionDto
             return this;
         }
 
+        public Builder WithAnswers(IEnumerable<CreateQuestionAnswerDto> answers)
+        {
+            ArgumentNullException.ThrowIfNull(answers);
+            _dto.Answers = [.. answers];
+            return this;
+        }
+
         public CreateQuestionDto Build()
         {
             var result = (CreateQuestionDto)_dto.MemberwiseClone();
+            result.Answers = [.. _dto.Answers];
             return result;
         }
 

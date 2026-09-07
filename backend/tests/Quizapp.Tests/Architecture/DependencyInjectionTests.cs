@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Quizapp.Application;
 using Quizapp.Application.DTOs.QuizManager.Quizzes;
+using Quizapp.Application.Strategies.QuizManager.Questions;
+using Quizapp.Domain.Enums;
 using Quizapp.Infrastructure;
 using Quizapp.Infrastructure.Persistence;
 
@@ -10,6 +12,28 @@ namespace Quizapp.Tests.Architecture;
 
 public class DependencyInjectionTests
 {
+    [Fact]
+    public void Question_strategies_are_scoped_and_registration_can_be_repeated()
+    {
+        var services = new ServiceCollection().AddApplication().AddApplication();
+        using var provider = services.BuildServiceProvider(new ServiceProviderOptions
+        {
+            ValidateScopes = true,
+            ValidateOnBuild = true
+        });
+        using var firstScope = provider.CreateScope();
+        using var secondScope = provider.CreateScope();
+
+        var strategies = firstScope.ServiceProvider.GetServices<IQuestionCreationStrategy>().ToArray();
+        var registeredTypes = strategies.SelectMany(strategy => strategy.SupportedTypes).ToArray();
+        Assert.Equal(Enum.GetValues<QuestionType>().Order(), registeredTypes.Order());
+        foreach (var strategy in strategies)
+        {
+            Assert.Contains(firstScope.ServiceProvider.GetServices<IQuestionCreationStrategy>(), other => ReferenceEquals(strategy, other));
+            Assert.DoesNotContain(secondScope.ServiceProvider.GetServices<IQuestionCreationStrategy>(), other => ReferenceEquals(strategy, other));
+        }
+    }
+
     [Fact]
     public void Application_registration_resolves_every_validator_with_scoped_lifetime()
     {
