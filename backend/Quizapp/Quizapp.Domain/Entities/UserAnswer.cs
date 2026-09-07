@@ -8,18 +8,6 @@ public class UserAnswer
     public Guid? AnswerId { get; init; }
     public string? ResponseText { get; init; }
 
-    public UserAnswer()
-    {
-    }
-
-    public UserAnswer(Guid id, Guid quizAttemptId, Guid questionId, Guid answerId)
-    {
-        Id = id;
-        QuizAttemptId = quizAttemptId;
-        QuestionId = questionId;
-        AnswerId = answerId;
-    }
-
     public QuizAttempt QuizAttemptNavigation { get; init; } = null!;
     public Question QuestionNavigation { get; init; } = null!;
     public Answer? AnswerNavigation { get; init; }

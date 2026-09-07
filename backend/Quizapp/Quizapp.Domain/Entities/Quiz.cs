@@ -14,22 +14,6 @@ public class Quiz
     public DateTime CreateAt { get; init; }
     public DateTime UpdateAt { get; init; }
 
-    public Quiz()
-    {
-    }
-
-    public Quiz(Guid id, string title, string? description, int duration, string? image, DateTime createAt,
-        DateTime updateAt)
-    {
-        Id = id;
-        Title = title;
-        Description = description;
-        Duration = duration;
-        Image = image;
-        CreateAt = createAt;
-        UpdateAt = updateAt;
-    }
-
     public ICollection<QuizAttempt> QuizAttempts { get; init; } = new List<QuizAttempt>();
     public ICollection<Question> Questions { get; init; } = new List<Question>();
     public ICollection<QuizQuestion> QuizQuestions { get; init; } = new List<QuizQuestion>();
