@@ -1,22 +1,37 @@
-using System.Diagnostics.CodeAnalysis;
-
 namespace Quizapp.Application.DTOs.QuizManager.Answers;
 
 public class UpdateAnswerDto
 {
-    public required string Text { get; init; }
-    public required bool IsCorrect { get; init; }
-    public bool IsActive { get; init; }
+    public string Text { get; set; } = string.Empty;
+    public bool IsCorrect { get; set; }
+    public bool IsActive { get; set; }
 
-    public UpdateAnswerDto()
+    public sealed class Builder
     {
-    }
+        private readonly UpdateAnswerDto _dto = new();
 
-    [SetsRequiredMembers]
-    public UpdateAnswerDto(string text, bool isCorrect, bool isActive)
-    {
-        Text = text;
-        IsCorrect = isCorrect;
-        IsActive = isActive;
+        public Builder WithText(string text)
+        {
+            ArgumentNullException.ThrowIfNull(text);
+            _dto.Text = text;
+            return this;
+        }
+
+        public Builder WithIsCorrect(bool isCorrect)
+        {
+            _dto.IsCorrect = isCorrect;
+            return this;
+        }
+
+        public Builder WithIsActive(bool isActive)
+        {
+            _dto.IsActive = isActive;
+            return this;
+        }
+
+        public UpdateAnswerDto Build()
+        {
+            return (UpdateAnswerDto)_dto.MemberwiseClone();
+        }
     }
 }

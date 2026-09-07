@@ -1,23 +1,38 @@
-using System.Diagnostics.CodeAnalysis;
 using QuizQuestionEntity = Quizapp.Domain.Entities.QuizQuestion;
 
 namespace Quizapp.Application.DTOs.QuizManager.QuizQuestion;
 
 public class AddQuestionToQuizDto
 {
-    public required Guid QuizId { get; init; }
-    public required Guid QuestionId { get; init; }
-    public int Order { get; init; } = QuizQuestionEntity.FirstOrder;
+    public Guid QuizId { get; set; }
+    public Guid QuestionId { get; set; }
+    public int Order { get; set; } = QuizQuestionEntity.FirstOrder;
 
-    public AddQuestionToQuizDto()
+    public sealed class Builder
     {
-    }
+        private readonly AddQuestionToQuizDto _dto = new();
 
-    [SetsRequiredMembers]
-    public AddQuestionToQuizDto(Guid quizId, Guid questionId, int order)
-    {
-        QuizId = quizId;
-        QuestionId = questionId;
-        Order = order;
+        public Builder WithQuizId(Guid quizId)
+        {
+            _dto.QuizId = quizId;
+            return this;
+        }
+
+        public Builder WithQuestionId(Guid questionId)
+        {
+            _dto.QuestionId = questionId;
+            return this;
+        }
+
+        public Builder WithOrder(int order)
+        {
+            _dto.Order = order;
+            return this;
+        }
+
+        public AddQuestionToQuizDto Build()
+        {
+            return (AddQuestionToQuizDto)_dto.MemberwiseClone();
+        }
     }
 }

@@ -2,11 +2,29 @@ using System.Text.Json;
 using Quizapp.Application.DTOs.Authentication;
 using Quizapp.Application.DTOs.QuizTaking;
 using Quizapp.Application.DTOs.UserManager;
+using Quizapp.Application.Validators.Authentication;
 
 namespace Quizapp.Tests.Application;
 
 public class DtoContractTests
 {
+    [Fact]
+    public void Missing_json_fields_use_defaults_but_registration_still_requires_valid_data()
+    {
+        var request = JsonSerializer.Deserialize<RegisterDto>("{}")!;
+
+        Assert.Equal(string.Empty, request.Username);
+        Assert.Equal(string.Empty, request.Email);
+        Assert.NotNull(request.Profile);
+        Assert.Equal(string.Empty, request.Profile.FullName);
+
+        var result = new RegisterDtoValidator().Validate(request);
+        Assert.Contains(result.Errors, error => error.PropertyName == nameof(RegisterDto.Username));
+        Assert.Contains(result.Errors, error => error.PropertyName == nameof(RegisterDto.Email));
+        Assert.Contains(result.Errors, error => error.PropertyName == nameof(RegisterDto.Password));
+        Assert.Contains(result.Errors, error => error.PropertyName == "Profile.FullName");
+    }
+
     [Fact]
     public void Registration_accepts_only_profile_data_from_the_nested_user_object()
     {
@@ -50,8 +68,12 @@ public class DtoContractTests
                 }
             ]
         };
-        var authentication = new AuthResponseDto("test-only-token", DateTime.UtcNow,
-            new UserDto { Id = Guid.NewGuid(), Username = "student", Email = "student@example.com" });
+        var authentication = new AuthResponseDto
+        {
+            Token = "test-only-token",
+            ExpiresAt = DateTime.UtcNow,
+            UserDto = new UserDto { Id = Guid.NewGuid(), Username = "student", Email = "student@example.com" }
+        };
 
         Assert.DoesNotContain("IsCorrect", JsonSerializer.Serialize(quiz));
         Assert.DoesNotContain("Password", JsonSerializer.Serialize(authentication));
