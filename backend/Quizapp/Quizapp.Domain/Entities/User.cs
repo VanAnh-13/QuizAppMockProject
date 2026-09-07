@@ -21,22 +21,6 @@ public class User
     public DateTime CreateAt { get; init; }
     public DateTime UpdateAt { get; init; }
 
-    public User()
-    {
-    }
-
-    public User(Guid id, string username, string email, string password, UserStatus status, DateTime createAt,
-        DateTime updateAt)
-    {
-        Id = id;
-        Username = username;
-        Email = email;
-        Password = password;
-        Status = status;
-        CreateAt = createAt;
-        UpdateAt = updateAt;
-    }
-
     public ICollection<QuizAttempt> QuizAttempts { get; init; } = new List<QuizAttempt>();
     public ICollection<Role> Roles { get; init; } = new List<Role>();
     public ICollection<UserRole> UserRoles { get; init; } = new List<UserRole>();

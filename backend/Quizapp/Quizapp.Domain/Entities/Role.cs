@@ -7,16 +7,6 @@ public class Role
     public string? Description { get; init; }
     public bool IsActive { get; init; }
 
-    public Role()
-    {
-    }
-
-    public Role(Guid id, string roleName)
-    {
-        Id = id;
-        RoleName = roleName;
-    }
-
     public ICollection<User> Users { get; init; } = new List<User>();
     public ICollection<UserRole> UserRoles { get; init; } = new List<UserRole>();
 }
