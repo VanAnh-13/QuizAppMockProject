@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Quizapp.Application;
 using Quizapp.Application.DTOs.QuizManager.Quizzes;
+using Quizapp.Application.Factories.QuizManager.Questions;
+using Quizapp.Application.Factories.RoleManager;
 using Quizapp.Application.Strategies.QuizManager.Questions;
 using Quizapp.Domain.Enums;
 using Quizapp.Infrastructure;
@@ -13,7 +15,7 @@ namespace Quizapp.Tests.Architecture;
 public class DependencyInjectionTests
 {
     [Fact]
-    public void Question_strategies_are_scoped_and_registration_can_be_repeated()
+    public void Creation_factories_and_strategies_are_scoped_and_registration_can_be_repeated()
     {
         var services = new ServiceCollection().AddApplication().AddApplication();
         using var provider = services.BuildServiceProvider(new ServiceProviderOptions
@@ -23,6 +25,13 @@ public class DependencyInjectionTests
         });
         using var firstScope = provider.CreateScope();
         using var secondScope = provider.CreateScope();
+
+        foreach (var contract in new[] { typeof(IRoleFactory), typeof(IQuestionFactory) })
+        {
+            var first = firstScope.ServiceProvider.GetRequiredService(contract);
+            Assert.Same(first, firstScope.ServiceProvider.GetRequiredService(contract));
+            Assert.NotSame(first, secondScope.ServiceProvider.GetRequiredService(contract));
+        }
 
         var strategies = firstScope.ServiceProvider.GetServices<IQuestionCreationStrategy>().ToArray();
         var registeredTypes = strategies.SelectMany(strategy => strategy.SupportedTypes).ToArray();

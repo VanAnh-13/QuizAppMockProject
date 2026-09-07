@@ -10,7 +10,7 @@ The backend currently provides:
 - DTOs for authentication, user and role management, quiz management, quiz taking, and attempt history.
 - Nested builders in all DTOs, using `new CreateQuizDto.Builder().WithTitle(...).Build()`; see [DTO builder examples](docs/dto-builders.md).
 - FluentValidation validators registered through dependency injection.
-- Question creation strategies; see [answer rules](docs/question-strategies.md).
+- Role and question factories, with creation strategies for all six question types; see [creation patterns](docs/creation-patterns.md).
 - SQL Server entity mappings and EF Core migrations.
 - A development API host with OpenAPI and Swagger UI.
 - xUnit tests for contracts, validation, layer dependencies, dependency injection, database mappings, and persistence.
