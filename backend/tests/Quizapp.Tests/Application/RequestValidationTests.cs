@@ -24,8 +24,8 @@ public class RequestValidationTests
     [InlineData((QuestionType)7, false)]
     public void Questions_accept_only_supported_question_types(QuestionType type, bool valid)
     {
-        Assert.Equal(valid, Validate(new CreateQuestionDto("Question", type, true, QuestionLevel.Easy)).IsValid);
-        Assert.Equal(valid, Validate(new UpdateQuestionDto("Question", type, true, QuestionLevel.Easy)).IsValid);
+        Assert.Equal(valid, Validate(new CreateQuestionDto { Content = "Question", QuestionType = type, IsActive = true, Level = QuestionLevel.Easy }).IsValid);
+        Assert.Equal(valid, Validate(new UpdateQuestionDto { Content = "Question", QuestionType = type, IsActive = true, Level = QuestionLevel.Easy }).IsValid);
     }
 
     [Theory]
@@ -37,8 +37,8 @@ public class RequestValidationTests
     [InlineData(double.PositiveInfinity, false)]
     public void Passed_score_is_an_absolute_finite_non_negative_number(double score, bool valid)
     {
-        Assert.Equal(valid, Validate(new CreateQuizDto("Quiz", null, 15, null, false, score)).IsValid);
-        Assert.Equal(valid, Validate(new UpdateQuizDto("Quiz", null, 15, null, false, score)).IsValid);
+        Assert.Equal(valid, Validate(new CreateQuizDto { Title = "Quiz", Duration = 15, IsActive = false, PassedScore = score }).IsValid);
+        Assert.Equal(valid, Validate(new UpdateQuizDto { Title = "Quiz", Duration = 15, IsActive = false, PassedScore = score }).IsValid);
     }
 
     [Theory]
@@ -49,28 +49,40 @@ public class RequestValidationTests
     [InlineData((QuestionLevel)4, false)]
     public void Questions_require_one_of_the_three_levels(QuestionLevel level, bool valid)
     {
-        Assert.Equal(valid, Validate(new CreateQuestionDto("Question", QuestionType.SingleChoice, true, level)).IsValid);
-        Assert.Equal(valid, Validate(new UpdateQuestionDto("Question", QuestionType.SingleChoice, true, level)).IsValid);
+        Assert.Equal(valid, Validate(new CreateQuestionDto { Content = "Question", QuestionType = QuestionType.SingleChoice, IsActive = true, Level = level }).IsValid);
+        Assert.Equal(valid, Validate(new UpdateQuestionDto { Content = "Question", QuestionType = QuestionType.SingleChoice, IsActive = true, Level = level }).IsValid);
     }
 
     [Fact]
     public void Registration_validates_nested_profile_and_password_confirmation()
     {
-        var request = new RegisterDto("student", "student@example.com", "test-only-password", "different-password",
-            new UserProfileDto
+        var request = new RegisterDto
+        {
+            Username = "student",
+            Email = "student@example.com",
+            Password = "test-only-password",
+            ConfirmPassword = "different-password",
+            Profile = new UserProfileDto
             {
                 FullName = "",
                 DateOfBirth = DateOnly.FromDateTime(DateTime.UtcNow).AddDays(1)
-            });
+            }
+        };
 
         var errors = Validate(request).Errors.Select(error => error.PropertyName).ToArray();
 
         Assert.Contains(nameof(RegisterDto.ConfirmPassword), errors);
         Assert.Contains("Profile.FullName", errors);
         Assert.Contains("Profile.DateOfBirth", errors);
-        Assert.False(Validate(new RegisterDto("student", "student@example.com", "password", "password", null!)).IsValid);
-        Assert.True(Validate(new RegisterDto("student", "student@example.com", "password", "password",
-            new UserProfileDto { FullName = "Student Name", DateOfBirth = new DateOnly(2000, 2, 29) })).IsValid);
+        Assert.False(Validate(new RegisterDto { Username = "student", Email = "student@example.com", Password = "password", ConfirmPassword = "password", Profile = null! }).IsValid);
+        Assert.True(Validate(new RegisterDto
+        {
+            Username = "student",
+            Email = "student@example.com",
+            Password = "password",
+            ConfirmPassword = "password",
+            Profile = new UserProfileDto { FullName = "Student Name", DateOfBirth = new DateOnly(2000, 2, 29) }
+        }).IsValid);
     }
 
     [Fact]
@@ -114,8 +126,8 @@ public class RequestValidationTests
     [Fact]
     public void Incorrect_and_inactive_answer_options_are_valid_management_input()
     {
-        Assert.True(Validate(new CreateAnswerDto("An incorrect option", false, false, Guid.NewGuid())).IsValid);
-        Assert.True(Validate(new UpdateAnswerDto("An incorrect option", false, false)).IsValid);
+        Assert.True(Validate(new CreateAnswerDto { Text = "An incorrect option", IsCorrect = false, IsActive = false, QuestionId = Guid.NewGuid() }).IsValid);
+        Assert.True(Validate(new UpdateAnswerDto { Text = "An incorrect option", IsCorrect = false, IsActive = false }).IsValid);
     }
 
     private static FluentValidation.Results.ValidationResult Validate<T>(T request)

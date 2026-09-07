@@ -1,36 +1,79 @@
-using System.Diagnostics.CodeAnalysis;
-
 namespace Quizapp.Application.DTOs.QuizManager.Quizzes;
 
 public class QuizDto
 {
     public Guid Id { get; set; }
-    public required string Title { get; init; }
-    public string? Description { get; init; }
-    public required int Duration { get; init; }
-    public string? Image { get; init; }
-    public double? PassedScore { get; init; }
+    public string Title { get; set; } = string.Empty;
+    public string? Description { get; set; }
+    public int Duration { get; set; }
+    public string? Image { get; set; }
+    public double? PassedScore { get; set; }
     public bool IsActive { get; set; }
+    public DateTime CreatedAt { get; set; }
+    public DateTime UpdatedAt { get; set; }
 
-    public DateTime CreatedAt { get; init; }
-    public DateTime UpdatedAt { get; init; }
-
-    public QuizDto()
+    public sealed class Builder
     {
-    }
+        private readonly QuizDto _dto = new();
 
-    [SetsRequiredMembers]
-    public QuizDto(Guid id, string title, string? description, int duration, string? image, bool isActive,
-        double? passedScore, DateTime createdAt, DateTime updatedAt)
-    {
-        Id = id;
-        Title = title;
-        Description = description;
-        Duration = duration;
-        Image = image;
-        IsActive = isActive;
-        PassedScore = passedScore;
-        CreatedAt = createdAt;
-        UpdatedAt = updatedAt;
+        public Builder WithId(Guid id)
+        {
+            _dto.Id = id;
+            return this;
+        }
+
+        public Builder WithTitle(string title)
+        {
+            ArgumentNullException.ThrowIfNull(title);
+            _dto.Title = title;
+            return this;
+        }
+
+        public Builder WithDescription(string? description)
+        {
+            _dto.Description = description;
+            return this;
+        }
+
+        public Builder WithDuration(int duration)
+        {
+            _dto.Duration = duration;
+            return this;
+        }
+
+        public Builder WithImage(string? image)
+        {
+            _dto.Image = image;
+            return this;
+        }
+
+        public Builder WithPassedScore(double? passedScore)
+        {
+            _dto.PassedScore = passedScore;
+            return this;
+        }
+
+        public Builder WithIsActive(bool isActive)
+        {
+            _dto.IsActive = isActive;
+            return this;
+        }
+
+        public Builder WithCreatedAt(DateTime createdAt)
+        {
+            _dto.CreatedAt = createdAt;
+            return this;
+        }
+
+        public Builder WithUpdatedAt(DateTime updatedAt)
+        {
+            _dto.UpdatedAt = updatedAt;
+            return this;
+        }
+
+        public QuizDto Build()
+        {
+            return (QuizDto)_dto.MemberwiseClone();
+        }
     }
 }

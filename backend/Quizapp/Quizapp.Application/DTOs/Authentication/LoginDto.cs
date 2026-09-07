@@ -1,20 +1,31 @@
-using System.Diagnostics.CodeAnalysis;
-
 namespace Quizapp.Application.DTOs.Authentication;
 
 public class LoginDto
 {
-    public required string Username { get; init; }
-    public required string Password { get; init; }
+    public string Username { get; set; } = string.Empty;
+    public string Password { get; set; } = string.Empty;
 
-    public LoginDto()
+    public sealed class Builder
     {
-    }
+        private readonly LoginDto _dto = new();
 
-    [SetsRequiredMembers]
-    public LoginDto(string username, string password)
-    {
-        Username = username;
-        Password = password;
+        public Builder WithUsername(string username)
+        {
+            ArgumentNullException.ThrowIfNull(username);
+            _dto.Username = username;
+            return this;
+        }
+
+        public Builder WithPassword(string password)
+        {
+            ArgumentNullException.ThrowIfNull(password);
+            _dto.Password = password;
+            return this;
+        }
+
+        public LoginDto Build()
+        {
+            return (LoginDto)_dto.MemberwiseClone();
+        }
     }
 }
