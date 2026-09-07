@@ -15,18 +15,21 @@ public class AddQuestionToQuizDto
         public Builder WithQuizId(Guid quizId)
         {
             _dto.QuizId = quizId;
+
             return this;
         }
 
         public Builder WithQuestionId(Guid questionId)
         {
             _dto.QuestionId = questionId;
+
             return this;
         }
 
         public Builder WithOrder(int order)
         {
             _dto.Order = order;
+
             return this;
         }
 

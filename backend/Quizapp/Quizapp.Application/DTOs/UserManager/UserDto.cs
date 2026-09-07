@@ -23,6 +23,7 @@ public sealed class UserDto
         public Builder WithId(Guid id)
         {
             _dto.Id = id;
+
             return this;
         }
 
@@ -30,6 +31,7 @@ public sealed class UserDto
         {
             ArgumentNullException.ThrowIfNull(username);
             _dto.Username = username;
+
             return this;
         }
 
@@ -37,48 +39,56 @@ public sealed class UserDto
         {
             ArgumentNullException.ThrowIfNull(email);
             _dto.Email = email;
+
             return this;
         }
 
         public Builder WithFullName(string? fullName)
         {
             _dto.FullName = fullName;
+
             return this;
         }
 
         public Builder WithPhoneNumber(string? phoneNumber)
         {
             _dto.PhoneNumber = phoneNumber;
+
             return this;
         }
 
         public Builder WithDateOfBirth(DateOnly? dateOfBirth)
         {
             _dto.DateOfBirth = dateOfBirth;
+
             return this;
         }
 
         public Builder WithAvatar(string? avatar)
         {
             _dto.Avatar = avatar;
+
             return this;
         }
 
         public Builder WithIsActive(bool isActive)
         {
             _dto.IsActive = isActive;
+
             return this;
         }
 
         public Builder WithCreatedAt(DateTime createdAt)
         {
             _dto.CreatedAt = createdAt;
+
             return this;
         }
 
         public Builder WithUpdatedAt(DateTime updatedAt)
         {
             _dto.UpdatedAt = updatedAt;
+
             return this;
         }
 
@@ -86,6 +96,7 @@ public sealed class UserDto
         {
             ArgumentNullException.ThrowIfNull(roles);
             _dto.Roles = [.. roles];
+
             return this;
         }
 
@@ -93,6 +104,7 @@ public sealed class UserDto
         {
             var result = (UserDto)_dto.MemberwiseClone();
             result.Roles = [.. _dto.Roles];
+
             return result;
         }
     }

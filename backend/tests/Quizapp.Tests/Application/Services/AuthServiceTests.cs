@@ -18,6 +18,7 @@ public class AuthServiceTests
             Username = "student", Email = "student@example.com", Password = "test-password-123",
             ConfirmPassword = "test-password-123", Profile = new UserProfileDto { FullName = "Student" }
         });
+
         var login = await service.LoginAsync(new LoginDto { Username = "student", Password = "test-password-123" });
 
         Assert.Equal(user.Id, login.UserDto.Id);

@@ -15,6 +15,7 @@ public sealed class UpdateUserDto
         {
             ArgumentNullException.ThrowIfNull(username);
             _dto.Username = username;
+
             return this;
         }
 
@@ -22,6 +23,7 @@ public sealed class UpdateUserDto
         {
             ArgumentNullException.ThrowIfNull(email);
             _dto.Email = email;
+
             return this;
         }
 
@@ -29,12 +31,14 @@ public sealed class UpdateUserDto
         {
             ArgumentNullException.ThrowIfNull(profile);
             _dto.Profile = profile;
+
             return this;
         }
 
         public Builder WithIsActive(bool isActive)
         {
             _dto.IsActive = isActive;
+
             return this;
         }
 

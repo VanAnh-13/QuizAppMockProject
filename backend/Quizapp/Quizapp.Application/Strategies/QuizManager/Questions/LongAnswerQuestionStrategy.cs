@@ -10,6 +10,7 @@ public sealed class LongAnswerQuestionStrategy : IQuestionCreationStrategy
     public void ValidateAnswers(IReadOnlyCollection<CreateQuestionAnswerDto> activeAnswers)
     {
         ArgumentNullException.ThrowIfNull(activeAnswers);
+
         QuestionAnswerRules.Require(activeAnswers.All(answer => answer.IsCorrect),
             "Any active reference answers for long-answer questions must be marked as correct.");
     }

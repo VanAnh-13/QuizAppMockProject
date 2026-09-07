@@ -12,7 +12,8 @@ public class ProfileAndQuizFieldsPersistenceTests(SqlServerFixture fixture) : IC
         var user = new User
         {
             Id = Guid.NewGuid(),
-            Username = Guid.NewGuid().ToString("N"),
+            Username = Guid.NewGuid()
+                .ToString("N"),
             Email = $"{Guid.NewGuid():N}@example.com",
             Password = "test-only-hash",
             FullName = "Nguyễn Văn An",
@@ -21,7 +22,9 @@ public class ProfileAndQuizFieldsPersistenceTests(SqlServerFixture fixture) : IC
             Avatar = "/images/avatar.png",
             IsActive = true
         };
+
         var quiz = new Quiz { Id = Guid.NewGuid(), Title = "Quiz", Duration = 15, PassedScore = 120.5 };
+
         var question = new Question
         {
             Id = Guid.NewGuid(),
@@ -44,12 +47,19 @@ public class ProfileAndQuizFieldsPersistenceTests(SqlServerFixture fixture) : IC
         Assert.True(savedUser.IsActive);
         Assert.Equal(UserStatus.Active, savedUser.Status);
         Assert.True(await context.Users.AnyAsync(value => value.Id == user.Id && value.IsActive));
-        Assert.Equal(quiz.PassedScore, await context.Quizzes.Where(value => value.Id == quiz.Id).Select(value => value.PassedScore).SingleAsync());
+
+        Assert.Equal(quiz.PassedScore, await context.Quizzes.Where(value => value.Id == quiz.Id)
+            .Select(value => value.PassedScore)
+            .SingleAsync());
+
         var savedQuestion = await context.Questions.SingleAsync(value => value.Id == question.Id);
         Assert.Equal(question.Level, savedQuestion.Level);
         Assert.Equal(question.Image, savedQuestion.Image);
 
-        context.Entry(savedUser).Property(value => value.Status).CurrentValue = UserStatus.Deactivated;
+        context.Entry(savedUser)
+            .Property(value => value.Status)
+            .CurrentValue = UserStatus.Deactivated;
+
         await context.SaveChangesAsync();
         context.ChangeTracker.Clear();
         Assert.False((await context.Users.SingleAsync(value => value.Id == user.Id)).IsActive);
@@ -73,6 +83,7 @@ public class ProfileAndQuizFieldsPersistenceTests(SqlServerFixture fixture) : IC
                 QuestionType = QuestionType.SingleChoice,
                 Level = (QuestionLevel)4
             });
+
             await Assert.ThrowsAsync<DbUpdateException>(() => context.SaveChangesAsync());
         }
     }

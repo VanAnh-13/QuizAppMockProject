@@ -14,6 +14,7 @@ public sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logge
         {
             logger.LogWarning(
                 "The response has already started; the global exception handler will not be executed.");
+
             return false;
         }
 
@@ -23,7 +24,8 @@ public sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logge
             logger.LogError(exception, "Unhandled exception: {Message}", exception.Message);
         else
             logger.LogWarning(exception, "Domain exception ({Type}): {Message}",
-                exception.GetType().Name, exception.Message);
+                exception.GetType()
+                    .Name, exception.Message);
 
         httpContext.Response.StatusCode = statusCode;
 

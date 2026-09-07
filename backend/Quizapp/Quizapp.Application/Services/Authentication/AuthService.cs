@@ -24,9 +24,12 @@ public sealed class AuthService(
     {
         ArgumentNullException.ThrowIfNull(request);
         await registerValidator.ValidateAndThrowAsync(request, cancellationToken);
+
         var user = await provisioning.CreateAsync(request.Username, request.Email, request.Password,
             request.Profile, true, cancellationToken);
+
         await unitOfWork.SaveChangesAsync(cancellationToken);
+
         return DtoMapping.ToDto(user);
     }
 
@@ -35,11 +38,15 @@ public sealed class AuthService(
         ArgumentNullException.ThrowIfNull(request);
         await loginValidator.ValidateAndThrowAsync(request, cancellationToken);
         var user = await users.GetByUsernameAsync(request.Username.Trim(), cancellationToken);
+
         if (user is null || !user.IsActive || !passwords.Verify(user.Password, request.Password))
             throw new AuthenticationException("Invalid username or password.");
+
         cancellationToken.ThrowIfCancellationRequested();
         var token = tokens.Create(user);
-        return new AuthResponseDto { Token = token.Value, ExpiresAt = token.ExpiresAt, UserDto = DtoMapping.ToDto(user) };
+
+        return new AuthResponseDto
+            { Token = token.Value, ExpiresAt = token.ExpiresAt, UserDto = DtoMapping.ToDto(user) };
     }
 
     public async Task ChangePasswordAsync(ChangePasswordDto request, CancellationToken cancellationToken = default)
@@ -47,11 +54,16 @@ public sealed class AuthService(
         var user = await authorization.RequireUserAsync(cancellationToken);
         ArgumentNullException.ThrowIfNull(request);
         await passwordValidator.ValidateAndThrowAsync(request, cancellationToken);
+
         if (!passwords.Verify(user.Password, request.CurrentPassword))
             throw new AuthenticationException("The current password is incorrect.");
+
         user.Password = passwords.Hash(request.NewPassword);
         user.SecurityStamp = Guid.NewGuid();
-        user.UpdateAt = clock.GetUtcNow().UtcDateTime;
+
+        user.UpdateAt = clock.GetUtcNow()
+            .UtcDateTime;
+
         await unitOfWork.SaveChangesAsync(cancellationToken);
     }
 }

@@ -12,6 +12,7 @@ public sealed class UpdateUserRolesDto
         {
             ArgumentNullException.ThrowIfNull(roleIds);
             _dto.RoleIds = [.. roleIds];
+
             return this;
         }
 
@@ -19,6 +20,7 @@ public sealed class UpdateUserRolesDto
         {
             var result = (UpdateUserRolesDto)_dto.MemberwiseClone();
             result.RoleIds = [.. _dto.RoleIds];
+
             return result;
         }
     }

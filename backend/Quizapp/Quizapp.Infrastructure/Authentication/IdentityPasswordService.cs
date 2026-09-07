@@ -14,13 +14,13 @@ public sealed class IdentityPasswordService : IPasswordService
     {
         if (string.IsNullOrEmpty(hash) || string.IsNullOrEmpty(password))
             return false;
+
         try
         {
             return _hasher.VerifyHashedPassword(_subject, hash, password) != PasswordVerificationResult.Failed;
         }
         catch (FormatException)
         {
-            // Legacy plaintext or malformed stored values are not valid password hashes.
             return false;
         }
     }

@@ -8,7 +8,11 @@ public sealed class UpdateRoleDtoValidator : AbstractValidator<UpdateRoleDto>
 {
     public UpdateRoleDtoValidator()
     {
-        RuleFor(dto => dto.RoleName).NotEmpty().MaximumLength(FieldLimits.NameLength);
-        RuleFor(dto => dto.Description).MaximumLength(FieldLimits.ContentLength);
+        RuleFor(dto => dto.RoleName)
+            .NotEmpty()
+            .MaximumLength(FieldLimits.NameLength);
+
+        RuleFor(dto => dto.Description)
+            .MaximumLength(FieldLimits.ContentLength);
     }
 }

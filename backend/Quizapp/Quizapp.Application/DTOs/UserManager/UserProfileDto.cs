@@ -15,24 +15,28 @@ public sealed class UserProfileDto
         {
             ArgumentNullException.ThrowIfNull(fullName);
             _dto.FullName = fullName;
+
             return this;
         }
 
         public Builder WithPhoneNumber(string? phoneNumber)
         {
             _dto.PhoneNumber = phoneNumber;
+
             return this;
         }
 
         public Builder WithDateOfBirth(DateOnly? dateOfBirth)
         {
             _dto.DateOfBirth = dateOfBirth;
+
             return this;
         }
 
         public Builder WithAvatar(string? avatar)
         {
             _dto.Avatar = avatar;
+
             return this;
         }
 

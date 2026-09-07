@@ -11,12 +11,14 @@ public class QuizAttemptDetailDto : QuizAttemptDto
         public Builder WithId(Guid id)
         {
             _dto.Id = id;
+
             return this;
         }
 
         public Builder WithQuizId(Guid quizId)
         {
             _dto.QuizId = quizId;
+
             return this;
         }
 
@@ -24,18 +26,21 @@ public class QuizAttemptDetailDto : QuizAttemptDto
         {
             ArgumentNullException.ThrowIfNull(quizTitle);
             _dto.QuizTitle = quizTitle;
+
             return this;
         }
 
         public Builder WithSubmittedAt(DateTime submittedAt)
         {
             _dto.SubmittedAt = submittedAt;
+
             return this;
         }
 
         public Builder WithScore(double score)
         {
             _dto.Score = score;
+
             return this;
         }
 
@@ -43,6 +48,7 @@ public class QuizAttemptDetailDto : QuizAttemptDto
         {
             ArgumentNullException.ThrowIfNull(answers);
             _dto.Answers = [.. answers];
+
             return this;
         }
 
@@ -50,6 +56,7 @@ public class QuizAttemptDetailDto : QuizAttemptDto
         {
             var result = (QuizAttemptDetailDto)_dto.MemberwiseClone();
             result.Answers = [.. _dto.Answers];
+
             return result;
         }
     }

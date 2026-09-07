@@ -8,7 +8,6 @@ public class QuizQuestion
     public required Guid QuizId { get; init; }
     public required Guid QuestionId { get; init; }
     public int Order { get; init; } = FirstOrder;
-
     public Quiz QuizNavigation { get; init; } = null!;
     public Question QuestionNavigation { get; init; } = null!;
 }

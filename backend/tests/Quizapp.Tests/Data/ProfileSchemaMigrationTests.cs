@@ -20,6 +20,7 @@ public class ProfileSchemaMigrationTests(SqlServerFixture fixture) : IClassFixtu
         var question = TestEntities.Question();
         var now = DateTime.UtcNow;
         const int activeStatus = (int)UserStatus.Active;
+
         await context.Database.ExecuteSqlInterpolatedAsync($"""
             INSERT INTO [Users] ([Id], [Username], [Email], [Password], [Status], [CreateAt], [UpdateAt])
             VALUES ({user.Id}, {user.Username}, {user.Email}, {user.Password}, {activeStatus}, {now}, {now});

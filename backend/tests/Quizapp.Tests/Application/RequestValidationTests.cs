@@ -24,8 +24,13 @@ public class RequestValidationTests
     [InlineData((QuestionType)7, false)]
     public void Questions_accept_only_supported_question_types(QuestionType type, bool valid)
     {
-        Assert.Equal(valid, Validate(new CreateQuestionDto { Content = "Question", QuestionType = type, IsActive = true, Level = QuestionLevel.Easy }).IsValid);
-        Assert.Equal(valid, Validate(new UpdateQuestionDto { Content = "Question", QuestionType = type, IsActive = true, Level = QuestionLevel.Easy }).IsValid);
+        Assert.Equal(valid, Validate(new CreateQuestionDto
+                { Content = "Question", QuestionType = type, IsActive = true, Level = QuestionLevel.Easy })
+            .IsValid);
+
+        Assert.Equal(valid, Validate(new UpdateQuestionDto
+                { Content = "Question", QuestionType = type, IsActive = true, Level = QuestionLevel.Easy })
+            .IsValid);
     }
 
     [Theory]
@@ -37,8 +42,13 @@ public class RequestValidationTests
     [InlineData(double.PositiveInfinity, false)]
     public void Passed_score_is_an_absolute_finite_non_negative_number(double score, bool valid)
     {
-        Assert.Equal(valid, Validate(new CreateQuizDto { Title = "Quiz", Duration = 15, IsActive = false, PassedScore = score }).IsValid);
-        Assert.Equal(valid, Validate(new UpdateQuizDto { Title = "Quiz", Duration = 15, IsActive = false, PassedScore = score }).IsValid);
+        Assert.Equal(valid, Validate(new CreateQuizDto
+                { Title = "Quiz", Duration = 15, IsActive = false, PassedScore = score })
+            .IsValid);
+
+        Assert.Equal(valid, Validate(new UpdateQuizDto
+                { Title = "Quiz", Duration = 15, IsActive = false, PassedScore = score })
+            .IsValid);
     }
 
     [Theory]
@@ -49,8 +59,13 @@ public class RequestValidationTests
     [InlineData((QuestionLevel)4, false)]
     public void Questions_require_one_of_the_three_levels(QuestionLevel level, bool valid)
     {
-        Assert.Equal(valid, Validate(new CreateQuestionDto { Content = "Question", QuestionType = QuestionType.SingleChoice, IsActive = true, Level = level }).IsValid);
-        Assert.Equal(valid, Validate(new UpdateQuestionDto { Content = "Question", QuestionType = QuestionType.SingleChoice, IsActive = true, Level = level }).IsValid);
+        Assert.Equal(valid, Validate(new CreateQuestionDto
+                { Content = "Question", QuestionType = QuestionType.SingleChoice, IsActive = true, Level = level })
+            .IsValid);
+
+        Assert.Equal(valid, Validate(new UpdateQuestionDto
+                { Content = "Question", QuestionType = QuestionType.SingleChoice, IsActive = true, Level = level })
+            .IsValid);
     }
 
     [Fact]
@@ -65,24 +80,35 @@ public class RequestValidationTests
             Profile = new UserProfileDto
             {
                 FullName = "",
-                DateOfBirth = DateOnly.FromDateTime(DateTime.UtcNow).AddDays(1)
+                DateOfBirth = DateOnly.FromDateTime(DateTime.UtcNow)
+                    .AddDays(1)
             }
         };
 
-        var errors = Validate(request).Errors.Select(error => error.PropertyName).ToArray();
+        var errors = Validate(request)
+            .Errors.Select(error => error.PropertyName)
+            .ToArray();
 
         Assert.Contains(nameof(RegisterDto.ConfirmPassword), errors);
         Assert.Contains("Profile.FullName", errors);
         Assert.Contains("Profile.DateOfBirth", errors);
-        Assert.False(Validate(new RegisterDto { Username = "student", Email = "student@example.com", Password = "password", ConfirmPassword = "password", Profile = null! }).IsValid);
+
+        Assert.False(Validate(new RegisterDto
+            {
+                Username = "student", Email = "student@example.com", Password = "password",
+                ConfirmPassword = "password", Profile = null!
+            })
+            .IsValid);
+
         Assert.True(Validate(new RegisterDto
-        {
-            Username = "student",
-            Email = "student@example.com",
-            Password = "password",
-            ConfirmPassword = "password",
-            Profile = new UserProfileDto { FullName = "Student Name", DateOfBirth = new DateOnly(2000, 2, 29) }
-        }).IsValid);
+            {
+                Username = "student",
+                Email = "student@example.com",
+                Password = "password",
+                ConfirmPassword = "password",
+                Profile = new UserProfileDto { FullName = "Student Name", DateOfBirth = new DateOnly(2000, 2, 29) }
+            })
+            .IsValid);
     }
 
     [Fact]
@@ -91,14 +117,30 @@ public class RequestValidationTests
         var questionId = Guid.NewGuid();
         var optionId = Guid.NewGuid();
 
-        Assert.True(Validate(new SubmitAnswerDto { QuestionId = questionId, AnswerIds = [optionId, Guid.NewGuid()] }).IsValid);
-        Assert.True(Validate(new SubmitAnswerDto { QuestionId = questionId, ResponseText = "An explanation" }).IsValid);
-        Assert.True(Validate(new SubmitQuizDto()).IsValid);
-        Assert.False(Validate(new SubmitAnswerDto { QuestionId = questionId }).IsValid);
-        Assert.False(Validate(new SubmitAnswerDto { QuestionId = questionId, ResponseText = "  " }).IsValid);
-        Assert.False(Validate(new SubmitAnswerDto { QuestionId = questionId, AnswerIds = [optionId, optionId] }).IsValid);
-        Assert.False(Validate(new SubmitAnswerDto { QuestionId = questionId, AnswerIds = [optionId], ResponseText = "text" }).IsValid);
-        Assert.False(Validate(new SubmitAnswerDto { QuestionId = questionId, AnswerIds = null! }).IsValid);
+        Assert.True(Validate(new SubmitAnswerDto { QuestionId = questionId, AnswerIds = [optionId, Guid.NewGuid()] })
+            .IsValid);
+
+        Assert.True(Validate(new SubmitAnswerDto { QuestionId = questionId, ResponseText = "An explanation" })
+            .IsValid);
+
+        Assert.True(Validate(new SubmitQuizDto())
+            .IsValid);
+
+        Assert.False(Validate(new SubmitAnswerDto { QuestionId = questionId })
+            .IsValid);
+
+        Assert.False(Validate(new SubmitAnswerDto { QuestionId = questionId, ResponseText = "  " })
+            .IsValid);
+
+        Assert.False(Validate(new SubmitAnswerDto { QuestionId = questionId, AnswerIds = [optionId, optionId] })
+            .IsValid);
+
+        Assert.False(Validate(new SubmitAnswerDto
+                { QuestionId = questionId, AnswerIds = [optionId], ResponseText = "text" })
+            .IsValid);
+
+        Assert.False(Validate(new SubmitAnswerDto { QuestionId = questionId, AnswerIds = null! })
+            .IsValid);
     }
 
     [Fact]
@@ -106,9 +148,14 @@ public class RequestValidationTests
     {
         var answer = new SubmitAnswerDto { QuestionId = Guid.NewGuid(), AnswerIds = [Guid.NewGuid()] };
 
-        Assert.False(Validate(new SubmitQuizDto { Answers = [answer, answer] }).IsValid);
-        Assert.False(Validate(new SubmitQuizDto { Answers = [null!] }).IsValid);
-        Assert.False(Validate(new SubmitQuizDto { Answers = null! }).IsValid);
+        Assert.False(Validate(new SubmitQuizDto { Answers = [answer, answer] })
+            .IsValid);
+
+        Assert.False(Validate(new SubmitQuizDto { Answers = [null!] })
+            .IsValid);
+
+        Assert.False(Validate(new SubmitQuizDto { Answers = null! })
+            .IsValid);
     }
 
     [Fact]
@@ -116,24 +163,41 @@ public class RequestValidationTests
     {
         var roleId = Guid.NewGuid();
 
-        Assert.True(Validate(new UpdateUserRolesDto()).IsValid);
-        Assert.True(Validate(new UpdateUserRolesDto { RoleIds = [roleId, Guid.NewGuid()] }).IsValid);
-        Assert.False(Validate(new UpdateUserRolesDto { RoleIds = [roleId, roleId] }).IsValid);
-        Assert.False(Validate(new UpdateUserRolesDto { RoleIds = [Guid.Empty] }).IsValid);
-        Assert.False(Validate(new UpdateUserRolesDto { RoleIds = null! }).IsValid);
+        Assert.True(Validate(new UpdateUserRolesDto())
+            .IsValid);
+
+        Assert.True(Validate(new UpdateUserRolesDto { RoleIds = [roleId, Guid.NewGuid()] })
+            .IsValid);
+
+        Assert.False(Validate(new UpdateUserRolesDto { RoleIds = [roleId, roleId] })
+            .IsValid);
+
+        Assert.False(Validate(new UpdateUserRolesDto { RoleIds = [Guid.Empty] })
+            .IsValid);
+
+        Assert.False(Validate(new UpdateUserRolesDto { RoleIds = null! })
+            .IsValid);
     }
 
     [Fact]
     public void Incorrect_and_inactive_answer_options_are_valid_management_input()
     {
-        Assert.True(Validate(new CreateAnswerDto { Text = "An incorrect option", IsCorrect = false, IsActive = false, QuestionId = Guid.NewGuid() }).IsValid);
-        Assert.True(Validate(new UpdateAnswerDto { Text = "An incorrect option", IsCorrect = false, IsActive = false }).IsValid);
+        Assert.True(Validate(new CreateAnswerDto
+                { Text = "An incorrect option", IsCorrect = false, IsActive = false, QuestionId = Guid.NewGuid() })
+            .IsValid);
+
+        Assert.True(Validate(new UpdateAnswerDto { Text = "An incorrect option", IsCorrect = false, IsActive = false })
+            .IsValid);
     }
 
     private static FluentValidation.Results.ValidationResult Validate<T>(T request)
     {
-        using var provider = new ServiceCollection().AddApplication().BuildServiceProvider();
+        using var provider = new ServiceCollection().AddApplication()
+            .BuildServiceProvider();
+
         using var scope = provider.CreateScope();
-        return scope.ServiceProvider.GetRequiredService<IValidator<T>>().Validate(request);
+
+        return scope.ServiceProvider.GetRequiredService<IValidator<T>>()
+            .Validate(request);
     }
 }

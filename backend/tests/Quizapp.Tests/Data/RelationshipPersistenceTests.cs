@@ -30,9 +30,13 @@ public class RelationshipPersistenceTests(SqlServerFixture database) : IClassFix
         context.ChangeTracker.Clear();
 
         Assert.True(await context.Questions.AnyAsync(value => value.Id == question.Id));
-        Assert.Empty(await context.QuizQuestions.Where(value => value.QuizId == firstQuiz.Id).ToListAsync());
+
+        Assert.Empty(await context.QuizQuestions.Where(value => value.QuizId == firstQuiz.Id)
+            .ToListAsync());
+
         Assert.Equal(question.Id, (await context.Quizzes.Include(value => value.Questions)
-            .SingleAsync(value => value.Id == secondQuiz.Id)).Questions.Single().Id);
+                .SingleAsync(value => value.Id == secondQuiz.Id)).Questions.Single()
+            .Id);
     }
 
     [SqlServerFact]
@@ -62,7 +66,8 @@ public class RelationshipPersistenceTests(SqlServerFixture database) : IClassFix
         await context.SaveChangesAsync();
         context.ChangeTracker.Clear();
 
-        await context.Quizzes.Where(value => value.Id == quiz.Id).ExecuteDeleteAsync();
+        await context.Quizzes.Where(value => value.Id == quiz.Id)
+            .ExecuteDeleteAsync();
 
         Assert.True(await context.Questions.AnyAsync(value => value.Id == question.Id));
         Assert.True(await context.Answers.AnyAsync(value => value.Id == answer.Id));
@@ -80,7 +85,8 @@ public class RelationshipPersistenceTests(SqlServerFixture database) : IClassFix
         context.AddRange(quiz, answer);
         await context.SaveChangesAsync();
 
-        await context.Questions.Where(value => value.Id == question.Id).ExecuteDeleteAsync();
+        await context.Questions.Where(value => value.Id == question.Id)
+            .ExecuteDeleteAsync();
 
         Assert.True(await context.Quizzes.AnyAsync(value => value.Id == quiz.Id));
         Assert.False(await context.Answers.AnyAsync(value => value.Id == answer.Id));
@@ -99,11 +105,17 @@ public class RelationshipPersistenceTests(SqlServerFixture database) : IClassFix
         context.Add(user);
         await context.SaveChangesAsync();
 
-        await context.Roles.Where(value => value.Id == firstRole.Id).ExecuteDeleteAsync();
+        await context.Roles.Where(value => value.Id == firstRole.Id)
+            .ExecuteDeleteAsync();
+
         context.ChangeTracker.Clear();
 
-        var reloadedUser = await context.Users.Include(value => value.Roles).SingleAsync(value => value.Id == user.Id);
-        Assert.Equal(secondRole.Id, Assert.Single(reloadedUser.Roles).Id);
+        var reloadedUser = await context.Users.Include(value => value.Roles)
+            .SingleAsync(value => value.Id == user.Id);
+
+        Assert.Equal(secondRole.Id, Assert.Single(reloadedUser.Roles)
+            .Id);
+
         Assert.False(await context.UserRoles.AnyAsync(value => value.RoleId == firstRole.Id));
     }
 
@@ -134,7 +146,9 @@ public class RelationshipPersistenceTests(SqlServerFixture database) : IClassFix
             nameof(Answer) => answer,
             _ => throw new ArgumentOutOfRangeException(nameof(principalType))
         };
-        context.Entry(principal).State = EntityState.Deleted;
+
+        context.Entry(principal)
+            .State = EntityState.Deleted;
 
         await AssertRejectedAsync(() => context.SaveChangesAsync(), ConstraintViolation);
         Assert.True(await context.QuizAttempts.AnyAsync(value => value.Id == attempt.Id));
@@ -150,9 +164,11 @@ public class RelationshipPersistenceTests(SqlServerFixture database) : IClassFix
         var secondAnswer = TestEntities.Answer(question);
         var attempt = TestEntities.Attempt(TestEntities.Quiz(), TestEntities.User());
         attempt.QuizNavigation.Questions.Add(question);
+
         context.AddRange(firstAnswer, secondAnswer,
             TestEntities.Selection(attempt, question, firstAnswer),
             TestEntities.Selection(attempt, question, secondAnswer));
+
         await context.SaveChangesAsync();
         Assert.Equal(2, await context.UserAnswers.CountAsync(value => value.QuizAttemptId == attempt.Id));
 
@@ -172,6 +188,7 @@ public class RelationshipPersistenceTests(SqlServerFixture database) : IClassFix
         context.AddRange(attempt, unrelatedAnswer);
         await context.SaveChangesAsync();
         context.ChangeTracker.Clear();
+
         context.UserAnswers.Add(new UserAnswer
         {
             QuizAttemptId = attempt.Id,

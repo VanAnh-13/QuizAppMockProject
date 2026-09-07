@@ -19,7 +19,12 @@ internal static class DtoMapping
         Id = user.Id, Username = user.Username, Email = user.Email,
         FullName = user.FullName, PhoneNumber = user.PhoneNumber, DateOfBirth = user.DateOfBirth,
         Avatar = user.Avatar, IsActive = user.IsActive, CreatedAt = user.CreateAt, UpdatedAt = user.UpdateAt,
-        Roles = user.Roles.OrderBy(role => role.RoleName).ThenBy(role => role.Id).Select(ToDto).ToArray()
+        Roles =
+        [
+            .. user.Roles.OrderBy(role => role.RoleName)
+                .ThenBy(role => role.Id)
+                .Select(ToDto)
+        ]
     };
 
     public static QuizDto ToDto(Quiz quiz) => new()

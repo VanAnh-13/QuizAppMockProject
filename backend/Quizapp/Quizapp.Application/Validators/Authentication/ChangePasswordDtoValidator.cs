@@ -8,9 +8,18 @@ public sealed class ChangePasswordDtoValidator : AbstractValidator<ChangePasswor
 {
     public ChangePasswordDtoValidator()
     {
-        RuleFor(dto => dto.CurrentPassword).NotEmpty().MaximumLength(PasswordLimits.MaximumLength);
-        RuleFor(dto => dto.NewPassword).NotEmpty().MinimumLength(PasswordLimits.MinimumLength)
-            .MaximumLength(PasswordLimits.MaximumLength).NotEqual(dto => dto.CurrentPassword);
-        RuleFor(dto => dto.ConfirmNewPassword).NotEmpty().Equal(dto => dto.NewPassword);
+        RuleFor(dto => dto.CurrentPassword)
+            .NotEmpty()
+            .MaximumLength(PasswordLimits.MaximumLength);
+
+        RuleFor(dto => dto.NewPassword)
+            .NotEmpty()
+            .MinimumLength(PasswordLimits.MinimumLength)
+            .MaximumLength(PasswordLimits.MaximumLength)
+            .NotEqual(dto => dto.CurrentPassword);
+
+        RuleFor(dto => dto.ConfirmNewPassword)
+            .NotEmpty()
+            .Equal(dto => dto.NewPassword);
     }
 }

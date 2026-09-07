@@ -30,16 +30,22 @@ public class QuestionStrategyTests
     public void Registered_strategy_enforces_answer_rules_without_a_factory(
         QuestionType type, int answerCount, int correctCount, bool valid)
     {
-        using var provider = new ServiceCollection().AddApplication().BuildServiceProvider();
+        using var provider = new ServiceCollection().AddApplication()
+            .BuildServiceProvider();
+
         using var scope = provider.CreateScope();
+
         var strategy = Assert.Single(scope.ServiceProvider.GetServices<IQuestionCreationStrategy>(),
             candidate => candidate.SupportedTypes.Contains(type));
-        var answers = Enumerable.Range(0, answerCount).Select(index =>
-            new CreateQuestionAnswerDto
-            {
-                Text = $"Option {index}",
-                IsCorrect = index < correctCount
-            }).ToArray();
+
+        var answers = Enumerable.Range(0, answerCount)
+            .Select(index =>
+                new CreateQuestionAnswerDto
+                {
+                    Text = $"Option {index}",
+                    IsCorrect = index < correctCount
+                })
+            .ToArray();
 
         if (valid)
         {

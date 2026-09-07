@@ -12,6 +12,7 @@ public sealed class AnswerOptionDto
         public Builder WithId(Guid id)
         {
             _dto.Id = id;
+
             return this;
         }
 
@@ -19,6 +20,7 @@ public sealed class AnswerOptionDto
         {
             ArgumentNullException.ThrowIfNull(text);
             _dto.Text = text;
+
             return this;
         }
 

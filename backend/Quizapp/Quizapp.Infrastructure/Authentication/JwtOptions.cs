@@ -14,13 +14,15 @@ public sealed class JwtOptions
     public string Issuer { get; set; } = string.Empty;
     public string Audience { get; set; } = string.Empty;
     public string SigningKey { get; set; } = string.Empty;
-    public int LifetimeMinutes { get; set; } = DefaultLifetimeMinutes;
+    public int LifetimeMinutes { get; init; } = DefaultLifetimeMinutes;
 
     public void Validate()
     {
         if (string.IsNullOrWhiteSpace(Issuer) || string.IsNullOrWhiteSpace(Audience)
-            || string.IsNullOrWhiteSpace(SigningKey) || Encoding.UTF8.GetByteCount(SigningKey) < MinimumSigningKeyBytes
-            || LifetimeMinutes is < 1 or > MaximumLifetimeMinutes)
-            throw new InvalidOperationException("Configure Jwt issuer, audience, a signing key of at least 32 UTF-8 bytes, and lifetime of 1-1440 minutes.");
+                                              || string.IsNullOrWhiteSpace(SigningKey) ||
+                                              Encoding.UTF8.GetByteCount(SigningKey) < MinimumSigningKeyBytes
+                                              || LifetimeMinutes is < 1 or > MaximumLifetimeMinutes)
+            throw new InvalidOperationException(
+                "Configure Jwt issuer, audience, a signing key of at least 32 UTF-8 bytes, and lifetime of 1-1440 minutes.");
     }
 }

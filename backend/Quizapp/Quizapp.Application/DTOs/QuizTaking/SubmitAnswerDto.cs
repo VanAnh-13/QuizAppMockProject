@@ -13,6 +13,7 @@ public sealed class SubmitAnswerDto
         public Builder WithQuestionId(Guid questionId)
         {
             _dto.QuestionId = questionId;
+
             return this;
         }
 
@@ -20,12 +21,14 @@ public sealed class SubmitAnswerDto
         {
             ArgumentNullException.ThrowIfNull(answerIds);
             _dto.AnswerIds = [.. answerIds];
+
             return this;
         }
 
         public Builder WithResponseText(string? responseText)
         {
             _dto.ResponseText = responseText;
+
             return this;
         }
 
@@ -33,6 +36,7 @@ public sealed class SubmitAnswerDto
         {
             var result = (SubmitAnswerDto)_dto.MemberwiseClone();
             result.AnswerIds = [.. _dto.AnswerIds];
+
             return result;
         }
     }

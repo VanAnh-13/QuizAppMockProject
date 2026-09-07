@@ -17,6 +17,7 @@ public sealed class CreateUserDto
         {
             ArgumentNullException.ThrowIfNull(username);
             _dto.Username = username;
+
             return this;
         }
 
@@ -24,6 +25,7 @@ public sealed class CreateUserDto
         {
             ArgumentNullException.ThrowIfNull(email);
             _dto.Email = email;
+
             return this;
         }
 
@@ -31,6 +33,7 @@ public sealed class CreateUserDto
         {
             ArgumentNullException.ThrowIfNull(password);
             _dto.Password = password;
+
             return this;
         }
 
@@ -38,6 +41,7 @@ public sealed class CreateUserDto
         {
             ArgumentNullException.ThrowIfNull(confirmPassword);
             _dto.ConfirmPassword = confirmPassword;
+
             return this;
         }
 
@@ -45,12 +49,14 @@ public sealed class CreateUserDto
         {
             ArgumentNullException.ThrowIfNull(profile);
             _dto.Profile = profile;
+
             return this;
         }
 
         public Builder WithIsActive(bool isActive)
         {
             _dto.IsActive = isActive;
+
             return this;
         }
 

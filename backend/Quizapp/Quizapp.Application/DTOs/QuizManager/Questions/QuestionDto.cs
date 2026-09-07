@@ -18,6 +18,7 @@ public class QuestionDto
         public Builder WithId(Guid id)
         {
             _dto.Id = id;
+
             return this;
         }
 
@@ -25,30 +26,35 @@ public class QuestionDto
         {
             ArgumentNullException.ThrowIfNull(content);
             _dto.Content = content;
+
             return this;
         }
 
         public Builder WithImage(string? image)
         {
             _dto.Image = image;
+
             return this;
         }
 
         public Builder WithLevel(QuestionLevel? level)
         {
             _dto.Level = level;
+
             return this;
         }
 
         public Builder WithQuestionType(QuestionType questionType)
         {
             _dto.QuestionType = questionType;
+
             return this;
         }
 
         public Builder WithIsActive(bool isActive)
         {
             _dto.IsActive = isActive;
+
             return this;
         }
 

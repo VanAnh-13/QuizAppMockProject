@@ -22,7 +22,8 @@ internal static class TestEntities
     public static User User() => new()
     {
         Id = Guid.NewGuid(),
-        Username = Guid.NewGuid().ToString("N"),
+        Username = Guid.NewGuid()
+            .ToString("N"),
         Email = $"{Guid.NewGuid():N}@example.com",
         Password = "test-only-hash"
     };
@@ -30,7 +31,8 @@ internal static class TestEntities
     public static Role Role() => new()
     {
         Id = Guid.NewGuid(),
-        RoleName = Guid.NewGuid().ToString("N")
+        RoleName = Guid.NewGuid()
+            .ToString("N")
     };
 
     public static Answer Answer(Question question) => new()
@@ -55,13 +57,13 @@ internal static class TestEntities
 
     public static UserAnswer Selection(QuizAttempt attempt, Question question, Answer? answer = null,
         string? responseText = null) => new()
-        {
-            Id = Guid.NewGuid(),
-            QuizAttemptId = attempt.Id,
-            QuizAttemptNavigation = attempt,
-            QuestionId = question.Id,
-            QuestionNavigation = question,
-            AnswerId = answer?.Id,
-            ResponseText = responseText
-        };
+    {
+        Id = Guid.NewGuid(),
+        QuizAttemptId = attempt.Id,
+        QuizAttemptNavigation = attempt,
+        QuestionId = question.Id,
+        QuestionNavigation = question,
+        AnswerId = answer?.Id,
+        ResponseText = responseText
+    };
 }

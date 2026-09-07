@@ -15,6 +15,7 @@ public class RoleServiceTests
         {
             RoleName = "Reviewer", Description = "Reviews questions", IsActive = true
         });
+
         var found = await service.GetByIdAsync(created.Id);
 
         Assert.NotEqual(Guid.Empty, found.Id);

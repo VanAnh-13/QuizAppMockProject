@@ -19,6 +19,7 @@ public class QuizDto
         public Builder WithId(Guid id)
         {
             _dto.Id = id;
+
             return this;
         }
 
@@ -26,48 +27,56 @@ public class QuizDto
         {
             ArgumentNullException.ThrowIfNull(title);
             _dto.Title = title;
+
             return this;
         }
 
         public Builder WithDescription(string? description)
         {
             _dto.Description = description;
+
             return this;
         }
 
         public Builder WithDuration(int duration)
         {
             _dto.Duration = duration;
+
             return this;
         }
 
         public Builder WithImage(string? image)
         {
             _dto.Image = image;
+
             return this;
         }
 
         public Builder WithPassedScore(double? passedScore)
         {
             _dto.PassedScore = passedScore;
+
             return this;
         }
 
         public Builder WithIsActive(bool isActive)
         {
             _dto.IsActive = isActive;
+
             return this;
         }
 
         public Builder WithCreatedAt(DateTime createdAt)
         {
             _dto.CreatedAt = createdAt;
+
             return this;
         }
 
         public Builder WithUpdatedAt(DateTime updatedAt)
         {
             _dto.UpdatedAt = updatedAt;
+
             return this;
         }
 

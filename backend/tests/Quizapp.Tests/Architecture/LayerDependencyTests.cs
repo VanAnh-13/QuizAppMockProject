@@ -13,9 +13,14 @@ public class LayerDependencyTests
         var applicationAssembly = typeof(CreateQuizDto).Assembly;
         var infrastructureAssembly = typeof(QuizAppDbContext).Assembly;
 
-        Assert.Equal("Quizapp.Domain", domainAssembly.GetName().Name);
-        Assert.Equal("Quizapp.Application", applicationAssembly.GetName().Name);
-        Assert.Equal("Quizapp.Infrastructure", infrastructureAssembly.GetName().Name);
+        Assert.Equal("Quizapp.Domain", domainAssembly.GetName()
+            .Name);
+
+        Assert.Equal("Quizapp.Application", applicationAssembly.GetName()
+            .Name);
+
+        Assert.Equal("Quizapp.Infrastructure", infrastructureAssembly.GetName()
+            .Name);
 
         Assert.All(domainAssembly.GetReferencedAssemblies(), reference =>
             Assert.StartsWith("System.", reference.Name!));

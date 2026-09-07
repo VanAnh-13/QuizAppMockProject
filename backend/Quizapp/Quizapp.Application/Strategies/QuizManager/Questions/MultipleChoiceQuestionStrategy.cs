@@ -10,8 +10,10 @@ public sealed class MultipleChoiceQuestionStrategy : IQuestionCreationStrategy
     public void ValidateAnswers(IReadOnlyCollection<CreateQuestionAnswerDto> activeAnswers)
     {
         ArgumentNullException.ThrowIfNull(activeAnswers);
+
         QuestionAnswerRules.Require(activeAnswers.Count >= QuestionAnswerRules.MinimumChoiceCount,
             $"Multiple-choice questions require at least {QuestionAnswerRules.MinimumChoiceCount} active options.");
+
         QuestionAnswerRules.Require(activeAnswers.Any(answer => answer.IsCorrect),
             "Multiple-choice questions require at least one active correct option.");
     }

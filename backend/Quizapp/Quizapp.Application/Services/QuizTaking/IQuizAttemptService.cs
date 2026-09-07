@@ -1,4 +1,4 @@
-﻿using Quizapp.Application.DTOs.Common;
+using Quizapp.Application.DTOs.Common;
 using Quizapp.Application.DTOs.QuizHistory;
 using Quizapp.Application.DTOs.QuizTaking;
 
@@ -11,7 +11,7 @@ public interface IQuizAttemptService
         CancellationToken cancellationToken = default);
 
     Task<QuizAttemptDetailDto> SubmitAsync(
-        Guid attemptId,
+        Guid quizId,
         SubmitQuizDto request,
         CancellationToken cancellationToken = default);
 

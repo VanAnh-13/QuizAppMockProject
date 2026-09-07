@@ -15,12 +15,14 @@ public class QuizAttemptDto
         public Builder WithId(Guid id)
         {
             _dto.Id = id;
+
             return this;
         }
 
         public Builder WithQuizId(Guid quizId)
         {
             _dto.QuizId = quizId;
+
             return this;
         }
 
@@ -28,18 +30,21 @@ public class QuizAttemptDto
         {
             ArgumentNullException.ThrowIfNull(quizTitle);
             _dto.QuizTitle = quizTitle;
+
             return this;
         }
 
         public Builder WithSubmittedAt(DateTime submittedAt)
         {
             _dto.SubmittedAt = submittedAt;
+
             return this;
         }
 
         public Builder WithScore(double score)
         {
             _dto.Score = score;
+
             return this;
         }
 

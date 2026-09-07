@@ -12,12 +12,21 @@ internal sealed class UserConfiguration : IEntityTypeConfiguration<User>
     {
         entry.HasKey(user => user.Id);
 
-        entry.Property(user => user.FullName).HasMaxLength(FieldLimits.FullNameLength);
-        entry.Property(user => user.PhoneNumber).HasMaxLength(FieldLimits.PhoneNumberLength);
-        entry.Property(user => user.DateOfBirth).HasColumnType("date");
-        entry.Property(user => user.Avatar).HasMaxLength(FieldLimits.ImageUrlLength);
-        entry.Property(user => user.IsActive).HasComputedColumnSql(
-            $"CONVERT(bit, CASE WHEN [Status] = {(int)UserStatus.Active} THEN 1 ELSE 0 END)", stored: true);
+        entry.Property(user => user.FullName)
+            .HasMaxLength(FieldLimits.FullNameLength);
+
+        entry.Property(user => user.PhoneNumber)
+            .HasMaxLength(FieldLimits.PhoneNumberLength);
+
+        entry.Property(user => user.DateOfBirth)
+            .HasColumnType("date");
+
+        entry.Property(user => user.Avatar)
+            .HasMaxLength(FieldLimits.ImageUrlLength);
+
+        entry.Property(user => user.IsActive)
+            .HasComputedColumnSql(
+                $"CONVERT(bit, CASE WHEN [Status] = {(int)UserStatus.Active} THEN 1 ELSE 0 END)", stored: true);
 
         entry.Property(user => user.Username)
             .HasMaxLength(FieldLimits.NameLength)

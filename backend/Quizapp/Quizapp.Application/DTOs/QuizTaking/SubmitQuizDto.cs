@@ -12,6 +12,7 @@ public sealed class SubmitQuizDto
         {
             ArgumentNullException.ThrowIfNull(answers);
             _dto.Answers = [.. answers];
+
             return this;
         }
 
@@ -19,6 +20,7 @@ public sealed class SubmitQuizDto
         {
             var result = (SubmitQuizDto)_dto.MemberwiseClone();
             result.Answers = [.. _dto.Answers];
+
             return result;
         }
     }

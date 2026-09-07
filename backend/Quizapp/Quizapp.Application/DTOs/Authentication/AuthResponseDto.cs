@@ -16,12 +16,14 @@ public class AuthResponseDto
         {
             ArgumentNullException.ThrowIfNull(token);
             _dto.Token = token;
+
             return this;
         }
 
         public Builder WithExpiresAt(DateTime expiresAt)
         {
             _dto.ExpiresAt = expiresAt;
+
             return this;
         }
 
@@ -29,6 +31,7 @@ public class AuthResponseDto
         {
             ArgumentNullException.ThrowIfNull(userDto);
             _dto.UserDto = userDto;
+
             return this;
         }
 

@@ -32,15 +32,18 @@ public sealed class SqlServerFixture : IAsyncLifetime
     public SqlServerFixture()
     {
         var configuredConnection = Environment.GetEnvironmentVariable(ConnectionVariable);
+
         if (string.IsNullOrWhiteSpace(configuredConnection))
             return;
 
         // Never create, clear, or delete the database named in the supplied connection string.
         var builder = new SqlConnectionStringBuilder(configuredConnection)
         {
-            InitialCatalog = DatabasePrefix + Guid.NewGuid().ToString("N"),
+            InitialCatalog = DatabasePrefix + Guid.NewGuid()
+                .ToString("N"),
             Pooling = false
         };
+
         _connectionString = builder.ConnectionString;
     }
 
@@ -50,7 +53,8 @@ public sealed class SqlServerFixture : IAsyncLifetime
             throw new InvalidOperationException($"Missing {ConnectionVariable}.");
 
         return new QuizAppDbContext(new DbContextOptionsBuilder<QuizAppDbContext>()
-            .UseSqlServer(_connectionString).Options);
+            .UseSqlServer(_connectionString)
+            .Options);
     }
 
     public async Task InitializeAsync()
@@ -67,7 +71,8 @@ public sealed class SqlServerFixture : IAsyncLifetime
         if (_connectionString is null)
             return;
 
-        if (!new SqlConnectionStringBuilder(_connectionString).InitialCatalog.StartsWith(DatabasePrefix, StringComparison.Ordinal))
+        if (!new SqlConnectionStringBuilder(_connectionString).InitialCatalog.StartsWith(DatabasePrefix,
+                StringComparison.Ordinal))
             throw new InvalidOperationException("Refusing to delete a database outside the test namespace.");
 
         await using var context = CreateContext();

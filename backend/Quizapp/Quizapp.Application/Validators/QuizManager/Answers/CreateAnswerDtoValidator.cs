@@ -8,7 +8,11 @@ public sealed class CreateAnswerDtoValidator : AbstractValidator<CreateAnswerDto
 {
     public CreateAnswerDtoValidator()
     {
-        RuleFor(dto => dto.Text).NotEmpty().MaximumLength(FieldLimits.ContentLength);
-        RuleFor(dto => dto.QuestionId).NotEmpty();
+        RuleFor(dto => dto.Text)
+            .NotEmpty()
+            .MaximumLength(FieldLimits.ContentLength);
+
+        RuleFor(dto => dto.QuestionId)
+            .NotEmpty();
     }
 }

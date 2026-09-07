@@ -10,15 +10,20 @@ public class UserServiceTests
     {
         using var context = new ServiceTestContext();
         var service = context.Get<IUserService>();
+
         var created = await service.CreateAsync(new CreateUserDto
         {
             Username = "learner", Email = "learner@example.com", Password = "test-password-123",
-            ConfirmPassword = "test-password-123", Profile = new UserProfileDto { FullName = "Learner" }, IsActive = true
+            ConfirmPassword = "test-password-123", Profile = new UserProfileDto { FullName = "Learner" },
+            IsActive = true
         });
+
         await service.UpdateAsync(created.Id, new UpdateUserDto
         {
-            Username = "learner", Email = "new@example.com", Profile = new UserProfileDto { FullName = "New name" }, IsActive = true
+            Username = "learner", Email = "new@example.com", Profile = new UserProfileDto { FullName = "New name" },
+            IsActive = true
         });
+
         await service.SetActiveAsync(created.Id, false);
         var result = await service.GetByIdAsync(created.Id);
 

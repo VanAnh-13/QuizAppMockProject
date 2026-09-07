@@ -16,12 +16,16 @@ public class QuizManagementServiceTests
         using var context = new ServiceTestContext();
         var questions = context.Get<IQuestionService>();
         var quizzes = context.Get<IQuizService>();
+
         var question = await questions.CreateAsync(new CreateQuestionDto
         {
             Content = "C# keyword?", Level = QuestionLevel.Easy, QuestionType = QuestionType.SingleChoice,
             IsActive = true, Answers = [new() { Text = "class", IsCorrect = true }, new() { Text = "select" }]
         });
-        var quiz = await quizzes.CreateAsync(new CreateQuizDto { Title = "C# basics", Duration = 15, PassedScore = 1, IsActive = true });
+
+        var quiz = await quizzes.CreateAsync(new CreateQuizDto
+            { Title = "C# basics", Duration = 15, PassedScore = 1, IsActive = true });
+
         var assignment = new AddQuestionToQuizDto { QuizId = quiz.Id, QuestionId = question.Id };
         var first = await quizzes.AddQuestionAsync(assignment);
         await Assert.ThrowsAsync<ConflictException>(() => quizzes.AddQuestionAsync(assignment));

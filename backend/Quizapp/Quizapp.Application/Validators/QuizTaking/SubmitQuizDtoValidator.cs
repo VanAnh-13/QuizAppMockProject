@@ -7,15 +7,21 @@ public sealed class SubmitQuizDtoValidator : AbstractValidator<SubmitQuizDto>
 {
     public SubmitQuizDtoValidator()
     {
-        RuleFor(dto => dto.Answers).NotNull()
+        RuleFor(dto => dto.Answers)
+            .NotNull()
             .Must(HaveDistinctQuestions)
             .WithMessage("Submit each question only once.");
-        RuleForEach(dto => dto.Answers).NotNull().SetValidator(new SubmitAnswerDtoValidator());
+
+        RuleForEach(dto => dto.Answers)
+            .NotNull()
+            .SetValidator(new SubmitAnswerDtoValidator());
     }
 
     private static bool HaveDistinctQuestions(IReadOnlyCollection<SubmitAnswerDto?>? answers)
     {
         return answers is null
-            || answers.Select(answer => answer?.QuestionId).Distinct().Count() == answers.Count;
+               || answers.Select(answer => answer?.QuestionId)
+                   .Distinct()
+                   .Count() == answers.Count;
     }
 }
