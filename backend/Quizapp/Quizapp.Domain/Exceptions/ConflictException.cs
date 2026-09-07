@@ -6,4 +6,5 @@ public class ConflictException(string entityName, string conflictField, string v
 {
     public string EntityName { get; } = entityName;
     public string ConflictField { get; } = conflictField;
+    public string Value { get; } = value;
 }

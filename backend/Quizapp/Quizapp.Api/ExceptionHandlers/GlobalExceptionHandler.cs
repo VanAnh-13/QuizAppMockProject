@@ -10,12 +10,19 @@ public sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logge
     public async ValueTask<bool> TryHandleAsync(
         HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
     {
+        if (httpContext.Response.HasStarted)
+        {
+            logger.LogWarning(
+                "The response has already started; the global exception handler will not be executed.");
+            return false;
+        }
+
         var statusCode = MapStatusCode(exception);
 
         if (statusCode >= 500)
             logger.LogError(exception, "Unhandled exception: {Message}", exception.Message);
         else
-            logger.LogWarning("Domain exception ({Type}): {Message}",
+            logger.LogWarning(exception, "Domain exception ({Type}): {Message}",
                 exception.GetType().Name, exception.Message);
 
         httpContext.Response.StatusCode = statusCode;
@@ -36,13 +43,13 @@ public sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logge
 
     private static int MapStatusCode(Exception exception) => exception switch
     {
-        NotFoundException       => StatusCodes.Status404NotFound,
-        ConflictException       => StatusCodes.Status409Conflict,
-        ValidationException     => StatusCodes.Status422UnprocessableEntity,
-        BusinessRuleException   => StatusCodes.Status400BadRequest,
+        NotFoundException => StatusCodes.Status404NotFound,
+        ConflictException => StatusCodes.Status409Conflict,
+        ValidationException => StatusCodes.Status422UnprocessableEntity,
+        BusinessRuleException => StatusCodes.Status400BadRequest,
         AuthenticationException => StatusCodes.Status401Unauthorized,
-        ForbiddenException      => StatusCodes.Status403Forbidden,
-        _                       => StatusCodes.Status500InternalServerError
+        ForbiddenException => StatusCodes.Status403Forbidden,
+        _ => StatusCodes.Status500InternalServerError
     };
 }
 
