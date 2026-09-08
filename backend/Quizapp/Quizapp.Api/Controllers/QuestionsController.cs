@@ -48,7 +48,7 @@ public class QuestionsController(IQuestionService questionService) : ControllerB
     public async Task<IActionResult> Activate(Guid id, [FromBody] SetActiveRequest request,
         CancellationToken cancellationToken)
     {
-        await questionService.SetActiveAsync(id, request.IsActive, cancellationToken);
+        await questionService.SetActiveAsync(id, request.IsActive!.Value, cancellationToken);
 
         return NoContent();
     }

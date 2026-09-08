@@ -36,11 +36,13 @@ public class RequestValidationTests
     [Theory]
     [InlineData(0, true)]
     [InlineData(5.5, true)]
-    [InlineData(120, true)]
+    [InlineData(100, true)]
+    [InlineData(100.1, false)]
+    [InlineData(120, false)]
     [InlineData(-1, false)]
     [InlineData(double.NaN, false)]
     [InlineData(double.PositiveInfinity, false)]
-    public void Passed_score_is_an_absolute_finite_non_negative_number(double score, bool valid)
+    public void Passed_score_is_a_finite_percentage_in_range_0_to_100(double score, bool valid)
     {
         Assert.Equal(valid, Validate(new CreateQuizDto
                 { Title = "Quiz", Duration = 15, IsActive = false, PassedScore = score })
@@ -123,8 +125,11 @@ public class RequestValidationTests
         Assert.True(Validate(new SubmitAnswerDto { QuestionId = questionId, ResponseText = "An explanation" })
             .IsValid);
 
-        Assert.True(Validate(new SubmitQuizDto())
+        Assert.True(Validate(new SubmitQuizDto { AttemptId = Guid.NewGuid() })
             .IsValid);
+
+        Assert.Contains(Validate(new SubmitQuizDto()).Errors,
+            error => error.PropertyName == nameof(SubmitQuizDto.AttemptId));
 
         Assert.False(Validate(new SubmitAnswerDto { QuestionId = questionId })
             .IsValid);
@@ -148,13 +153,13 @@ public class RequestValidationTests
     {
         var answer = new SubmitAnswerDto { QuestionId = Guid.NewGuid(), AnswerIds = [Guid.NewGuid()] };
 
-        Assert.False(Validate(new SubmitQuizDto { Answers = [answer, answer] })
+        Assert.False(Validate(new SubmitQuizDto { AttemptId = Guid.NewGuid(), Answers = [answer, answer] })
             .IsValid);
 
-        Assert.False(Validate(new SubmitQuizDto { Answers = [null!] })
+        Assert.False(Validate(new SubmitQuizDto { AttemptId = Guid.NewGuid(), Answers = [null!] })
             .IsValid);
 
-        Assert.False(Validate(new SubmitQuizDto { Answers = null! })
+        Assert.False(Validate(new SubmitQuizDto { AttemptId = Guid.NewGuid(), Answers = null! })
             .IsValid);
     }
 

@@ -10,6 +10,8 @@ internal sealed class QuizAttemptConfiguration : IEntityTypeConfiguration<QuizAt
     {
         entry.HasKey(attempt => attempt.Id);
 
+        entry.Property(attempt => attempt.SubmitAt).IsConcurrencyToken();
+
         entry.HasOne(attempt => attempt.QuizNavigation)
             .WithMany(quiz => quiz.QuizAttempts)
             .HasForeignKey(attempt => attempt.QuizId)

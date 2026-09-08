@@ -8,6 +8,18 @@ namespace Quizapp.Tests.Data;
 public class QuizAppModelTests
 {
     [Fact]
+    public void Attempts_track_submission_concurrency_and_require_start_and_expiry_times()
+    {
+        using var context = CreateContext();
+        var attempt = context.Model.FindEntityType(typeof(QuizAttempt))!;
+        var submittedAt = attempt.FindProperty(nameof(QuizAttempt.SubmitAt))!;
+        Assert.True(submittedAt.IsNullable);
+        Assert.True(submittedAt.IsConcurrencyToken);
+        Assert.False(attempt.FindProperty(nameof(QuizAttempt.StartedAt))!.IsNullable);
+        Assert.False(attempt.FindProperty(nameof(QuizAttempt.ExpiresAt))!.IsNullable);
+    }
+
+    [Fact]
     public void Model_builds_without_accidental_shadow_foreign_keys()
     {
         using var context = CreateContext();

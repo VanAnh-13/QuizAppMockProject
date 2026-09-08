@@ -100,7 +100,7 @@ internal sealed class MemoryQuizAttempts : IQuizAttemptRepository
     {
         cancellationToken.ThrowIfCancellationRequested();
 
-        var query = Rows.Where(a => a.UserId == userId && (quizId is null || a.QuizId == quizId))
+        var query = Rows.Where(a => a.UserId == userId && a.SubmitAt != null && (quizId is null || a.QuizId == quizId))
             .OrderByDescending(a => a.SubmitAt)
             .ToArray();
 

@@ -19,6 +19,7 @@ public class ProfileSchemaMigrationTests(SqlServerFixture fixture) : IClassFixtu
         var quiz = TestEntities.Quiz();
         var question = TestEntities.Question();
         var now = DateTime.UtcNow;
+        var attemptId = Guid.NewGuid();
         const int activeStatus = (int)UserStatus.Active;
 
         await context.Database.ExecuteSqlInterpolatedAsync($"""
@@ -28,6 +29,8 @@ public class ProfileSchemaMigrationTests(SqlServerFixture fixture) : IClassFixtu
             VALUES ({quiz.Id}, {quiz.Title}, {quiz.Duration}, {false}, {now}, {now});
             INSERT INTO [Questions] ([Id], [Content], [QuestionType], [IsActive])
             VALUES ({question.Id}, {question.Content}, {(int)question.QuestionType}, {false});
+            INSERT INTO [QuizAttempts] ([Id], [QuizId], [UserId], [SubmitAt], [Score])
+            VALUES ({attemptId}, {quiz.Id}, {user.Id}, {now}, {75.0});
             """);
 
         await migrator.MigrateAsync();
@@ -47,6 +50,11 @@ public class ProfileSchemaMigrationTests(SqlServerFixture fixture) : IClassFixtu
         Assert.Equal(question.Content, savedQuestion.Content);
         Assert.Null(savedQuestion.Image);
         Assert.Null(savedQuestion.Level);
+        var savedAttempt = await context.QuizAttempts.SingleAsync(value => value.Id == attemptId);
+        Assert.Equal(now, savedAttempt.SubmitAt);
+        Assert.Equal(now, savedAttempt.StartedAt);
+        Assert.Equal(now, savedAttempt.ExpiresAt);
+        Assert.Equal(75, savedAttempt.Score);
         Assert.Empty(await context.Database.GetPendingMigrationsAsync());
     }
 }

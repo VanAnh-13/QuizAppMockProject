@@ -21,7 +21,7 @@ public sealed class EfQuizAttemptRepository(QuizAppDbContext db) : IQuizAttemptR
     {
         var query = db.QuizAttempts
             .Include(a => a.QuizNavigation)
-            .Where(a => a.UserId == userId);
+            .Where(a => a.UserId == userId && a.SubmitAt != null);
 
         if (quizId.HasValue)
             query = query.Where(a => a.QuizId == quizId.Value);

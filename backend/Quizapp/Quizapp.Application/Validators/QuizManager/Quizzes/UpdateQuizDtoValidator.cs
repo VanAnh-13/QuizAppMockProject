@@ -25,6 +25,7 @@ public sealed class UpdateQuizDtoValidator : AbstractValidator<UpdateQuizDto>
         RuleFor(dto => dto.PassedScore)
             .Must(double.IsFinite)
             .WithMessage("Passed score must be a finite number.")
-            .GreaterThanOrEqualTo(Quiz.MinimumPassedScore);
+            .GreaterThanOrEqualTo(Quiz.MinimumPassedScore)
+            .LessThanOrEqualTo(Quiz.MaximumPassedScore);
     }
 }

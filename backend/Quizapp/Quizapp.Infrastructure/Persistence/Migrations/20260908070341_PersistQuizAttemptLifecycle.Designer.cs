@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Quizapp.Infrastructure.Persistence;
 
@@ -11,9 +12,11 @@ using Quizapp.Infrastructure.Persistence;
 namespace Quizapp.Infrastructure.Persistence.Migrations
 {
     [DbContext(typeof(QuizAppDbContext))]
-    partial class QuizAppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260908070341_PersistQuizAttemptLifecycle")]
+    partial class PersistQuizAttemptLifecycle
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -121,7 +124,7 @@ namespace Quizapp.Infrastructure.Persistence.Migrations
 
                     b.ToTable("Quizzes", t =>
                         {
-                            t.HasCheckConstraint("CK_Quizzes_PassedScore", "[PassedScore] IS NULL OR ([PassedScore] >= 0 AND [PassedScore] <= 100)");
+                            t.HasCheckConstraint("CK_Quizzes_PassedScore", "[PassedScore] IS NULL OR [PassedScore] >= 0");
 
                             t.HasCheckConstraint("CK_Quizzes_PositiveDuration", "[Duration] > 0");
                         });

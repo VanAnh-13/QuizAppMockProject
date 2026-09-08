@@ -22,7 +22,8 @@ internal sealed class QuizConfiguration : IEntityTypeConfiguration<Quiz>
             .HasMaxLength(FieldLimits.ImageUrlLength);
 
         entry.ToTable(table => table.HasCheckConstraint(
-            "CK_Quizzes_PassedScore", $"[PassedScore] IS NULL OR [PassedScore] >= {Quiz.MinimumPassedScore}"));
+            "CK_Quizzes_PassedScore",
+            $"[PassedScore] IS NULL OR ([PassedScore] >= {Quiz.MinimumPassedScore} AND [PassedScore] <= {Quiz.MaximumPassedScore})"));
 
         entry.ToTable(table => table.HasCheckConstraint("CK_Quizzes_PositiveDuration", "[Duration] > 0"));
 

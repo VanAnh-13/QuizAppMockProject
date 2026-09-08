@@ -17,7 +17,7 @@ Quizapp/
 
 | Directory | README | Status |
 | --- | --- | --- |
-| [`backend/`](backend/) | [Backend README](backend/README.md) | ✅ Foundation complete — domain models, DTOs, validators, EF migrations, tests |
+| [`backend/`](backend/) | [Backend README](backend/README.md) | Services, controllers, JWT authentication, EF migrations, and tests |
 | [`frontend/`](frontend/) | [Frontend README](frontend/README.md) | 🚧 Not yet implemented |
 
 ## Tech Stack
@@ -32,6 +32,8 @@ Quizapp/
 ## Quick Start
 
 ### Backend
+
+Configure SQL Server and JWT using the [backend setup instructions](backend/README.md#2-configure-sql-server-and-jwt) before starting the API.
 
 ```powershell
 dotnet restore "D:/Homeworks/c#/Quizapp/backend/Quizapp.sln"

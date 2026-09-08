@@ -51,6 +51,8 @@ internal static class TestEntities
         QuizNavigation = quiz,
         UserId = user.Id,
         UserNavigation = user,
+        StartedAt = DateTime.UtcNow.AddMinutes(-1),
+        ExpiresAt = DateTime.UtcNow.AddMinutes(quiz.Duration),
         SubmitAt = DateTime.UtcNow,
         Score = 0
     };

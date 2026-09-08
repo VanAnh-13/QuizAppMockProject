@@ -13,6 +13,7 @@ using Quizapp.Domain.Enums;
 using Quizapp.Infrastructure;
 using Quizapp.Infrastructure.Persistence;
 using Quizapp.Tests.Application.Services;
+using Quizapp.Tests.Data;
 
 namespace Quizapp.Tests.Architecture;
 
@@ -23,10 +24,11 @@ public class DependencyInjectionTests
     private static void AddStubs(IServiceCollection services)
     {
         services.TryAddSingleton<ICurrentUser, TestCurrentUser>();
-        services.TryAddSingleton<IUserRepository, MemoryUsers>();
+        services.TryAddSingleton<MemoryUsers>();
+        services.TryAddSingleton<IUserRepository>(sp => sp.GetRequiredService<MemoryUsers>());
 
         services.TryAddSingleton<IRoleRepository>(sp =>
-            new MemoryRoles(sp.GetRequiredService<MemoryUsers>() as MemoryUsers ?? new MemoryUsers()));
+            new MemoryRoles(sp.GetRequiredService<MemoryUsers>()));
 
         services.TryAddSingleton<IQuizRepository, MemoryQuizzes>();
         services.TryAddSingleton<IQuestionRepository, MemoryQuestions>();
@@ -34,6 +36,34 @@ public class DependencyInjectionTests
         services.TryAddSingleton<IUnitOfWork, MemoryUnitOfWork>();
         services.TryAddSingleton<IPasswordService, NullPasswordService>();
         services.TryAddSingleton<ITokenService, NullTokenService>();
+    }
+
+    [Fact]
+    public async Task Repository_stubs_resolve_and_share_one_user_store_after_repeated_registration()
+    {
+        var services = new ServiceCollection();
+        AddStubs(services);
+        AddStubs(services);
+        using var provider = services.BuildServiceProvider(new ServiceProviderOptions
+        {
+            ValidateScopes = true,
+            ValidateOnBuild = true
+        });
+
+        var roles = provider.GetRequiredService<IRoleRepository>();
+        var users = provider.GetRequiredService<IUserRepository>();
+        Assert.Same(provider.GetRequiredService<MemoryUsers>(), users);
+
+        var role = TestEntities.Role();
+        var user = TestEntities.User();
+        user.Roles.Add(role);
+        Assert.False(await roles.HasUsersAsync(role.Id, CancellationToken.None));
+
+        users.Add(user);
+
+        Assert.True(await roles.HasUsersAsync(role.Id, CancellationToken.None));
+        users.Remove(user);
+        Assert.False(await roles.HasUsersAsync(role.Id, CancellationToken.None));
     }
 
     [Fact]
@@ -157,7 +187,7 @@ file sealed class NullPasswordService : IPasswordService
 {
     public string Hash(string password) => password;
 
-    public bool Verify(string password, string hash) => false;
+    public bool Verify(string hash, string password) => false;
 }
 
 file sealed class NullTokenService : ITokenService

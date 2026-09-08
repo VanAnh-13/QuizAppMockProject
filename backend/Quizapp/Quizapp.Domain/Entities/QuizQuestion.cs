@@ -7,7 +7,7 @@ public class QuizQuestion
     public Guid Id { get; init; }
     public required Guid QuizId { get; init; }
     public required Guid QuestionId { get; init; }
-    public int Order { get; init; } = FirstOrder;
+    public int Order { get; set; } = FirstOrder;
     public Quiz QuizNavigation { get; init; } = null!;
     public Question QuestionNavigation { get; init; } = null!;
 }

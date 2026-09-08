@@ -10,7 +10,7 @@ These instructions apply to the entire Quizapp repository. Follow any more speci
 
 This is a monorepo. The .NET solution lives in `D:/Homeworks/c#/Quizapp/backend`; shared documentation and repository configuration stay at the root. A future web client belongs in its own top-level directory, not inside the .NET solution tree.
 
-The current application is a .NET 10 backend foundation, not a complete quiz service. The API host exposes development OpenAPI/Swagger but has no business endpoints or configured authentication pipeline. DTOs, validators, and the JWT package do not establish an implemented HTTP workflow. There is no frontend yet. Update this note and the README when that changes.
+The application is a .NET 10 backend with controllers and services for authentication, user/role management, quiz management, quiz taking, and history. JWT settings are validated before startup, and authentication checks the current user's security stamp. Starting an attempt uses POST and persists its owner and deadline; submission requires the returned AttemptId and completes that same attempt. Development OpenAPI/Swagger is available. There is no frontend yet. Update this note and the README when that changes.
 
 ## Branching model
 

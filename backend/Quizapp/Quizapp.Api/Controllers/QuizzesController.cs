@@ -49,7 +49,7 @@ public class QuizzesController(IQuizService quizService) : ControllerBase
     public async Task<IActionResult> Activate(Guid id, [FromBody] SetActiveRequest request,
         CancellationToken cancellationToken)
     {
-        await quizService.SetActiveAsync(id, request.IsActive, cancellationToken);
+        await quizService.SetActiveAsync(id, request.IsActive!.Value, cancellationToken);
 
         return NoContent();
     }

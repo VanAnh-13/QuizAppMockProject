@@ -139,28 +139,16 @@ public sealed class QuizService(
         await authorization.RequireAdminAsync(cancellationToken);
         var quiz = await FindAsync(quizId, cancellationToken);
 
-        if (orderedQuestionIds.Count != quiz.QuizQuestions.Count ||
-            orderedQuestionIds.Any(id => quiz.QuizQuestions.All(qq => qq.QuestionId != id)))
+        var questionMap = quiz.QuizQuestions.ToDictionary(qq => qq.QuestionId);
+
+        if (orderedQuestionIds.Count != questionMap.Count ||
+            !orderedQuestionIds.ToHashSet()
+                .SetEquals(questionMap.Keys))
             throw new Quizapp.Domain.Exceptions.ValidationException(nameof(orderedQuestionIds),
                 "The provided question IDs must exactly match the quiz's assigned questions.");
 
-        // Remove all and re-add in new order (since Order is init)
-        var questionMap = quiz.QuizQuestions.ToDictionary(qq => qq.QuestionId);
-
-        foreach (var qq in quiz.QuizQuestions.ToList())
-            quiz.QuizQuestions.Remove(qq);
-
         for (var i = 0; i < orderedQuestionIds.Count; i++)
-        {
-            var existing = questionMap[orderedQuestionIds[i]];
-
-            quiz.QuizQuestions.Add(new QuizQuestion
-            {
-                Id = existing.Id, QuizId = existing.QuizId, QuestionId = existing.QuestionId,
-                QuizNavigation = existing.QuizNavigation, QuestionNavigation = existing.QuestionNavigation,
-                Order = QuizQuestion.FirstOrder + i
-            });
-        }
+            questionMap[orderedQuestionIds[i]].Order = QuizQuestion.FirstOrder + i;
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
     }

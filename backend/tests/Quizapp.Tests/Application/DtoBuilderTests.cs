@@ -62,7 +62,9 @@ public class DtoBuilderTests
         Assert.Equal(answerId, Assert.Single(second.AnswerIds));
         Assert.Equal(questionId, second.QuestionId);
 
-        var submissionBuilder = new SubmitQuizDto.Builder().WithAnswers([second]);
+        var attemptId = Guid.NewGuid();
+        var submissionBuilder = new SubmitQuizDto.Builder().WithAttemptId(attemptId).WithAnswers([second]);
+        Assert.Equal(attemptId, submissionBuilder.Build().AttemptId);
         var submission = submissionBuilder.Build();
         submission.Answers.Clear();
 

@@ -6,3 +6,42 @@ resharper_unused_type_global_highlighting = warning
 resharper_unused_member_global_highlighting = warning
 resharper_class_never_instantiated_global_highlighting = warning
 resharper_unused_auto_property_accessor_global_highlighting = warning
+
+# C# formatting shared by editors and dotnet format.
+indent_style = space
+indent_size = 4
+tab_width = 4
+csharp_new_line_before_open_brace = all
+csharp_new_line_before_else = true
+csharp_new_line_before_catch = true
+csharp_new_line_before_finally = true
+csharp_preserve_single_line_blocks = true
+csharp_preserve_single_line_statements = false
+csharp_space_after_comma = true
+csharp_space_after_keywords_in_control_flow_statements = true
+csharp_space_around_binary_operators = before_and_after
+
+# Rider/ReSharper: separate members and logical blocks with a blank line.
+# Reference: https://www.jetbrains.com/help/resharper/EditorConfig_CSHARP_BlankLinesPageScheme.html
+resharper_csharp_keep_blank_lines_in_declarations = 1
+resharper_csharp_keep_blank_lines_in_code = 1
+resharper_csharp_blank_lines_after_using_list = 1
+resharper_csharp_blank_lines_after_file_scoped_namespace_directive = 1
+resharper_csharp_blank_lines_around_type = 1
+resharper_csharp_blank_lines_around_invocable = 1
+resharper_csharp_blank_lines_around_single_line_invocable = 1
+resharper_csharp_blank_lines_around_property = 1
+resharper_csharp_blank_lines_around_auto_property = 0
+resharper_csharp_blank_lines_around_single_line_auto_property = 0
+resharper_csharp_blank_lines_before_control_transfer_statements = 1
+resharper_csharp_blank_lines_before_block_statements = 1
+resharper_csharp_blank_lines_after_block_statements = 1
+resharper_csharp_blank_lines_before_multiline_statements = 1
+resharper_csharp_blank_lines_after_multiline_statements = 1
+
+# Keep fluent calls on separate lines, matching RegisterDtoValidator.
+resharper_csharp_wrap_chained_method_calls = chop_always
+
+# Keep auto-properties and interface properties compact: { get; set; } / { get; init; }.
+resharper_csharp_place_abstract_accessorholder_on_single_line = true
+resharper_csharp_keep_existing_declaration_block_arrangement = false

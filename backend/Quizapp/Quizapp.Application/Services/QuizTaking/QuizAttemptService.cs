@@ -20,7 +20,7 @@ public sealed class QuizAttemptService(
 {
     public async Task<QuizAttemptStartDto> StartAsync(Guid quizId, CancellationToken cancellationToken = default)
     {
-        await authorization.RequireUserAsync(cancellationToken);
+        var user = await authorization.RequireUserAsync(cancellationToken);
 
         var quiz = await quizzes.GetByIdAsync(quizId, cancellationToken)
                    ?? throw new NotFoundException(nameof(Quiz), quizId);
@@ -32,6 +32,7 @@ public sealed class QuizAttemptService(
             .UtcDateTime;
 
         var questions = quiz.QuizQuestions
+            .Where(qq => qq.QuestionNavigation.IsActive)
             .OrderBy(qq => qq.Order)
             .Select(qq => new QuestionForAttemptDto
             {
@@ -50,9 +51,23 @@ public sealed class QuizAttemptService(
             })
             .ToArray();
 
+        var attempt = new QuizAttempt
+        {
+            Id = Guid.NewGuid(),
+            UserId = user.Id,
+            QuizId = quiz.Id,
+            UserNavigation = user,
+            QuizNavigation = quiz,
+            StartedAt = now,
+            ExpiresAt = now.AddMinutes(quiz.Duration)
+        };
+
+        attempts.Add(attempt);
+        await unitOfWork.SaveChangesAsync(cancellationToken);
+
         return new QuizAttemptStartDto
         {
-            AttemptId = Guid.NewGuid(),
+            AttemptId = attempt.Id,
             Quiz = new QuizForAttemptDto
             {
                 QuizId = quiz.Id,
@@ -62,8 +77,8 @@ public sealed class QuizAttemptService(
                 Image = quiz.Image, PassedScore = quiz.PassedScore,
                 Questions = questions
             },
-            StartedAt = now,
-            ExpiresAt = now.AddMinutes(quiz.Duration)
+            StartedAt = attempt.StartedAt,
+            ExpiresAt = attempt.ExpiresAt
         };
     }
 
@@ -75,13 +90,32 @@ public sealed class QuizAttemptService(
         ArgumentNullException.ThrowIfNull(request);
         await submitValidator.ValidateAndThrowAsync(request, cancellationToken);
 
+        var attempt = await attempts.GetByIdAsync(request.AttemptId, cancellationToken)
+                      ?? throw new NotFoundException(nameof(QuizAttempt), request.AttemptId);
+
+        if (attempt.UserId != user.Id)
+            throw new ForbiddenException("You cannot submit another user's attempt.");
+
+        if (attempt.QuizId != quizId)
+            throw new BusinessRuleException("AttemptQuizMismatch", "This attempt belongs to a different quiz.");
+
+        if (attempt.SubmitAt is not null)
+            throw new ConflictException(nameof(QuizAttempt), nameof(QuizAttempt.Id), attempt.Id.ToString());
+
+        var now = clock.GetUtcNow().UtcDateTime;
+
+        if (now >= attempt.ExpiresAt)
+            throw new BusinessRuleException("AttemptExpired", "The time allowed for this attempt has expired.");
+
         var quiz = await quizzes.GetByIdAsync(quizId, cancellationToken)
                    ?? throw new NotFoundException(nameof(Quiz), quizId);
 
         if (!quiz.IsActive)
             throw new BusinessRuleException("QuizInactive", "This quiz is not available.");
 
-        var orderedQuestions = quiz.QuizQuestions.OrderBy(qq => qq.Order)
+        var orderedQuestions = quiz.QuizQuestions
+            .Where(qq => qq.QuestionNavigation.IsActive)
+            .OrderBy(qq => qq.Order)
             .Select(qq => qq.QuestionNavigation)
             .ToArray();
 
@@ -112,6 +146,19 @@ public sealed class QuizAttemptService(
 
             if (submission is null) continue;
 
+            if (submission.AnswerIds.Count > 0)
+            {
+                var validAnswerIds = question.Answers
+                    .Where(a => a.IsActive)
+                    .Select(a => a.Id)
+                    .ToHashSet();
+
+                var invalidId = submission.AnswerIds.FirstOrDefault(id => !validAnswerIds.Contains(id));
+                if (invalidId != default)
+                    throw new Quizapp.Domain.Exceptions.ValidationException(nameof(SubmitQuizDto.Answers),
+                        $"Answer '{invalidId}' is not a valid active option for question '{question.Id}'.");
+            }
+
             pendingAnswers.AddRange(submission.AnswerIds
                 .Select(answerId =>
                     ((Guid QuestionId, Guid? AnswerId, string? ResponseText))(question.Id, answerId, null))
@@ -125,28 +172,17 @@ public sealed class QuizAttemptService(
             ? Math.Round(totalPoints / orderedQuestions.Length * 100, 2)
             : 0;
 
-        var now = clock.GetUtcNow()
-            .UtcDateTime;
-
-        var attemptId = Guid.NewGuid();
-
-        var attempt = new QuizAttempt
-        {
-            Id = attemptId, UserId = user.Id, QuizId = quiz.Id,
-            SubmitAt = now, Score = finalScore
-        };
+        attempt.SubmitAt = now;
+        attempt.Score = finalScore;
 
         foreach (var (qId, aId, text) in pendingAnswers)
             attempt.UserAnswers.Add(new UserAnswer
             {
-                Id = Guid.NewGuid(),
-                QuizAttemptId = attemptId,
+                QuizAttemptId = attempt.Id,
                 QuestionId = qId,
                 AnswerId = aId,
                 ResponseText = text
             });
-
-        attempts.Add(attempt);
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
@@ -172,7 +208,9 @@ public sealed class QuizAttemptService(
         if (attempt.UserId != user.Id && !ServiceAuthorization.IsAdmin(user))
             throw new ForbiddenException("You do not have access to this attempt.");
 
-        return MapToDetail(attempt);
+        return attempt.SubmitAt is null
+            ? throw new BusinessRuleException("AttemptNotSubmitted", "This attempt has not been submitted.")
+            : MapToDetail(attempt);
     }
 
     public async Task<PagedResultDto<QuizAttemptDto>> GetHistoryAsync(int pageNumber, int pageSize, Guid? quizId = null,
@@ -189,7 +227,7 @@ public sealed class QuizAttemptService(
             QuizId = attempt.QuizId,
             QuizTitle = attempt.QuizNavigation.Title,
             Score = attempt.Score,
-            SubmittedAt = attempt.SubmitAt
+            SubmittedAt = attempt.SubmitAt!.Value
         });
     }
 
@@ -197,7 +235,9 @@ public sealed class QuizAttemptService(
     {
         var quiz = attempt.QuizNavigation;
 
-        var orderedQuestions = quiz.QuizQuestions.OrderBy(qq => qq.Order)
+        var orderedQuestions = quiz.QuizQuestions
+            .Where(qq => qq.QuestionNavigation.IsActive)
+            .OrderBy(qq => qq.Order)
             .Select(qq => qq.QuestionNavigation)
             .ToArray();
 
@@ -235,7 +275,7 @@ public sealed class QuizAttemptService(
             QuizId = attempt.QuizId,
             QuizTitle = quiz.Title,
             Score = attempt.Score,
-            SubmittedAt = attempt.SubmitAt,
+            SubmittedAt = attempt.SubmitAt!.Value,
             Answers = results
         };
     }
@@ -248,10 +288,19 @@ public sealed class QuizAttemptService(
 
             case QuestionType.TrueFalse:
             {
-                var correctId = question.Answers.FirstOrDefault(a => a is { IsCorrect: true, IsActive: true })
-                    ?.Id;
+                if (submission is null)
+                    return 0.0;
 
-                return correctId.HasValue && submission?.AnswerIds.Contains(correctId.Value) == true ? 1.0 : 0.0;
+                var selectedAnswer = submission.AnswerIds.Count == 1
+                    ? question.Answers.FirstOrDefault(answer =>
+                        answer.Id == submission.AnswerIds[0] && answer.QuestionId == question.Id && answer.IsActive)
+                    : null;
+
+                if (selectedAnswer is null)
+                    throw new Quizapp.Domain.Exceptions.ValidationException(nameof(SubmitQuizDto.Answers),
+                        $"Question '{question.Id}' requires exactly one active answer belonging to that question.");
+
+                return selectedAnswer.IsCorrect ? 1.0 : 0.0;
             }
 
             case QuestionType.MultipleChoice:

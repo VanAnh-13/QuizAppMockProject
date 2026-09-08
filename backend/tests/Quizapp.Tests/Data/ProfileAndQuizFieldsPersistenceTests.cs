@@ -23,7 +23,7 @@ public class ProfileAndQuizFieldsPersistenceTests(SqlServerFixture fixture) : IC
             IsActive = true
         };
 
-        var quiz = new Quiz { Id = Guid.NewGuid(), Title = "Quiz", Duration = 15, PassedScore = 120.5 };
+        var quiz = new Quiz { Id = Guid.NewGuid(), Title = "Quiz", Duration = 15, PassedScore = 80.5 };
 
         var question = new Question
         {

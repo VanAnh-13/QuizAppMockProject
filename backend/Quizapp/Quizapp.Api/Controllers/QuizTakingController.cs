@@ -10,7 +10,7 @@ namespace Quizapp.Api.Controllers;
 [Authorize]
 public class QuizTakingController(IQuizAttemptService attemptService) : ControllerBase
 {
-    [HttpGet("quizzes/{quizId:guid}/start")]
+    [HttpPost("quizzes/{quizId:guid}/start")]
     public async Task<IActionResult> Start(Guid quizId, CancellationToken cancellationToken)
     {
         var result = await attemptService.StartAsync(quizId, cancellationToken);

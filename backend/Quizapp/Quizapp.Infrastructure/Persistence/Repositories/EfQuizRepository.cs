@@ -11,6 +11,7 @@ public sealed class EfQuizRepository(QuizAppDbContext db) : IQuizRepository
         db.Quizzes
             .Include(q => q.QuizQuestions)
             .ThenInclude(qq => qq.QuestionNavigation)
+            .ThenInclude(question => question.Answers)
             .FirstOrDefaultAsync(q => q.Id == id, cancellationToken);
 
     public async Task<PagedResultDto<Quiz>> GetListAsync(int pageNumber, int pageSize, string? search,

@@ -48,7 +48,7 @@ public class UsersController(IUserService userService) : ControllerBase
     public async Task<IActionResult> Activate(Guid id, [FromBody] SetActiveRequest request,
         CancellationToken cancellationToken)
     {
-        await userService.SetActiveAsync(id, request.IsActive, cancellationToken);
+        await userService.SetActiveAsync(id, request.IsActive!.Value, cancellationToken);
 
         return NoContent();
     }

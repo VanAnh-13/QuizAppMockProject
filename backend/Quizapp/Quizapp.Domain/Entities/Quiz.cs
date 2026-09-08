@@ -3,6 +3,7 @@ namespace Quizapp.Domain.Entities;
 public class Quiz
 {
     public const double MinimumPassedScore = 0;
+    public const double MaximumPassedScore = 100;
 
     public Guid Id { get; init; }
     public required string Title { get; set; }
