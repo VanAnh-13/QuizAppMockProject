@@ -14,6 +14,24 @@ namespace Quizapp.Tests.Application.Services;
 public class QuizAttemptServiceTests
 {
     [Fact]
+    public async Task History_and_result_keep_the_title_from_when_the_attempt_started()
+    {
+        using var context = new ServiceTestContext();
+        var quiz = CreateQuiz(context);
+        quiz.Title = "Original quiz";
+        var service = context.Get<IQuizAttemptService>();
+        var start = await service.StartAsync(quiz.Id);
+        quiz.Title = "Renamed quiz";
+        await service.SubmitAsync(quiz.Id, new SubmitQuizDto { AttemptId = start.AttemptId });
+
+        var history = await service.GetHistoryAsync(1, 10);
+        var result = await service.GetResultAsync(start.AttemptId);
+
+        Assert.Equal("Original quiz", Assert.Single(history.Items).QuizTitle);
+        Assert.Equal("Original quiz", result.QuizTitle);
+    }
+
+    [Fact]
     public async Task Only_the_owner_can_read_or_change_progress_even_when_the_other_user_is_admin()
     {
         using var context = new ServiceTestContext();

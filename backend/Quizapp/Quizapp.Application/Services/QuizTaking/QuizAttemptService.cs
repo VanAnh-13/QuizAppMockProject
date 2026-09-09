@@ -424,7 +424,7 @@ public sealed class QuizAttemptService(
         {
             Id = attempt.Id,
             QuizId = attempt.QuizId,
-            QuizTitle = attempt.QuizNavigation.Title,
+            QuizTitle = AttemptQuizSnapshot.Read(attempt).Title,
             Score = attempt.Score,
             SubmittedAt = attempt.SubmitAt!.Value
         });
