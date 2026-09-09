@@ -74,7 +74,8 @@ public sealed class QuizAttemptService(
                 Title = quiz.Title,
                 Description = quiz.Description,
                 Duration = quiz.Duration,
-                Image = quiz.Image, PassedScore = quiz.PassedScore,
+                Image = quiz.Image,
+                PassedScore = quiz.PassedScore,
                 Questions = questions
             },
             StartedAt = attempt.StartedAt,
@@ -139,9 +140,13 @@ public sealed class QuizAttemptService(
 
             userAnswerResults.Add(new UserAnswerResultDto
             {
-                QuestionId = question.Id, QuestionContent = question.Content,
-                QuestionType = question.QuestionType, Image = question.Image, Level = question.Level,
-                SelectedAnswers = selectedAnswers, ResponseText = submission?.ResponseText
+                QuestionId = question.Id,
+                QuestionContent = question.Content,
+                QuestionType = question.QuestionType, 
+                Image = question.Image,
+                Level = question.Level,
+                SelectedAnswers = selectedAnswers,
+                ResponseText = submission?.ResponseText
             });
 
             if (submission is null) continue;
@@ -154,7 +159,7 @@ public sealed class QuizAttemptService(
                     .ToHashSet();
 
                 var invalidId = submission.AnswerIds.FirstOrDefault(id => !validAnswerIds.Contains(id));
-                if (invalidId != default)
+                if (invalidId != Guid.Empty)
                     throw new Quizapp.Domain.Exceptions.ValidationException(nameof(SubmitQuizDto.Answers),
                         $"Answer '{invalidId}' is not a valid active option for question '{question.Id}'.");
             }

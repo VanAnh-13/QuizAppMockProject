@@ -48,9 +48,15 @@ public sealed class QuizService(
 
         var quiz = new Quiz
         {
-            Id = Guid.NewGuid(), Title = request.Title.Trim(), Description = request.Description,
-            Duration = request.Duration, Image = request.Image, PassedScore = request.PassedScore,
-            IsActive = request.IsActive, CreateAt = now, UpdateAt = now
+            Id = Guid.NewGuid(),
+            Title = request.Title.Trim(),
+            Description = request.Description,
+            Duration = request.Duration,
+            Image = request.Image,
+            PassedScore = request.PassedScore,
+            IsActive = request.IsActive,
+            CreateAt = now,
+            UpdateAt = now
         };
 
         quizzes.Add(quiz);
@@ -65,6 +71,7 @@ public sealed class QuizService(
         ArgumentNullException.ThrowIfNull(request);
         await updateValidator.ValidateAndThrowAsync(request, cancellationToken);
         var quiz = await FindAsync(quizId, cancellationToken);
+        
         quiz.Title = request.Title.Trim();
         quiz.Description = request.Description;
         quiz.Duration = request.Duration;

@@ -20,7 +20,7 @@ builder.Services.AddSingleton<IOptions<JwtOptions>>(Options.Create(jwt));
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        options.MapInboundClaims = false; // preserve short claim names ("role", "sub") as issued
+        options.MapInboundClaims = false; 
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
