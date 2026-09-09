@@ -15,6 +15,8 @@ public class QuizAppModelTests
         var submittedAt = attempt.FindProperty(nameof(QuizAttempt.SubmitAt))!;
         Assert.True(submittedAt.IsNullable);
         Assert.True(submittedAt.IsConcurrencyToken);
+        Assert.True(attempt.FindProperty(nameof(QuizAttempt.Revision))!.IsConcurrencyToken);
+        Assert.True(attempt.FindProperty(nameof(QuizAttempt.PausedAt))!.IsNullable);
         Assert.False(attempt.FindProperty(nameof(QuizAttempt.StartedAt))!.IsNullable);
         Assert.False(attempt.FindProperty(nameof(QuizAttempt.ExpiresAt))!.IsNullable);
     }

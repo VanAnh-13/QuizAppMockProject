@@ -14,6 +14,84 @@ namespace Quizapp.Tests.Data;
 public class QuizAttemptPersistenceTests(SqlServerFixture database) : IClassFixture<SqlServerFixture>
 {
     [SqlServerFact]
+    public async Task A_paused_draft_survives_reloading_and_completes_from_its_original_quiz_snapshot()
+    {
+        await using var db = database.CreateContext();
+        var quiz = TestEntities.Quiz();
+        quiz.IsActive = true;
+        var user = TestEntities.User();
+        user.IsActive = true;
+        var question = TestEntities.Question(QuestionType.ShortAnswer);
+        question.IsActive = true;
+        question.Answers.Add(new Answer
+        {
+            Id = Guid.NewGuid(), QuestionId = question.Id, Text = "Original", IsActive = true, IsCorrect = true
+        });
+        quiz.Questions.Add(question);
+        db.AddRange(quiz, user);
+        await db.SaveChangesAsync();
+        db.ChangeTracker.Clear();
+        using var services = new ServiceTestContext();
+        services.CurrentUser.UserId = user.Id;
+        services.Services.AddSingleton<IUserRepository>(new EfUserRepository(db));
+        services.Services.AddSingleton<IQuizRepository>(new EfQuizRepository(db));
+        services.Services.AddSingleton<IQuizAttemptRepository>(new EfQuizAttemptRepository(db));
+        services.Services.AddSingleton<IUnitOfWork>(new EfUnitOfWork(db));
+        var service = services.Get<IQuizAttemptService>();
+        var start = await service.StartAsync(quiz.Id);
+        var paused = await service.PauseAsync(start.AttemptId, new SaveQuizProgressDto
+        {
+            Revision = 0, Answers = [new SubmitAnswerDto { QuestionId = question.Id, ResponseText = "Original" }]
+        });
+        db.ChangeTracker.Clear();
+        var loaded = await service.GetProgressAsync(start.AttemptId);
+        Assert.Equal(paused.PausedAt, loaded.PausedAt);
+        Assert.Equal(paused.RemainingSeconds, loaded.RemainingSeconds);
+        Assert.Equal(DateTimeKind.Utc, loaded.ExpiresAt.Kind);
+        Assert.Equal(DateTimeKind.Utc, loaded.StartedAt.Kind);
+        Assert.Equal(DateTimeKind.Utc, loaded.PausedAt!.Value.Kind);
+        Assert.Equal("Original", Assert.Single(loaded.Answers).ResponseText);
+        Assert.Contains((await service.GetInProgressAsync(1, 10)).Items, item => item.AttemptId == start.AttemptId);
+
+        var currentQuiz = await new EfQuizRepository(db).GetByIdAsync(quiz.Id, CancellationToken.None);
+        currentQuiz!.QuizQuestions.Clear();
+        currentQuiz.IsActive = false;
+        await db.SaveChangesAsync();
+        db.ChangeTracker.Clear();
+        var resumed = await service.ResumeAsync(start.AttemptId, new AttemptRevisionDto { Revision = loaded.Revision });
+        db.ChangeTracker.Clear();
+        var result = await service.SubmitSavedAsync(start.AttemptId, new AttemptRevisionDto { Revision = resumed.Revision });
+        db.ChangeTracker.Clear();
+        Assert.Equal(100, result.Score);
+        Assert.Equal(100, (await service.GetResultAsync(start.AttemptId)).Score);
+        Assert.Equal("Original", Assert.Single((await service.GetResultAsync(start.AttemptId)).Answers).ResponseText);
+    }
+
+    [SqlServerFact]
+    public async Task Concurrent_draft_updates_cannot_overwrite_each_other()
+    {
+        await using var first = database.CreateContext();
+        var attempt = TestEntities.Attempt(TestEntities.Quiz(), TestEntities.User());
+        attempt.SubmitAt = null;
+        first.Add(attempt);
+        await first.SaveChangesAsync();
+        await using var second = database.CreateContext();
+        var stale = await second.QuizAttempts.SingleAsync(a => a.Id == attempt.Id);
+        attempt.Revision++;
+        attempt.PausedAt = attempt.StartedAt;
+        await new EfUnitOfWork(first).SaveChangesAsync(CancellationToken.None);
+        stale.Revision++;
+        stale.LastSavedAt = DateTime.UtcNow;
+
+        await Assert.ThrowsAsync<ConflictException>(() => new EfUnitOfWork(second).SaveChangesAsync(CancellationToken.None));
+
+        await using var verification = database.CreateContext();
+        var saved = await verification.QuizAttempts.SingleAsync(a => a.Id == attempt.Id);
+        Assert.NotNull(saved.PausedAt);
+        Assert.Null(saved.LastSavedAt);
+    }
+
+    [SqlServerFact]
     public async Task Start_and_submit_persist_one_attempt_and_its_answers_across_contexts()
     {
         await using var db = database.CreateContext();
@@ -22,6 +100,7 @@ public class QuizAttemptPersistenceTests(SqlServerFixture database) : IClassFixt
         var user = TestEntities.User();
         user.IsActive = true;
         var question = TestEntities.Question(QuestionType.ShortAnswer);
+        question.IsActive = true;
         quiz.Questions.Add(question);
         db.AddRange(quiz, user);
         await db.SaveChangesAsync();

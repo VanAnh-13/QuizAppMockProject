@@ -10,6 +10,35 @@ namespace Quizapp.Api.Controllers;
 [Authorize]
 public class QuizTakingController(IQuizAttemptService attemptService) : ControllerBase
 {
+    [HttpPost("attempts/{attemptId:guid}/submit")]
+    public async Task<IActionResult> SubmitSaved(Guid attemptId, [FromBody] AttemptRevisionDto request,
+        CancellationToken cancellationToken) =>
+        Ok(await attemptService.SubmitSavedAsync(attemptId, request, cancellationToken));
+
+    [HttpGet("attempts/in-progress")]
+    public async Task<IActionResult> GetInProgress([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 20,
+        [FromQuery] Guid? quizId = null, CancellationToken cancellationToken = default) =>
+        Ok(await attemptService.GetInProgressAsync(pageNumber, pageSize, quizId, cancellationToken));
+
+    [HttpPost("attempts/{attemptId:guid}/pause")]
+    public async Task<IActionResult> Pause(Guid attemptId, [FromBody] SaveQuizProgressDto request,
+        CancellationToken cancellationToken) =>
+        Ok(await attemptService.PauseAsync(attemptId, request, cancellationToken));
+
+    [HttpPost("attempts/{attemptId:guid}/resume")]
+    public async Task<IActionResult> Resume(Guid attemptId, [FromBody] AttemptRevisionDto request,
+        CancellationToken cancellationToken) =>
+        Ok(await attemptService.ResumeAsync(attemptId, request, cancellationToken));
+
+    [HttpGet("attempts/{attemptId:guid}/progress")]
+    public async Task<IActionResult> GetProgress(Guid attemptId, CancellationToken cancellationToken) =>
+        Ok(await attemptService.GetProgressAsync(attemptId, cancellationToken));
+
+    [HttpPut("attempts/{attemptId:guid}/progress")]
+    public async Task<IActionResult> SaveProgress(Guid attemptId, [FromBody] SaveQuizProgressDto request,
+        CancellationToken cancellationToken) =>
+        Ok(await attemptService.SaveProgressAsync(attemptId, request, cancellationToken));
+
     [HttpPost("quizzes/{quizId:guid}/start")]
     public async Task<IActionResult> Start(Guid quizId, CancellationToken cancellationToken)
     {

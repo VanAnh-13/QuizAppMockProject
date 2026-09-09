@@ -88,6 +88,19 @@ internal sealed class MemoryQuizAttempts : IQuizAttemptRepository
 {
     public List<QuizAttempt> Rows { get; } = [];
 
+    public Task<PagedResultDto<QuizAttempt>> GetInProgressAsync(Guid userId, int pageNumber, int pageSize,
+        Guid? quizId, CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        var query = Rows.Where(a => a.UserId == userId && a.SubmitAt == null && (quizId is null || a.QuizId == quizId))
+            .OrderByDescending(a => a.StartedAt).ThenBy(a => a.Id).ToArray();
+        return Task.FromResult(new PagedResultDto<QuizAttempt>
+        {
+            Items = query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToArray(),
+            TotalCount = query.Length, PageNumber = pageNumber, PageSize = pageSize
+        });
+    }
+
     public Task<QuizAttempt?> GetByIdAsync(Guid id, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();

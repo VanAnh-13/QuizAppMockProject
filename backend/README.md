@@ -129,28 +129,16 @@ OpenAPI and Swagger UI are exposed **only in Development**. A `404` at `/` is ex
 
 ## Quiz Attempt Contract
 
-Send a valid bearer token with these requests:
+Quiz attempts persist their owner, deadline, saved answers, pause state and a snapshot of the starting quiz. Pausing freezes the remaining time; resuming continues the same attempt. The frontend runs the timer and calls submission; there is no backend submission scheduler.
 
-1. `POST /api/quizzes/{quizId}/start` creates and saves an attempt owned by the current user. The response contains `attemptId`, `startedAt`, `expiresAt`, and the quiz questions without correct-answer flags.
-2. `POST /api/quizzes/{quizId}/submit` requires that `attemptId` in the request body, alongside `answers`. It completes the saved attempt and returns the same ID.
-3. `GET /api/attempts/{attemptId}` and `GET /api/quiz-history` return submitted results. An in-progress attempt has no result and is excluded from history.
+- `POST /api/quizzes/{quizId}/start` creates an attempt and returns its ID, revision and UTC timestamps.
+- `GET /api/attempts/in-progress` lists the current user's unfinished attempts.
+- `GET` / `PUT /api/attempts/{attemptId}/progress` restore or save the full answer list.
+- `POST /api/attempts/{attemptId}/pause` saves answers and pauses atomically; `/resume` continues with the remaining time.
+- `POST /api/attempts/{attemptId}/submit` grades the saved answers. At or after expiry, submissions can only grade answers saved before the deadline.
+- `GET /api/attempts/{attemptId}` and `GET /api/quiz-history` return submitted results.
 
-Example submission body:
-
-```json
-{
-  "attemptId": "<attemptId returned by start>",
-  "answers": []
-}
-```
-
-An empty answer list submits an unanswered quiz. The attempt must belong to the authenticated user and the quiz in the route. Submission at or after the saved expiry returns `400`; changing the quiz duration later does not extend an existing attempt. A missing/empty attempt ID returns `422`, an unknown ID returns `404`, another user's attempt returns `403`, and an already submitted attempt returns `409`. The submission timestamp is a concurrency token to prevent a stale submission from overwriting a completed result.
-
-**Client compatibility:** start previously used `GET`; clients must now use `POST` and retain the returned ID for submission. Submitting without starting is no longer supported.
-
-For single-choice and true/false questions, a submitted response must select exactly one active answer belonging to that question. Invalid selections return `422` without completing the attempt, so the client can correct and resubmit. Omit a question from `answers` to leave it unanswered (zero points). Multiple-choice questions continue to allow multiple selections.
-
-Apply the `PersistQuizAttemptLifecycle` migration before using this flow. It adds start/expiry timestamps and makes the submission timestamp nullable. Existing submitted scores and timestamps are preserved; because their start times were never recorded, their submission timestamps are used for the legacy start/expiry values. Rolling back this migration is blocked while unsubmitted attempts exist.
+Apply the `AddAttemptPauseAndDraft` migration before using these endpoints. See [the full attempt-progress contract](docs/attempt-progress.md) for DTOs, frontend sequencing, deadline boundaries, conflicts, legacy compatibility and migration behavior.
 
 ## Data Model
 

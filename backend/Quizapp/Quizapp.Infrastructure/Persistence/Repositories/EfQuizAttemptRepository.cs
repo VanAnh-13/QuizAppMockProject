@@ -7,6 +7,22 @@ namespace Quizapp.Infrastructure.Persistence.Repositories;
 
 public sealed class EfQuizAttemptRepository(QuizAppDbContext db) : IQuizAttemptRepository
 {
+    public async Task<PagedResultDto<QuizAttempt>> GetInProgressAsync(Guid userId, int pageNumber, int pageSize,
+        Guid? quizId, CancellationToken cancellationToken)
+    {
+        var query = db.QuizAttempts.AsNoTracking().Include(a => a.QuizNavigation)
+            .Where(a => a.UserId == userId && a.SubmitAt == null);
+        if (quizId.HasValue)
+            query = query.Where(a => a.QuizId == quizId.Value);
+        var total = await query.CountAsync(cancellationToken);
+        var items = await query.OrderByDescending(a => a.StartedAt).ThenBy(a => a.Id)
+            .Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync(cancellationToken);
+        return new PagedResultDto<QuizAttempt>
+        {
+            Items = items, TotalCount = total, PageNumber = pageNumber, PageSize = pageSize
+        };
+    }
+
     public Task<QuizAttempt?> GetByIdAsync(Guid id, CancellationToken cancellationToken) =>
         db.QuizAttempts
             .Include(a => a.UserAnswers)

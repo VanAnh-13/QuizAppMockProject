@@ -8,6 +8,7 @@ public sealed class SubmitQuizDtoValidator : AbstractValidator<SubmitQuizDto>
     public SubmitQuizDtoValidator()
     {
         RuleFor(dto => dto.AttemptId).NotEmpty();
+        RuleFor(dto => dto.Revision).GreaterThanOrEqualTo(0);
 
         RuleFor(dto => dto.Answers)
             .NotNull()

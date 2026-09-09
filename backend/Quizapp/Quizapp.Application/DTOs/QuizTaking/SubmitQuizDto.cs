@@ -3,11 +3,18 @@ namespace Quizapp.Application.DTOs.QuizTaking;
 public sealed class SubmitQuizDto
 {
     public Guid AttemptId { get; set; }
+    public long? Revision { get; set; }
     public List<SubmitAnswerDto> Answers { get; set; } = [];
 
     public sealed class Builder
     {
         private readonly SubmitQuizDto _dto = new();
+
+        public Builder WithRevision(long? revision)
+        {
+            _dto.Revision = revision;
+            return this;
+        }
 
         public Builder WithAttemptId(Guid attemptId)
         {
