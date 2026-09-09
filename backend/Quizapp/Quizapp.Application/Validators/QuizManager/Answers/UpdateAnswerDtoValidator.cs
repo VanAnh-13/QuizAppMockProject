@@ -7,5 +7,7 @@ namespace Quizapp.Application.Validators.QuizManager.Answers;
 public sealed class UpdateAnswerDtoValidator : AbstractValidator<UpdateAnswerDto>
 {
     public UpdateAnswerDtoValidator()
-        => RuleFor(dto => dto.Text).NotEmpty().MaximumLength(FieldLimits.ContentLength);
+        => RuleFor(dto => dto.Text)
+            .NotEmpty()
+            .MaximumLength(FieldLimits.ContentLength);
 }

@@ -19,30 +19,35 @@ public class CreateQuestionDto
         {
             ArgumentNullException.ThrowIfNull(content);
             _dto.Content = content;
+
             return this;
         }
 
         public Builder WithImage(string? image)
         {
             _dto.Image = image;
+
             return this;
         }
 
         public Builder WithLevel(QuestionLevel level)
         {
             _dto.Level = level;
+
             return this;
         }
 
         public Builder WithQuestionType(QuestionType questionType)
         {
             _dto.QuestionType = questionType;
+
             return this;
         }
 
         public Builder WithIsActive(bool isActive)
         {
             _dto.IsActive = isActive;
+
             return this;
         }
 
@@ -50,6 +55,7 @@ public class CreateQuestionDto
         {
             ArgumentNullException.ThrowIfNull(answers);
             _dto.Answers = [.. answers];
+
             return this;
         }
 
@@ -57,8 +63,8 @@ public class CreateQuestionDto
         {
             var result = (CreateQuestionDto)_dto.MemberwiseClone();
             result.Answers = [.. _dto.Answers];
+
             return result;
         }
-
     }
 }

@@ -14,6 +14,7 @@ public sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logge
         {
             logger.LogWarning(
                 "The response has already started; the global exception handler will not be executed.");
+
             return false;
         }
 
@@ -23,19 +24,28 @@ public sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logge
             logger.LogError(exception, "Unhandled exception: {Message}", exception.Message);
         else
             logger.LogWarning(exception, "Domain exception ({Type}): {Message}",
-                exception.GetType().Name, exception.Message);
+                exception.GetType()
+                    .Name, exception.Message);
 
         httpContext.Response.StatusCode = statusCode;
 
         await httpContext.Response.WriteAsJsonAsync(new ErrorResponse
         {
-            Error = (exception as QuizAppException)?.ErrorCode ?? "INTERNAL_ERROR",
+            Error = exception is FluentValidation.ValidationException
+                ? "VALIDATION_ERROR"
+                : (exception as QuizAppException)?.ErrorCode ?? "INTERNAL_ERROR",
             Message = statusCode >= 500 && exception is not QuizAppException
                 ? "An unexpected error occurred."
                 : exception.Message,
             TraceId = Activity.Current?.Id ?? httpContext.TraceIdentifier,
             Rule = (exception as BusinessRuleException)?.RuleName,
-            Errors = (exception as ValidationException)?.Errors
+            Errors = exception is FluentValidation.ValidationException validation
+                ? validation.Errors.GroupBy(error => error.PropertyName)
+                    .ToDictionary(group => group.Key,
+                        group =>
+                            group.Select(error => error.ErrorMessage)
+                                .ToArray())
+                : (exception as ValidationException)?.Errors
         }, cancellationToken);
 
         return true;
@@ -46,6 +56,7 @@ public sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logge
         NotFoundException => StatusCodes.Status404NotFound,
         ConflictException => StatusCodes.Status409Conflict,
         ValidationException => StatusCodes.Status422UnprocessableEntity,
+        FluentValidation.ValidationException => StatusCodes.Status422UnprocessableEntity,
         BusinessRuleException => StatusCodes.Status400BadRequest,
         AuthenticationException => StatusCodes.Status401Unauthorized,
         ForbiddenException => StatusCodes.Status403Forbidden,

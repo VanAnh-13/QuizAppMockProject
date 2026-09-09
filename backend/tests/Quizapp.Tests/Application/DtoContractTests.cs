@@ -68,6 +68,7 @@ public class DtoContractTests
                 }
             ]
         };
+
         var authentication = new AuthResponseDto
         {
             Token = "test-only-token",

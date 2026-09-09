@@ -22,9 +22,12 @@ public sealed class QuestionFactory : IQuestionFactory
             foreach (var questionType in strategy.SupportedTypes)
             {
                 if (!Enum.IsDefined(questionType))
-                    throw new InvalidOperationException($"A creation strategy declares an unknown question type: {questionType}.");
+                    throw new InvalidOperationException(
+                        $"A creation strategy declares an unknown question type: {questionType}.");
+
                 if (!_strategies.TryAdd(questionType, strategy))
-                    throw new InvalidOperationException($"More than one creation strategy is registered for {questionType}.");
+                    throw new InvalidOperationException(
+                        $"More than one creation strategy is registered for {questionType}.");
             }
         }
     }
@@ -33,6 +36,7 @@ public sealed class QuestionFactory : IQuestionFactory
     {
         ArgumentNullException.ThrowIfNull(request);
         _validator.ValidateAndThrow(request);
+
         if (!_strategies.TryGetValue(request.QuestionType, out var strategy))
             throw new NotSupportedException($"No creation strategy is registered for {request.QuestionType}.");
 

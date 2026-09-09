@@ -7,7 +7,6 @@ public class UserAnswer
     public required Guid QuestionId { get; init; }
     public Guid? AnswerId { get; init; }
     public string? ResponseText { get; init; }
-
     public QuizAttempt QuizAttemptNavigation { get; init; } = null!;
     public Question QuestionNavigation { get; init; } = null!;
     public Answer? AnswerNavigation { get; init; }

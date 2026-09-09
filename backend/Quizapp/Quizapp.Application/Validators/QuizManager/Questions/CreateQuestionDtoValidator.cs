@@ -8,11 +8,24 @@ public sealed class CreateQuestionDtoValidator : AbstractValidator<CreateQuestio
 {
     public CreateQuestionDtoValidator()
     {
-        RuleFor(dto => dto.Content).NotEmpty().MaximumLength(FieldLimits.ContentLength);
-        RuleFor(dto => dto.Image).MaximumLength(FieldLimits.ImageUrlLength);
-        RuleFor(dto => dto.QuestionType).IsInEnum();
-        RuleFor(dto => dto.Level).IsInEnum();
-        RuleFor(dto => dto.Answers).NotNull();
-        RuleForEach(dto => dto.Answers).NotNull().SetValidator(new CreateQuestionAnswerDtoValidator());
+        RuleFor(dto => dto.Content)
+            .NotEmpty()
+            .MaximumLength(FieldLimits.ContentLength);
+
+        RuleFor(dto => dto.Image)
+            .MaximumLength(FieldLimits.ImageUrlLength);
+
+        RuleFor(dto => dto.QuestionType)
+            .IsInEnum();
+
+        RuleFor(dto => dto.Level)
+            .IsInEnum();
+
+        RuleFor(dto => dto.Answers)
+            .NotNull();
+
+        RuleForEach(dto => dto.Answers)
+            .NotNull()
+            .SetValidator(new CreateQuestionAnswerDtoValidator());
     }
 }

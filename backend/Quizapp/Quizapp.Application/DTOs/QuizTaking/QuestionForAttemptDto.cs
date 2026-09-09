@@ -19,6 +19,7 @@ public sealed class QuestionForAttemptDto
         public Builder WithId(Guid id)
         {
             _dto.Id = id;
+
             return this;
         }
 
@@ -26,30 +27,35 @@ public sealed class QuestionForAttemptDto
         {
             ArgumentNullException.ThrowIfNull(content);
             _dto.Content = content;
+
             return this;
         }
 
         public Builder WithImage(string? image)
         {
             _dto.Image = image;
+
             return this;
         }
 
         public Builder WithLevel(QuestionLevel? level)
         {
             _dto.Level = level;
+
             return this;
         }
 
         public Builder WithQuestionType(QuestionType questionType)
         {
             _dto.QuestionType = questionType;
+
             return this;
         }
 
         public Builder WithOrder(int order)
         {
             _dto.Order = order;
+
             return this;
         }
 
@@ -57,6 +63,7 @@ public sealed class QuestionForAttemptDto
         {
             ArgumentNullException.ThrowIfNull(answers);
             _dto.Answers = answers.ToList();
+
             return this;
         }
 
@@ -64,6 +71,7 @@ public sealed class QuestionForAttemptDto
         {
             var result = (QuestionForAttemptDto)_dto.MemberwiseClone();
             result.Answers = _dto.Answers.ToList();
+
             return result;
         }
     }

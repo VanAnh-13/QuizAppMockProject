@@ -121,7 +121,7 @@ namespace Quizapp.Infrastructure.Persistence.Migrations
 
                     b.ToTable("Quizzes", t =>
                         {
-                            t.HasCheckConstraint("CK_Quizzes_PassedScore", "[PassedScore] IS NULL OR [PassedScore] >= 0");
+                            t.HasCheckConstraint("CK_Quizzes_PassedScore", "[PassedScore] IS NULL OR ([PassedScore] >= 0 AND [PassedScore] <= 100)");
 
                             t.HasCheckConstraint("CK_Quizzes_PositiveDuration", "[Duration] > 0");
                         });
@@ -133,13 +133,20 @@ namespace Quizapp.Infrastructure.Persistence.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("datetime2");
+
                     b.Property<Guid>("QuizId")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<double>("Score")
                         .HasColumnType("float");
 
-                    b.Property<DateTime>("SubmitAt")
+                    b.Property<DateTime>("StartedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("SubmitAt")
+                        .IsConcurrencyToken()
                         .HasColumnType("datetime2");
 
                     b.Property<Guid>("UserId")
@@ -248,6 +255,9 @@ namespace Quizapp.Infrastructure.Persistence.Migrations
                     b.Property<string>("PhoneNumber")
                         .HasMaxLength(32)
                         .HasColumnType("nvarchar(32)");
+
+                    b.Property<Guid>("SecurityStamp")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");

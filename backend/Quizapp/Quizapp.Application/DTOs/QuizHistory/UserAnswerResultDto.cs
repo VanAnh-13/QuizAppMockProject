@@ -20,6 +20,7 @@ public sealed class UserAnswerResultDto
         public Builder WithQuestionId(Guid questionId)
         {
             _dto.QuestionId = questionId;
+
             return this;
         }
 
@@ -27,24 +28,28 @@ public sealed class UserAnswerResultDto
         {
             ArgumentNullException.ThrowIfNull(questionContent);
             _dto.QuestionContent = questionContent;
+
             return this;
         }
 
         public Builder WithQuestionType(QuestionType questionType)
         {
             _dto.QuestionType = questionType;
+
             return this;
         }
 
         public Builder WithImage(string? image)
         {
             _dto.Image = image;
+
             return this;
         }
 
         public Builder WithLevel(QuestionLevel? level)
         {
             _dto.Level = level;
+
             return this;
         }
 
@@ -52,12 +57,14 @@ public sealed class UserAnswerResultDto
         {
             ArgumentNullException.ThrowIfNull(selectedAnswers);
             _dto.SelectedAnswers = selectedAnswers.ToList();
+
             return this;
         }
 
         public Builder WithResponseText(string? responseText)
         {
             _dto.ResponseText = responseText;
+
             return this;
         }
 
@@ -65,6 +72,7 @@ public sealed class UserAnswerResultDto
         {
             var result = (UserAnswerResultDto)_dto.MemberwiseClone();
             result.SelectedAnswers = _dto.SelectedAnswers.ToList();
+
             return result;
         }
     }

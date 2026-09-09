@@ -10,9 +10,12 @@ public sealed class SingleChoiceQuestionStrategy : IQuestionCreationStrategy
     public void ValidateAnswers(IReadOnlyCollection<CreateQuestionAnswerDto> activeAnswers)
     {
         ArgumentNullException.ThrowIfNull(activeAnswers);
+
         QuestionAnswerRules.Require(activeAnswers.Count >= QuestionAnswerRules.MinimumChoiceCount,
             $"Single-choice questions require at least {QuestionAnswerRules.MinimumChoiceCount} active options.");
-        QuestionAnswerRules.Require(activeAnswers.Count(answer => answer.IsCorrect) == QuestionAnswerRules.SingleCorrectAnswerCount,
+
+        QuestionAnswerRules.Require(
+            activeAnswers.Count(answer => answer.IsCorrect) == QuestionAnswerRules.SingleCorrectAnswerCount,
             "Single-choice questions require exactly one active correct option.");
     }
 }

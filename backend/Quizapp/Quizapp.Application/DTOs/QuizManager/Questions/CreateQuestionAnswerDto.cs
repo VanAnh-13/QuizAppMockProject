@@ -14,18 +14,21 @@ public sealed class CreateQuestionAnswerDto
         {
             ArgumentNullException.ThrowIfNull(text);
             _dto.Text = text;
+
             return this;
         }
 
         public Builder WithIsCorrect(bool isCorrect)
         {
             _dto.IsCorrect = isCorrect;
+
             return this;
         }
 
         public Builder WithIsActive(bool isActive)
         {
             _dto.IsActive = isActive;
+
             return this;
         }
 

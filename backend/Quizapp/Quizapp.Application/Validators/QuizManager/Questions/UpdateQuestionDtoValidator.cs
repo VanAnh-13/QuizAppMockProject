@@ -8,9 +8,17 @@ public sealed class UpdateQuestionDtoValidator : AbstractValidator<UpdateQuestio
 {
     public UpdateQuestionDtoValidator()
     {
-        RuleFor(dto => dto.Content).NotEmpty().MaximumLength(FieldLimits.ContentLength);
-        RuleFor(dto => dto.Image).MaximumLength(FieldLimits.ImageUrlLength);
-        RuleFor(dto => dto.QuestionType).IsInEnum();
-        RuleFor(dto => dto.Level).IsInEnum();
+        RuleFor(dto => dto.Content)
+            .NotEmpty()
+            .MaximumLength(FieldLimits.ContentLength);
+
+        RuleFor(dto => dto.Image)
+            .MaximumLength(FieldLimits.ImageUrlLength);
+
+        RuleFor(dto => dto.QuestionType)
+            .IsInEnum();
+
+        RuleFor(dto => dto.Level)
+            .IsInEnum();
     }
 }

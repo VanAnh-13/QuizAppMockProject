@@ -17,6 +17,7 @@ public sealed class QuizForAttemptDto
         public Builder WithQuizId(Guid quizId)
         {
             _dto.QuizId = quizId;
+
             return this;
         }
 
@@ -24,30 +25,35 @@ public sealed class QuizForAttemptDto
         {
             ArgumentNullException.ThrowIfNull(title);
             _dto.Title = title;
+
             return this;
         }
 
         public Builder WithDescription(string? description)
         {
             _dto.Description = description;
+
             return this;
         }
 
         public Builder WithDuration(int duration)
         {
             _dto.Duration = duration;
+
             return this;
         }
 
         public Builder WithImage(string? image)
         {
             _dto.Image = image;
+
             return this;
         }
 
         public Builder WithPassedScore(double? passedScore)
         {
             _dto.PassedScore = passedScore;
+
             return this;
         }
 
@@ -55,6 +61,7 @@ public sealed class QuizForAttemptDto
         {
             ArgumentNullException.ThrowIfNull(questions);
             _dto.Questions = [.. questions];
+
             return this;
         }
 
@@ -62,6 +69,7 @@ public sealed class QuizForAttemptDto
         {
             var result = (QuizForAttemptDto)_dto.MemberwiseClone();
             result.Questions = [.. _dto.Questions];
+
             return result;
         }
     }

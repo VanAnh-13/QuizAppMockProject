@@ -14,6 +14,7 @@ public sealed class RoleDto
         public Builder WithId(Guid id)
         {
             _dto.Id = id;
+
             return this;
         }
 
@@ -21,18 +22,21 @@ public sealed class RoleDto
         {
             ArgumentNullException.ThrowIfNull(roleName);
             _dto.RoleName = roleName;
+
             return this;
         }
 
         public Builder WithDescription(string? description)
         {
             _dto.Description = description;
+
             return this;
         }
 
         public Builder WithIsActive(bool isActive)
         {
             _dto.IsActive = isActive;
+
             return this;
         }
 

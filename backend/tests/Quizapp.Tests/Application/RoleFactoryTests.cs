@@ -11,11 +11,16 @@ public class RoleFactoryTests
     [Fact]
     public void Factory_creates_custom_roles_with_independent_ids_and_preserves_input()
     {
-        using var provider = new ServiceCollection().AddApplication().BuildServiceProvider();
+        using var provider = new ServiceCollection().AddApplication()
+            .BuildServiceProvider();
+
         using var scope = provider.CreateScope();
         var factory = scope.ServiceProvider.GetRequiredService<IRoleFactory>();
+
         var request = new CreateRoleDto.Builder().WithRoleName("Question Reviewer")
-            .WithDescription("Reviews question content").WithIsActive(false).Build();
+            .WithDescription("Reviews question content")
+            .WithIsActive(false)
+            .Build();
 
         var first = factory.Create(request);
         var second = factory.Create(request);
@@ -32,13 +37,18 @@ public class RoleFactoryTests
     [Fact]
     public void Factory_rejects_null_and_invalid_role_requests()
     {
-        using var provider = new ServiceCollection().AddApplication().BuildServiceProvider();
+        using var provider = new ServiceCollection().AddApplication()
+            .BuildServiceProvider();
+
         using var scope = provider.CreateScope();
         var factory = scope.ServiceProvider.GetRequiredService<IRoleFactory>();
 
         Assert.Throws<ArgumentNullException>(() => factory.Create(null!));
+
         var exception = Assert.Throws<ValidationException>(() =>
-            factory.Create(new CreateRoleDto.Builder().WithRoleName(" ").Build()));
+            factory.Create(new CreateRoleDto.Builder().WithRoleName(" ")
+                .Build()));
+
         Assert.Contains(exception.Errors, error => error.PropertyName == nameof(CreateRoleDto.RoleName));
     }
 }

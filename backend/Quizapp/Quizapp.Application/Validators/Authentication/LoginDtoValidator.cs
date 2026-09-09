@@ -8,7 +8,11 @@ public sealed class LoginDtoValidator : AbstractValidator<LoginDto>
 {
     public LoginDtoValidator()
     {
-        RuleFor(dto => dto.Username).NotEmpty().MaximumLength(FieldLimits.NameLength);
-        RuleFor(dto => dto.Password).NotEmpty();
+        RuleFor(dto => dto.Username)
+            .NotEmpty()
+            .MaximumLength(FieldLimits.NameLength);
+
+        RuleFor(dto => dto.Password)
+            .NotEmpty();
     }
 }

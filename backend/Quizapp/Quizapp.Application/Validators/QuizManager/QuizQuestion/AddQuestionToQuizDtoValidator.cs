@@ -8,8 +8,13 @@ public sealed class AddQuestionToQuizDtoValidator : AbstractValidator<AddQuestio
 {
     public AddQuestionToQuizDtoValidator()
     {
-        RuleFor(dto => dto.QuizId).NotEmpty();
-        RuleFor(dto => dto.QuestionId).NotEmpty();
-        RuleFor(dto => dto.Order).GreaterThanOrEqualTo(QuizQuestionEntity.FirstOrder);
+        RuleFor(dto => dto.QuizId)
+            .NotEmpty();
+
+        RuleFor(dto => dto.QuestionId)
+            .NotEmpty();
+
+        RuleFor(dto => dto.Order)
+            .GreaterThanOrEqualTo(QuizQuestionEntity.FirstOrder);
     }
 }

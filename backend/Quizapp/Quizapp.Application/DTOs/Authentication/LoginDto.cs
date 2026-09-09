@@ -13,6 +13,7 @@ public class LoginDto
         {
             ArgumentNullException.ThrowIfNull(username);
             _dto.Username = username;
+
             return this;
         }
 
@@ -20,6 +21,7 @@ public class LoginDto
         {
             ArgumentNullException.ThrowIfNull(password);
             _dto.Password = password;
+
             return this;
         }
 
