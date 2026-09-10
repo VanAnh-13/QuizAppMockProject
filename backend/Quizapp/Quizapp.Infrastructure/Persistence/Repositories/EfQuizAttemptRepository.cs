@@ -10,16 +10,27 @@ public sealed class EfQuizAttemptRepository(QuizAppDbContext db) : IQuizAttemptR
     public async Task<PagedResultDto<QuizAttempt>> GetInProgressAsync(Guid userId, int pageNumber, int pageSize,
         Guid? quizId, CancellationToken cancellationToken)
     {
-        var query = db.QuizAttempts.AsNoTracking().Include(a => a.QuizNavigation)
+        var query = db.QuizAttempts.AsNoTracking()
+            .Include(a => a.QuizNavigation)
             .Where(a => a.UserId == userId && a.SubmitAt == null);
+
         if (quizId.HasValue)
             query = query.Where(a => a.QuizId == quizId.Value);
+
         var total = await query.CountAsync(cancellationToken);
-        var items = await query.OrderByDescending(a => a.StartedAt).ThenBy(a => a.Id)
-            .Skip((pageNumber - 1) * pageSize).Take(pageSize).ToListAsync(cancellationToken);
+
+        var items = await query.OrderByDescending(a => a.StartedAt)
+            .ThenBy(a => a.Id)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
+
         return new PagedResultDto<QuizAttempt>
         {
-            Items = items, TotalCount = total, PageNumber = pageNumber, PageSize = pageSize
+            Items = items,
+            TotalCount = total,
+            PageNumber = pageNumber,
+            PageSize = pageSize
         };
     }
 
@@ -27,9 +38,10 @@ public sealed class EfQuizAttemptRepository(QuizAppDbContext db) : IQuizAttemptR
         db.QuizAttempts
             .Include(a => a.UserAnswers)
             .Include(a => a.QuizNavigation)
-            .ThenInclude(q => q.QuizQuestions)
-            .ThenInclude(qq => qq.QuestionNavigation)
-            .ThenInclude(q => q.Answers)
+                .ThenInclude(q => q.QuizQuestions)
+                .ThenInclude(qq => qq.QuestionNavigation)
+                .ThenInclude(q => q.Answers)
+            .AsSplitQuery()
             .FirstOrDefaultAsync(a => a.Id == id, cancellationToken);
 
     public async Task<PagedResultDto<QuizAttempt>> GetHistoryAsync(Guid userId, int pageNumber, int pageSize,

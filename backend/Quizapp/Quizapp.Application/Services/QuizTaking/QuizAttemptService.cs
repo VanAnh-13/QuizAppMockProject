@@ -25,11 +25,8 @@ public sealed class QuizAttemptService(
     {
         var attempt = await GetOwnedAttemptAsync(attemptId, cancellationToken);
         await RequireRevisionAsync(attempt, request, cancellationToken);
-        return await SubmitAsync(attempt.QuizId, new SubmitQuizDto
-        {
-            AttemptId = attempt.Id, Revision = request.Revision,
-            Answers = JsonSerializer.Deserialize<List<SubmitAnswerDto>>(attempt.DraftAnswersJson)!
-        }, cancellationToken);
+
+        return await CompleteAsync(attempt, ReadSavedAnswers(attempt), cancellationToken);
     }
 
     public async Task<PagedResultDto<QuizAttemptSummaryDto>> GetInProgressAsync(int pageNumber, int pageSize,
@@ -38,12 +35,19 @@ public sealed class QuizAttemptService(
         var user = await authorization.RequireUserAsync(cancellationToken);
         ServiceRules.ValidatePage(pageNumber, pageSize);
         var page = await attempts.GetInProgressAsync(user.Id, pageNumber, pageSize, quizId, cancellationToken);
+
         var now = clock.GetUtcNow().UtcDateTime;
+
         return ServiceRules.MapPage(page, attempt => new QuizAttemptSummaryDto
         {
-            AttemptId = attempt.Id, QuizId = attempt.QuizId, QuizTitle = AttemptQuizSnapshot.Read(attempt).Title,
-            StartedAt = attempt.StartedAt, ExpiresAt = attempt.ExpiresAt, PausedAt = attempt.PausedAt,
-            ServerTime = now, Revision = attempt.Revision,
+            AttemptId = attempt.Id, 
+            QuizId = attempt.QuizId, 
+            QuizTitle = AttemptQuizSnapshot.Read(attempt).Title,
+            StartedAt = attempt.StartedAt,
+            ExpiresAt = attempt.ExpiresAt,
+            PausedAt = attempt.PausedAt,
+            ServerTime = now,
+            Revision = attempt.Revision,
             RemainingSeconds = Math.Max(0, (attempt.ExpiresAt - (attempt.PausedAt ?? now)).TotalSeconds)
         });
     }
@@ -127,8 +131,8 @@ public sealed class QuizAttemptService(
         CancellationToken cancellationToken)
     {
         ArgumentNullException.ThrowIfNull(request);
-        await revisionValidator.ValidateAndThrowAsync(request, cancellationToken);
         RequireUnsubmitted(attempt);
+        await revisionValidator.ValidateAndThrowAsync(request, cancellationToken);
 
         if (request.Revision != attempt.Revision)
             throw new ConflictException(nameof(QuizAttempt), nameof(QuizAttempt.Revision), attempt.Revision.ToString());
@@ -177,9 +181,16 @@ public sealed class QuizAttemptService(
                 throw new Quizapp.Domain.Exceptions.ValidationException(nameof(SubmitQuizDto.Answers),
                     "The response does not match this question's type or active answer options.");
 
-            _ = Score(question, response);
+            if (question.QuestionType is QuestionType.SingleChoice or QuestionType.TrueFalse
+                && response.AnswerIds.Count != 1)
+                throw new Quizapp.Domain.Exceptions.ValidationException(nameof(SubmitQuizDto.Answers),
+                    $"Question '{question.Id}' requires exactly one active answer belonging to that question.");
         }
     }
+
+    private static List<SubmitAnswerDto> ReadSavedAnswers(QuizAttempt attempt) =>
+        JsonSerializer.Deserialize<List<SubmitAnswerDto>>(attempt.DraftAnswersJson)
+        ?? throw new InvalidOperationException("The attempt's saved answers are invalid.");
 
     private static QuizAttemptProgressDto MapProgress(QuizAttempt attempt, DateTime now) => new()
     {
@@ -191,7 +202,7 @@ public sealed class QuizAttemptService(
         PausedAt = attempt.PausedAt,
         LastSavedAt = attempt.LastSavedAt,
         RemainingSeconds = Math.Max(0, (attempt.ExpiresAt - (attempt.PausedAt ?? now)).TotalSeconds),
-        Answers = JsonSerializer.Deserialize<List<SubmitAnswerDto>>(attempt.DraftAnswersJson)!,
+        Answers = ReadSavedAnswers(attempt),
         Quiz = MapQuiz(AttemptQuizSnapshot.Read(attempt))
     };
 
@@ -267,37 +278,34 @@ public sealed class QuizAttemptService(
     public async Task<QuizAttemptDetailDto> SubmitAsync(Guid quizId, SubmitQuizDto request,
         CancellationToken cancellationToken = default)
     {
-        var user = await authorization.RequireUserAsync(cancellationToken);
-
         ArgumentNullException.ThrowIfNull(request);
         await submitValidator.ValidateAndThrowAsync(request, cancellationToken);
 
-        var attempt = await attempts.GetByIdAsync(request.AttemptId, cancellationToken)
-                      ?? throw new NotFoundException(nameof(QuizAttempt), request.AttemptId);
-
-        if (attempt.UserId != user.Id)
-            throw new ForbiddenException("You cannot submit another user's attempt.");
+        var attempt = await GetOwnedAttemptAsync(request.AttemptId, cancellationToken);
 
         if (attempt.QuizId != quizId)
             throw new BusinessRuleException("AttemptQuizMismatch", "This attempt belongs to a different quiz.");
 
-        if (attempt.SubmitAt is not null)
-            throw new ConflictException(nameof(QuizAttempt), nameof(QuizAttempt.Id), attempt.Id.ToString());
+        if (request.Revision.HasValue || attempt.Revision > 0)
+            await RequireRevisionAsync(attempt, new AttemptRevisionDto { Revision = request.Revision },
+                cancellationToken);
 
-        var now = clock.GetUtcNow()
-            .UtcDateTime;
+        return await CompleteAsync(attempt, request.Answers, cancellationToken);
+    }
+
+    private async Task<QuizAttemptDetailDto> CompleteAsync(QuizAttempt attempt, IReadOnlyList<SubmitAnswerDto> answers,
+        CancellationToken cancellationToken)
+    {
+        RequireUnsubmitted(attempt);
 
         if (attempt.PausedAt is not null)
             throw new BusinessRuleException("AttemptPaused", "Resume this attempt before submitting it.");
 
-        if (request.Revision.HasValue || attempt.Revision > 0)
-            await RequireRevisionAsync(attempt, new AttemptRevisionDto { Revision = request.Revision }, cancellationToken);
+        var now = clock.GetUtcNow().UtcDateTime;
 
         var expired = now >= attempt.ExpiresAt;
         var submittedAt = expired ? attempt.ExpiresAt : now;
-        var responses = expired
-            ? JsonSerializer.Deserialize<List<SubmitAnswerDto>>(attempt.DraftAnswersJson)!
-            : request.Answers;
+        var responses = expired ? ReadSavedAnswers(attempt) : answers;
 
         var quiz = AttemptQuizSnapshot.Read(attempt);
 
@@ -341,20 +349,6 @@ public sealed class QuizAttemptService(
             });
 
             if (submission is null) continue;
-
-            if (submission.AnswerIds.Count > 0)
-            {
-                var validAnswerIds = question.Answers
-                    .Where(a => a.IsActive)
-                    .Select(a => a.Id)
-                    .ToHashSet();
-
-                var invalidId = submission.AnswerIds.FirstOrDefault(id => !validAnswerIds.Contains(id));
-
-                if (invalidId != Guid.Empty)
-                    throw new Quizapp.Domain.Exceptions.ValidationException(nameof(SubmitQuizDto.Answers),
-                        $"Answer '{invalidId}' is not a valid active option for question '{question.Id}'.");
-            }
 
             pendingAnswers.AddRange(submission.AnswerIds
                 .Select(answerId =>
@@ -424,7 +418,8 @@ public sealed class QuizAttemptService(
         {
             Id = attempt.Id,
             QuizId = attempt.QuizId,
-            QuizTitle = AttemptQuizSnapshot.Read(attempt).Title,
+            QuizTitle = AttemptQuizSnapshot.Read(attempt)
+                .Title,
             Score = attempt.Score,
             SubmittedAt = attempt.SubmitAt!.Value
         });
@@ -490,14 +485,7 @@ public sealed class QuizAttemptService(
                 if (submission is null)
                     return 0.0;
 
-                var selectedAnswer = submission.AnswerIds.Count == 1
-                    ? question.Answers.FirstOrDefault(answer =>
-                        answer.Id == submission.AnswerIds[0] && answer.QuestionId == question.Id && answer.IsActive)
-                    : null;
-
-                if (selectedAnswer is null)
-                    throw new Quizapp.Domain.Exceptions.ValidationException(nameof(SubmitQuizDto.Answers),
-                        $"Question '{question.Id}' requires exactly one active answer belonging to that question.");
+                var selectedAnswer = question.Answers.Single(answer => answer.Id == submission.AnswerIds[0]);
 
                 return selectedAnswer.IsCorrect ? 1.0 : 0.0;
             }

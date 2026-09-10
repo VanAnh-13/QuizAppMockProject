@@ -44,6 +44,7 @@ Boundary and registration checks live in `D:/Homeworks/c#/Quizapp/tests/Quizapp.
 ## Editing conventions
 
 - Match neighboring C# files: file-scoped namespaces, four-space indentation, PascalCase public members, and `_camelCase` private fields. Preserve local encoding and line endings; avoid unrelated formatting churn.
+- The repository's current formatting is the source of truth: keep code aligned with the existing style in the file, project, and solution. Do not introduce a different formatting standard, broader reflow, or formatter churn that changes unrelated code. Preserve the current layout, spacing, line endings, and surrounding conventions unless the task explicitly requires a format update.
 - Nullable reference types and implicit usings are enabled. Follow existing `required`, `init`, and constructor patterns; preserve DTO serialization behavior when changing contracts.
 - Use existing packages and abstractions. Inspect the affected `.csproj` before adding dependencies; avoid introducing a new architectural pattern for a small change.
 - Shared field lengths belong in `D:/Homeworks/c#/Quizapp/Quizapp/Quizapp.Domain/Constants/FieldLimits.cs`. Keep DTO validators and EF column constraints consistent with those limits.
