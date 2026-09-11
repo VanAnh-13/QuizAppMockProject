@@ -79,7 +79,27 @@ internal sealed class TestCurrentUser : ICurrentUser
     public Guid? UserId { get; set; }
 }
 
-internal sealed class MemoryQuizzes() : MemoryRepository<Quiz>(quiz => quiz.Id, quiz => quiz.Title), IQuizRepository;
+internal sealed class MemoryQuizzes() : MemoryRepository<Quiz>(quiz => quiz.Id, quiz => quiz.Title), IQuizRepository
+{
+    public Task<PagedResultDto<Quiz>> GetActiveListAsync(int pageNumber, int pageSize, string? search,
+        CancellationToken cancellationToken)
+    {
+        cancellationToken.ThrowIfCancellationRequested();
+        var query = Rows.Where(quiz => quiz.IsActive)
+            .Where(quiz => search is null || quiz.Title.Contains(search, StringComparison.OrdinalIgnoreCase))
+            .OrderBy(quiz => quiz.Title)
+            .ThenBy(quiz => quiz.Id)
+            .ToArray();
+
+        return Task.FromResult(new PagedResultDto<Quiz>
+        {
+            Items = query.Skip((pageNumber - 1) * pageSize).Take(pageSize).ToArray(),
+            TotalCount = query.Length,
+            PageNumber = pageNumber,
+            PageSize = pageSize
+        });
+    }
+}
 
 internal sealed class MemoryQuestions()
     : MemoryRepository<Question>(question => question.Id, question => question.Content), IQuestionRepository;

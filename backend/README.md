@@ -13,6 +13,8 @@ The backend currently provides:
 - Role and question factories, with creation strategies for all six question types; see [creation patterns](docs/creation-patterns.md).
 - SQL Server entity mappings and EF Core migrations.
 - A development API host with OpenAPI and Swagger UI.
+- A read-only public quiz catalog endpoint, `GET /api/public/quizzes`, for active quiz metadata without answers or grading keys.
+- A development CORS policy for the Angular client at `http://localhost:4200`.
 - xUnit tests for contracts, validation, layer dependencies, dependency injection, database mappings, and persistence.
 
 Controllers and application services implement authentication, user/role management, quiz management, quiz taking, and attempt history. JWT authentication validates each user's security stamp. The API rejects invalid JWT configuration during startup.
@@ -44,13 +46,13 @@ backend/
 Domain (no deps) → Application (Domain) → Infrastructure (Application + Domain) → Api (Application + Infrastructure)
 ```
 
-| Project | Responsibility | Key Dependencies |
-| --- | --- | --- |
-| **Quizapp.Domain** | Entities, enums, and shared field limits | None |
-| **Quizapp.Application** | DTOs, request validators, and validator registration | FluentValidation 12.1.1 |
+| Project                    | Responsibility                                                                | Key Dependencies                     |
+| -------------------------- | ----------------------------------------------------------------------------- | ------------------------------------ |
+| **Quizapp.Domain**         | Entities, enums, and shared field limits                                      | None                                 |
+| **Quizapp.Application**    | DTOs, request validators, and validator registration                          | FluentValidation 12.1.1              |
 | **Quizapp.Infrastructure** | `QuizAppDbContext`, SQL Server configuration, entity mappings, and migrations | EF Core 10.0.11, SQL Server provider |
-| **Quizapp.Api** | ASP.NET Core entry point, DI composition, and development API docs | JWT Bearer, OpenApi, Swagger UI |
-| **Quizapp.Tests** | Contract, validation, architecture, model, migration, and persistence tests | xUnit 2.9.3 |
+| **Quizapp.Api**            | ASP.NET Core entry point, DI composition, and development API docs            | JWT Bearer, OpenApi, Swagger UI      |
+| **Quizapp.Tests**          | Contract, validation, architecture, model, migration, and persistence tests   | xUnit 2.9.3                          |
 
 ## Quick Start
 
@@ -119,11 +121,11 @@ dotnet run --project "$Api" --launch-profile https
 dotnet run --project "$Api" --launch-profile http
 ```
 
-| Resource | URL |
-| --- | --- |
-| Swagger UI | https://localhost:7267/swagger |
+| Resource         | URL                                    |
+| ---------------- | -------------------------------------- |
+| Swagger UI       | https://localhost:7267/swagger         |
 | OpenAPI document | https://localhost:7267/openapi/v1.json |
-| HTTP listener | http://localhost:5269 |
+| HTTP listener    | http://localhost:5269                  |
 
 OpenAPI and Swagger UI are exposed **only in Development**. A `404` at `/` is expected — no root endpoint is mapped.
 
@@ -172,12 +174,12 @@ The fixture creates a unique `QuizappRelationTests_<guid>` database, applies mig
 
 ### Test Categories
 
-| Directory | What It Tests |
-| --- | --- |
-| `Application/` | DTO contract shapes, FluentValidation request validation |
-| `Architecture/` | Layer dependency boundaries, DI/service registration |
-| `Api/` | Real HTTP routing and JWT middleware with test repositories |
-| `Data/` | EF Core model/schema, SQL Server persistence and relationships |
+| Directory       | What It Tests                                                  |
+| --------------- | -------------------------------------------------------------- |
+| `Application/`  | DTO contract shapes, FluentValidation request validation       |
+| `Architecture/` | Layer dependency boundaries, DI/service registration           |
+| `Api/`          | Real HTTP routing and JWT middleware with test repositories    |
+| `Data/`         | EF Core model/schema, SQL Server persistence and relationships |
 
 ### Focused Test Run
 
@@ -204,14 +206,14 @@ Configure those explicitly before using Compose as a runnable stack.
 
 ## Useful Commands
 
-| Command | Purpose |
-| --- | --- |
-| `dotnet restore "$Solution"` | Restore NuGet dependencies |
-| `dotnet build "$Solution" -c Release` | Build all projects in Release mode |
-| `dotnet test "$Tests"` | Run tests (SQL Server tests are conditional) |
-| `dotnet run --project "$Api" --launch-profile https` | Run the development host with HTTPS |
-| `dotnet ef dbcontext info --project "$Infra" --startup-project "$Api"` | Inspect the EF context and provider |
-| `dotnet ef database update --project "$Infra" --startup-project "$Api"` | Apply migrations |
+| Command                                                                 | Purpose                                      |
+| ----------------------------------------------------------------------- | -------------------------------------------- |
+| `dotnet restore "$Solution"`                                            | Restore NuGet dependencies                   |
+| `dotnet build "$Solution" -c Release`                                   | Build all projects in Release mode           |
+| `dotnet test "$Tests"`                                                  | Run tests (SQL Server tests are conditional) |
+| `dotnet run --project "$Api" --launch-profile https`                    | Run the development host with HTTPS          |
+| `dotnet ef dbcontext info --project "$Infra" --startup-project "$Api"`  | Inspect the EF context and provider          |
+| `dotnet ef database update --project "$Infra" --startup-project "$Api"` | Apply migrations                             |
 
 ### Creating a New Migration
 
@@ -225,11 +227,11 @@ Review the generated schema changes before applying.
 
 ## Troubleshooting
 
-| Problem | Solution |
-| --- | --- |
-| Swagger is missing | Use a Development launch profile and navigate to `/swagger`, not `/` |
-| API fails before startup with JWT configuration error | Check `Jwt__Issuer`, `Jwt__Audience`, `Jwt__SigningKey`, and `Jwt__LifetimeMinutes` |
-| SQL Server connection fails | Check server name, credentials, network access, certificate settings, and the `ConnectionStrings__DefaultConnection` env variable |
-| Database tables missing | Run `dotnet ef database update` — startup does not migrate automatically |
-| Persistence tests skipped | Set `QUIZAPP_TEST_SQLSERVER_CONNECTION_STRING` for a dedicated test instance |
-| HTTPS certificate errors | Trust the .NET dev certificate (`dotnet dev-certs https --trust`) or use the HTTP launch profile |
+| Problem                                               | Solution                                                                                                                          |
+| ----------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------- |
+| Swagger is missing                                    | Use a Development launch profile and navigate to `/swagger`, not `/`                                                              |
+| API fails before startup with JWT configuration error | Check `Jwt__Issuer`, `Jwt__Audience`, `Jwt__SigningKey`, and `Jwt__LifetimeMinutes`                                               |
+| SQL Server connection fails                           | Check server name, credentials, network access, certificate settings, and the `ConnectionStrings__DefaultConnection` env variable |
+| Database tables missing                               | Run `dotnet ef database update` — startup does not migrate automatically                                                          |
+| Persistence tests skipped                             | Set `QUIZAPP_TEST_SQLSERVER_CONNECTION_STRING` for a dedicated test instance                                                      |
+| HTTPS certificate errors                              | Trust the .NET dev certificate (`dotnet dev-certs https --trust`) or use the HTTP launch profile                                  |

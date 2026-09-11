@@ -19,6 +19,8 @@ frontend/build/
 *.user
 *.suo
 *.DotSettings.user
+.vscode/
+.idea/
 
 # Local secrets
 .env

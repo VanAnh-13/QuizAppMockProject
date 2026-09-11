@@ -13,6 +13,15 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
+const string angularDevelopmentCorsPolicy = "AngularDevelopmentClient";
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(angularDevelopmentCorsPolicy, policy => policy
+        .WithOrigins("http://localhost:4200")
+        .AllowAnyHeader()
+        .AllowAnyMethod());
+});
+
 var jwt = builder.Configuration.GetSection(JwtOptions.SectionName).Get<JwtOptions>() ?? new JwtOptions();
 jwt.Validate();
 builder.Services.AddSingleton<IOptions<JwtOptions>>(Options.Create(jwt));
@@ -74,6 +83,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseExceptionHandler();
 app.UseHttpsRedirection();
+app.UseCors(angularDevelopmentCorsPolicy);
 
 app.UseAuthentication();
 app.UseAuthorization();
