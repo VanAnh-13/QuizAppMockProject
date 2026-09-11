@@ -10,7 +10,7 @@ These instructions apply to the entire Quizapp repository. Follow any more speci
 
 This is a monorepo. The .NET solution lives in `D:/Homeworks/c#/Quizapp/backend`; shared documentation and repository configuration stay at the root. A future web client belongs in its own top-level directory, not inside the .NET solution tree.
 
-The application is a .NET 10 backend with controllers and services for authentication, user/role management, quiz management, quiz taking, and history. JWT settings are validated before startup, and authentication checks the current user's security stamp. Starting an attempt uses POST and persists its owner and deadline; submission requires the returned AttemptId and completes that same attempt. Development OpenAPI/Swagger is available. There is no frontend yet. Update this note and the README when that changes.
+The application is a .NET 10 backend with controllers and services for authentication, user/role management, quiz management, quiz taking, and history. JWT settings are validated before startup, and authentication checks the current user's security stamp. Starting an attempt uses POST and persists its owner, deadline and quiz snapshot. Progress can be saved, paused (freezing time), and resumed on the same attempt. The frontend triggers submission; expired attempts grade only saved answers. Progress writes use revisions to reject stale updates. See backend/docs/attempt-progress.md for the contract. Development OpenAPI/Swagger is available. There is no frontend yet. Update this note and the README when that changes.
 
 ## Branching model
 
@@ -44,6 +44,7 @@ Boundary and registration checks live in `D:/Homeworks/c#/Quizapp/tests/Quizapp.
 ## Editing conventions
 
 - Match neighboring C# files: file-scoped namespaces, four-space indentation, PascalCase public members, and `_camelCase` private fields. Preserve local encoding and line endings; avoid unrelated formatting churn.
+- The repository's current formatting is the source of truth: keep code aligned with the existing style in the file, project, and solution. Do not introduce a different formatting standard, broader reflow, or formatter churn that changes unrelated code. Preserve the current layout, spacing, line endings, and surrounding conventions unless the task explicitly requires a format update.
 - Nullable reference types and implicit usings are enabled. Follow existing `required`, `init`, and constructor patterns; preserve DTO serialization behavior when changing contracts.
 - Use existing packages and abstractions. Inspect the affected `.csproj` before adding dependencies; avoid introducing a new architectural pattern for a small change.
 - Shared field lengths belong in `D:/Homeworks/c#/Quizapp/Quizapp/Quizapp.Domain/Constants/FieldLimits.cs`. Keep DTO validators and EF column constraints consistent with those limits.

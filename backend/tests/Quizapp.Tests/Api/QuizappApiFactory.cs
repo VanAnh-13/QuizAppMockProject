@@ -32,13 +32,17 @@ internal sealed class QuizappApiFactory : WebApplicationFactory<AuthController>
 
     public User User { get; } = new()
     {
-        Id = Guid.NewGuid(), Username = "token-user", Email = "token-user@example.com",
-        Password = new IdentityPasswordService().Hash(OriginalPassword), IsActive = true
+        Id = Guid.NewGuid(),
+        Username = "token-user",
+        Email = "token-user@example.com",
+        Password = new IdentityPasswordService().Hash(OriginalPassword),
+        IsActive = true
     };
 
     public MemoryUsers Users { get; } = new();
     public MemoryQuizzes Quizzes { get; } = new();
     public MemoryQuizAttempts Attempts { get; } = new();
+    public TimeProvider Clock { get; set; } = TimeProvider.System;
 
     public QuizappApiFactory() => Users.Add(User);
 
@@ -51,6 +55,7 @@ internal sealed class QuizappApiFactory : WebApplicationFactory<AuthController>
         builder.UseSetting($"{JwtOptions.SectionName}:SigningKey", _jwt.SigningKey);
         builder.ConfigureTestServices(services =>
         {
+            services.AddSingleton(Clock);
             services.RemoveAll<IUserRepository>();
             services.AddScoped<IUserRepository>(_ => Users);
             services.RemoveAll<IUnitOfWork>();

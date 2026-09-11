@@ -6,6 +6,23 @@ namespace Quizapp.Application.Services.QuizTaking;
 
 public interface IQuizAttemptService
 {
+    Task<QuizAttemptDetailDto> SubmitSavedAsync(Guid attemptId, AttemptRevisionDto request,
+        CancellationToken cancellationToken = default);
+
+    Task<PagedResultDto<QuizAttemptSummaryDto>> GetInProgressAsync(int pageNumber, int pageSize,
+        Guid? quizId = null, CancellationToken cancellationToken = default);
+
+    Task<QuizAttemptProgressDto> PauseAsync(Guid attemptId, SaveQuizProgressDto request,
+        CancellationToken cancellationToken = default);
+
+    Task<QuizAttemptProgressDto> ResumeAsync(Guid attemptId, AttemptRevisionDto request,
+        CancellationToken cancellationToken = default);
+
+    Task<QuizAttemptProgressDto> GetProgressAsync(Guid attemptId, CancellationToken cancellationToken = default);
+
+    Task<QuizAttemptProgressDto> SaveProgressAsync(Guid attemptId, SaveQuizProgressDto request,
+        CancellationToken cancellationToken = default);
+
     Task<QuizAttemptStartDto> StartAsync(
         Guid quizId,
         CancellationToken cancellationToken = default);

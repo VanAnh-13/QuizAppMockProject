@@ -7,6 +7,9 @@ public interface IQuizAttemptRepository
 {
     Task<QuizAttempt?> GetByIdAsync(Guid id, CancellationToken cancellationToken);
 
+    Task<PagedResultDto<QuizAttempt>> GetInProgressAsync(Guid userId, int pageNumber, int pageSize,
+        Guid? quizId, CancellationToken cancellationToken);
+
     Task<PagedResultDto<QuizAttempt>> GetHistoryAsync(Guid userId, int pageNumber, int pageSize, Guid? quizId,
         CancellationToken cancellationToken);
 
