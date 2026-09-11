@@ -11,6 +11,75 @@ namespace Quizapp.Tests.Api;
 public class QuizAttemptProgressApiTests
 {
     [Theory]
+    [InlineData(-1, "duplicate_questions")]
+    [InlineData(0, "duplicate_questions")]
+    [InlineData(30, "duplicate_questions")]
+    [InlineData(-1, "duplicate_options")]
+    [InlineData(0, "duplicate_options")]
+    [InlineData(30, "duplicate_options")]
+    [InlineData(-1, "mixed_response")]
+    [InlineData(0, "mixed_response")]
+    [InlineData(30, "mixed_response")]
+    public async Task Legacy_submit_validates_only_the_answers_used_for_grading(int secondsFromExpiry, string invalidResponse)
+    {
+        var clock = new ProgressClock();
+        await using var factory = new QuizappApiFactory { Clock = clock };
+        var quiz = TestEntities.Quiz();
+        quiz.IsActive = true;
+        var question = TestEntities.Question(QuestionType.ShortAnswer);
+        question.IsActive = true;
+        question.Answers.Add(new Answer
+        {
+            Id = Guid.NewGuid(), QuestionId = question.Id, Text = "Saved answer", IsCorrect = true, IsActive = true
+        });
+        quiz.QuizQuestions.Add(new QuizQuestion
+        {
+            Id = Guid.NewGuid(), QuizId = quiz.Id, QuestionId = question.Id,
+            QuizNavigation = quiz, QuestionNavigation = question
+        });
+        factory.Quizzes.Add(quiz);
+        using var client = factory.CreateAuthenticatedClient();
+        using var started = await client.PostAsync($"/api/quizzes/{quiz.Id}/start", null);
+        var start = (await started.Content.ReadFromJsonAsync<QuizAttemptStartDto>())!;
+        using var saved = await client.PutAsJsonAsync($"/api/attempts/{start.AttemptId}/progress", new SaveQuizProgressDto
+        {
+            Revision = 0,
+            Answers = [new SubmitAnswerDto { QuestionId = question.Id, ResponseText = "Saved answer" }]
+        });
+        Assert.Equal(HttpStatusCode.OK, saved.StatusCode);
+        clock.Now = new DateTimeOffset(start.ExpiresAt.AddSeconds(secondsFromExpiry));
+        var duplicate = new SubmitAnswerDto { QuestionId = question.Id, ResponseText = "Discarded answer" };
+        var optionId = question.Answers.Single().Id;
+        var suppliedAnswers = invalidResponse switch
+        {
+            "duplicate_questions" => new List<SubmitAnswerDto> { duplicate, duplicate },
+            "duplicate_options" => [new SubmitAnswerDto { QuestionId = question.Id, AnswerIds = [optionId, optionId] }],
+            "mixed_response" => [new SubmitAnswerDto { QuestionId = question.Id, AnswerIds = [optionId], ResponseText = "Discarded answer" }],
+            _ => throw new ArgumentOutOfRangeException(nameof(invalidResponse))
+        };
+
+        using var submitted = await client.PostAsJsonAsync($"/api/quizzes/{quiz.Id}/submit", new SubmitQuizDto
+        {
+            AttemptId = start.AttemptId, Revision = 1, Answers = suppliedAnswers
+        });
+
+        if (secondsFromExpiry < 0)
+        {
+            Assert.Equal(HttpStatusCode.UnprocessableEntity, submitted.StatusCode);
+            Assert.Contains("Answers", await submitted.Content.ReadAsStringAsync());
+            var progress = await client.GetFromJsonAsync<QuizAttemptProgressDto>($"/api/attempts/{start.AttemptId}/progress");
+            Assert.Equal("Saved answer", Assert.Single(progress!.Answers).ResponseText);
+            return;
+        }
+
+        Assert.Equal(HttpStatusCode.OK, submitted.StatusCode);
+        var result = await submitted.Content.ReadFromJsonAsync<JsonElement>();
+        Assert.Equal(100, result.GetProperty("score").GetDouble());
+        Assert.Equal("Saved answer", result.GetProperty("answers")[0].GetProperty("responseText").GetString());
+        Assert.Equal(start.ExpiresAt, result.GetProperty("submittedAt").GetDateTime());
+    }
+
+    [Theory]
     [InlineData(-1)]
     [InlineData(0)]
     [InlineData(30)]

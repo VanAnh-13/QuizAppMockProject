@@ -279,7 +279,11 @@ public sealed class QuizAttemptService(
         CancellationToken cancellationToken = default)
     {
         ArgumentNullException.ThrowIfNull(request);
-        await submitValidator.ValidateAndThrowAsync(request, cancellationToken);
+        await submitValidator.ValidateAsync(request, options =>
+        {
+            options.IncludeProperties(nameof(SubmitQuizDto.AttemptId), nameof(SubmitQuizDto.Revision));
+            options.ThrowOnFailures();
+        }, cancellationToken);
 
         var attempt = await GetOwnedAttemptAsync(request.AttemptId, cancellationToken);
 
@@ -293,7 +297,7 @@ public sealed class QuizAttemptService(
         return await CompleteAsync(attempt, request.Answers, cancellationToken);
     }
 
-    private async Task<QuizAttemptDetailDto> CompleteAsync(QuizAttempt attempt, IReadOnlyList<SubmitAnswerDto> answers,
+    private async Task<QuizAttemptDetailDto> CompleteAsync(QuizAttempt attempt, List<SubmitAnswerDto> answers,
         CancellationToken cancellationToken)
     {
         RequireUnsubmitted(attempt);
@@ -306,6 +310,12 @@ public sealed class QuizAttemptService(
         var expired = now >= attempt.ExpiresAt;
         var submittedAt = expired ? attempt.ExpiresAt : now;
         var responses = expired ? ReadSavedAnswers(attempt) : answers;
+
+        await submitValidator.ValidateAndThrowAsync(new SubmitQuizDto
+        {
+            AttemptId = attempt.Id,
+            Answers = responses
+        }, cancellationToken);
 
         var quiz = AttemptQuizSnapshot.Read(attempt);
 
