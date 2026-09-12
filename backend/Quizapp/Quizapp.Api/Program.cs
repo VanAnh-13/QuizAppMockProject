@@ -8,28 +8,36 @@ using Quizapp.Application;
 using Quizapp.Application.Abstractions.Persistence;
 using Quizapp.Infrastructure;
 using Quizapp.Infrastructure.Authentication;
+using Quizapp.Infrastructure.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
 const string angularDevelopmentCorsPolicy = "AngularDevelopmentClient";
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy(angularDevelopmentCorsPolicy, policy => policy
-        .WithOrigins("http://localhost:4200")
-        .AllowAnyHeader()
-        .AllowAnyMethod());
-});
 
-var jwt = builder.Configuration.GetSection(JwtOptions.SectionName).Get<JwtOptions>() ?? new JwtOptions();
+if (builder.Environment.IsDevelopment())
+{
+    builder.Services.AddCors(options =>
+    {
+        options.AddPolicy(angularDevelopmentCorsPolicy, policy => policy
+            .WithOrigins("http://localhost:4200")
+            .AllowAnyHeader()
+            .AllowAnyMethod());
+    });
+}
+
+var jwt = builder.Configuration.GetSection(JwtOptions.SectionName)
+    .Get<JwtOptions>() ?? new JwtOptions();
+
 jwt.Validate();
-builder.Services.AddSingleton<IOptions<JwtOptions>>(Options.Create(jwt));
+builder.Services.AddSingleton(Options.Create(jwt));
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        options.MapInboundClaims = false; 
+        options.MapInboundClaims = false;
+
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = true,
@@ -46,14 +54,20 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         {
             OnTokenValidated = async context =>
             {
-                var subject = context.Principal?.FindFirst("sub")?.Value
-                              ?? context.Principal?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-                var stamp = context.Principal?.FindFirst(JwtOptions.SecurityStampClaim)?.Value;
+                var subject = context.Principal?.FindFirst("sub")
+                                  ?.Value
+                              ?? context.Principal?.FindFirst(ClaimTypes.NameIdentifier)
+                                  ?.Value;
+
+                var stamp = context.Principal?.FindFirst(JwtOptions.SecurityStampClaim)
+                    ?.Value;
 
                 if (!Guid.TryParse(subject, out var userId) || userId == Guid.Empty
-                    || !Guid.TryParse(stamp, out var securityStamp) || securityStamp == Guid.Empty)
+                                                            || !Guid.TryParse(stamp, out var securityStamp) ||
+                                                            securityStamp == Guid.Empty)
                 {
                     context.Fail("Invalid access token.");
+
                     return;
                 }
 
@@ -79,11 +93,21 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
     app.UseSwaggerUI(option => option.SwaggerEndpoint("/openapi/v1.json", "QuizApp"));
+
+    if (app.Configuration.GetValue<bool>("SampleData:Enabled"))
+    {
+        await using var scope = app.Services.CreateAsyncScope();
+        var db = scope.ServiceProvider.GetRequiredService<QuizAppDbContext>();
+        await SampleQuizDataSeeder.SeedAsync(db);
+    }
 }
 
 app.UseExceptionHandler();
-app.UseHttpsRedirection();
-app.UseCors(angularDevelopmentCorsPolicy);
+
+if (app.Environment.IsDevelopment())
+    app.UseCors(angularDevelopmentCorsPolicy);
+else
+    app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
