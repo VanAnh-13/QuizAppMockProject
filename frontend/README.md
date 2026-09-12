@@ -1,68 +1,37 @@
-# Quizapp — Frontend
+# Quizapp frontend
 
-Angular + TypeScript web client for the Quizapp quiz-management platform.
+Angular 22 client for quiz discovery, authentication, timed attempts, saved progress, submission, and attempt history.
 
-> **This project has not been implemented yet.** The directory is reserved for the future web client. See the [root README](../README.md) for the current project status.
+## API integration
 
-## Planned Tech Stack
+The browser calls relative `/api` URLs. During local development, Angular proxies those requests to the backend origin in `QUIZAPP_API_TARGET`; no server URL is embedded in application code.
 
-| Layer | Technology |
-| --- | --- |
-| Framework | [Angular](https://angular.dev/) |
-| Language | TypeScript |
-| UI Library | TBD (Angular Material / Tailwind CSS) |
-| State Management | TBD (NgRx / Angular Signals) |
-| HTTP Client | Angular HttpClient |
-| Testing | Jasmine + Karma / Jest |
+Public screens use `GET /api/public/quizzes`. Authentication uses `/api/auth/register` and `/api/auth/login`. Attempt creation, progress, pause/resume, submission, results, and history use the protected routes documented in [the backend attempt contract](../backend/docs/attempt-progress.md).
 
-## Planned Features
+## Run locally
 
-- **Authentication** — Login, registration, JWT token management
-- **Quiz Taking** — Browse quizzes, answer questions, view results
-- **Quiz Management** — Create, edit, and publish quizzes (admin/instructor)
-- **Question Bank** — Manage reusable questions across quizzes
-- **User Management** — Profile editing, role-based access
-- **Attempt History** — Review past quiz attempts and scores
+Start the backend HTTP profile, then run:
 
-## Getting Started (Future)
-
-Once implemented, the expected workflow will be:
-
-```bash
-# Install dependencies
-npm install
-
-# Start development server
-ng serve
-
-# Run tests
-ng test
-
-# Build for production
-ng build --configuration production
+```powershell
+Set-Location "D:/Homeworks/angular/quiz_app/frontend"
+pnpm install
+$env:QUIZAPP_API_TARGET = 'http://localhost:5269'
+pnpm start
 ```
 
-The frontend will communicate with the backend API at the URLs documented in the [backend README](../backend/README.md).
+Open `http://localhost:4200`.
 
-## Project Structure (Planned)
+## Verify
 
-```
-frontend/
-├── src/
-│   ├── app/
-│   │   ├── core/          # Auth, guards, interceptors, global services
-│   │   ├── shared/        # Reusable components, pipes, directives
-│   │   ├── features/      # Feature modules (quiz, auth, admin, etc.)
-│   │   └── app.config.ts
-│   ├── assets/
-│   ├── environments/
-│   └── index.html
-├── angular.json
-├── package.json
-├── tsconfig.json
-└── README.md
+```powershell
+pnpm test -- --watch=false
+pnpm build
 ```
 
-## Contributing
+The main routes are:
 
-Refer to the [root README](../README.md) for branching model and development guidelines. Frontend feature branches should be prefixed with `feature/web-`, for example `feature/web-quiz-list`.
+- `/` — public quiz catalog
+- `/quiz/:quizId` — public quiz details and authenticated attempt history
+- `/quiz/:quizId/attempt` — authenticated quiz attempt
+
+JWTs are kept in session storage and attached only to requests under the configured API base path.

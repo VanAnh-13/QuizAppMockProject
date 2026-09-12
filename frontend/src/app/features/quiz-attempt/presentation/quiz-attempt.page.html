@@ -1,0 +1,337 @@
+﻿<a class="skip-link" href="#question-content">Chuyển đến câu hỏi hiện tại</a>
+
+<header class="exam-header">
+    <div class="exam-header__inner">
+        <div class="exam-header__identity">
+            <a class="exam-brand" routerLink="/" aria-label="QuizApp — Trở về trang khám phá">
+                <span class="exam-brand__mark material-symbols-outlined"
+                        aria-hidden="true">task_alt</span>
+                <span>QuizApp</span>
+            </a>
+            <span class="exam-header__divider" aria-hidden="true"></span>
+            <div class="exam-title">
+                <span>Quiz</span>
+                <h1>{{ store.title() }}</h1>
+            </div>
+        </div>
+
+        <div class="exam-progress">
+            <div class="exam-progress__label">
+                <span>Tiến độ bài làm</span>
+                <strong>Đã trả lời {{ store.answeredCount() }}/{{ store.questions().length }}
+                    câu</strong>
+            </div>
+            <div
+                    class="exam-progress__track"
+                    role="progressbar"
+                    aria-label="Tiến độ bài làm"
+                    aria-valuemin="0"
+                    [attr.aria-valuemax]="store.questions().length"
+                    [attr.aria-valuenow]="store.answeredCount()"
+            >
+                <span [style.width.%]="store.progressPercent()"></span>
+            </div>
+        </div>
+
+        <div class="exam-header__actions">
+            <div class="timer" [class.timer--paused]="store.isPaused()">
+                <span class="material-symbols-outlined" aria-hidden="true">timer</span>
+                <span class="timer__label">{{
+                        store.isPaused() ? 'Đã tạm dừng:' : 'Thời gian còn lại:'
+                    }}</span>
+                <strong aria-live="off">{{ store.formattedTime() }}</strong>
+            </div>
+            <button
+                    class="pause-button"
+                    type="button"
+                    [attr.aria-pressed]="store.isPaused()"
+                    [disabled]="
+          store.isLoading() ||
+          store.isBusy() ||
+          store.requiresReload() ||
+          !!store.result() ||
+          store.remainingSeconds() === 0
+        "
+                    (click)="store.togglePause()"
+            >
+        <span class="material-symbols-outlined" aria-hidden="true">{{
+                store.isPaused() ? 'play_circle' : 'pause_circle'
+            }}</span>
+                <span>{{ store.isPaused() ? 'Tiếp tục làm bài' : 'Tạm dừng bài thi' }}</span>
+            </button>
+        </div>
+    </div>
+</header>
+
+@if (store.isLoading()) {
+    <section class="api-state" role="status">Đang tải lượt làm bài…</section>
+}
+@if (store.errorMessage(); as error) {
+    <section class="api-state" role="alert">
+        <p>{{ error }}</p>
+        <button type="button" [disabled]="store.isBusy() || store.isSaving()" (click)="reload()">
+            Tải lại trạng thái
+        </button>
+        <button type="button" (click)="auth.open()">Đăng nhập</button>
+    </section>
+}
+<app-auth-dialog #auth (authenticated)="reload()"/>
+@if (store.result(); as result) {
+    <section class="api-state" role="status">
+        <h2>Đã nộp bài thành công</h2>
+        <p>
+            Điểm: <strong>{{ result.score }} / 100</strong>
+        </p>
+        <a [routerLink]="['/quiz', result.quizId]">Về chi tiết và lịch sử bài thi</a>
+    </section>
+} @else if (!store.isLoading() && store.currentQuestion(); as question) {
+    <p class="api-state" role="status">{{ store.saveStatus() }}</p>
+    @if (store.isPaused()) {
+        <p class="api-state" role="status">
+            Bài thi đang tạm dừng. Nhấn “Tiếp tục làm bài” để trả lời.
+        </p>
+    }
+    <main class="attempt-workspace">
+        <section
+                class="question-card"
+                id="question-content"
+                tabindex="-1"
+                aria-labelledby="question-title"
+        >
+            <div class="question-card__meta">
+                <div>
+          <span class="question-number"
+          >Câu {{ store.currentQuestionNumber() }} / {{ store.questions().length }}</span
+          >
+                    <span class="question-type">
+            <span class="material-symbols-outlined" aria-hidden="true">{{
+                    question.multiple ? 'check_box' : 'radio_button_checked'
+                }}</span>
+                        {{
+                            question.isText
+                                    ? 'Trả lời bằng văn bản'
+                                    : question.multiple
+                                            ? 'Chọn nhiều đáp án'
+                                            : 'Chọn một đáp án'
+                        }}
+          </span>
+                </div>
+                <span class="question-score">
+          <span class="material-symbols-outlined" aria-hidden="true">help_outline</span>
+          1.0 điểm thành phần
+        </span>
+            </div>
+
+            <div class="question-card__copy">
+                <h2 id="question-title">{{ question.prompt }}</h2>
+                <p>{{ question.guidance }}</p>
+                @if (question.image) {
+                    <img [src]="question.image" alt="Hình minh họa câu hỏi" class="question-image"/>
+                }
+            </div>
+
+            <fieldset class="answer-list" [disabled]="!store.canEdit()">
+                <legend class="visually-hidden">Danh sách các phương án trả lời</legend>
+                @if (question.isText) {
+                    <label for="text-answer">Câu trả lời của bạn</label>
+                    <textarea
+                            id="text-answer"
+                            rows="5"
+                            [value]="store.responseText()"
+                            (input)="store.setResponseText($any($event.target).value)"
+                    ></textarea>
+                }
+                @for (option of question.options; track option.id) {
+                    <label
+                            class="answer-option"
+                            [class.answer-option--selected]="store.isOptionSelected(option.id)"
+                    >
+                        <input
+                                [id]="'option-' + option.id"
+                                [type]="question.multiple ? 'checkbox' : 'radio'"
+                                name="current-answer"
+                                [checked]="store.isOptionSelected(option.id)"
+                                (change)="toggleOption(option.id)"
+                        />
+                        <span class="answer-option__control material-symbols-outlined"
+                                aria-hidden="true">
+              {{ store.isOptionSelected(option.id) ? 'check' : '' }}
+            </span>
+                        <span class="answer-option__copy">
+              <strong class="answer-option__letter">{{ option.label }}.</strong>
+                            @if (option.title) {
+                                <strong>{{ option.title }}</strong>
+                            }
+                            {{ option.description }}
+            </span>
+                    </label>
+                }
+            </fieldset>
+
+            @if (question.multiple) {
+                <div class="question-note">
+                    <span class="material-symbols-outlined" aria-hidden="true">info</span>
+                    <p>
+                        <strong>Lưu ý:</strong> Đối với câu hỏi chọn nhiều đáp án, việc chọn sai đáp
+                        án sẽ bị
+                        trừ điểm thành phần của câu hỏi đó (điểm tối thiểu là 0).
+                    </p>
+                </div>
+            }
+
+            <div class="question-card__navigation">
+                <button
+                        type="button"
+                        class="previous-button"
+                        [disabled]="!store.canGoPrevious()"
+                        (click)="store.previousQuestion()"
+                >
+                    <span class="material-symbols-outlined" aria-hidden="true">arrow_back</span>
+                    Câu trước
+                </button>
+                <div>
+                    <button
+                            type="button"
+                            class="review-button"
+                            [class.review-button--active]="store.isQuestionMarked(store.currentQuestionNumber())"
+                            [attr.aria-pressed]="store.isQuestionMarked(store.currentQuestionNumber())"
+                            (click)="store.toggleReview()"
+                    >
+            <span class="material-symbols-outlined" aria-hidden="true">{{
+                    store.isQuestionMarked(store.currentQuestionNumber()) ? 'bookmark' : 'bookmark_border'
+                }}</span>
+                        {{
+                            store.isQuestionMarked(store.currentQuestionNumber())
+                                    ? 'Đã đánh dấu'
+                                    : 'Đánh dấu xem lại'
+                        }}
+                    </button>
+                    <button
+                            type="button"
+                            class="next-button"
+                            [disabled]="!store.canGoNext()"
+                            (click)="store.nextQuestion()"
+                    >
+                        Câu tiếp theo
+                        <span class="material-symbols-outlined"
+                                aria-hidden="true">arrow_forward</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <aside class="attempt-sidebar" aria-label="Điều hướng bài thi">
+            <section class="palette-card" aria-labelledby="palette-title">
+                <div class="palette-card__heading">
+                    <div>
+                        <h2 id="palette-title">Danh sách câu hỏi</h2>
+                        <p>{{ store.questions().length }} câu hỏi</p>
+                    </div>
+                </div>
+
+                <nav class="question-palette" aria-label="Bộ điều hướng câu hỏi">
+                    @for (question of store.questions(); track question.id) {
+                        <button
+                                type="button"
+                                [class.question-palette__button--answered]="store.isQuestionAnswered(question.number)"
+                                [class.question-palette__button--current]="store.currentQuestionNumber() === question.number "
+                                [class.question-palette__button--marked]="store.isQuestionMarked(question.number)"
+                                [attr.aria-current]="store.currentQuestionNumber() === question.number ? 'step' : null"
+                                [title]="`Câu ${question.number}${store.currentQuestionNumber() === question.number
+                                ? ' - Đang làm'
+                                : store.isQuestionMarked(question.number)
+                                ? ' - Đánh dấu xem lại'
+                                : store.isQuestionAnswered(question.number)
+                                ? ' - Đã trả lời'
+                                : ' - Chưa trả lời'}`"
+                                (click)="store.goToQuestion(question.number)"
+                        >
+                            <span>{{ question.number }}</span>
+                            @if (store.isQuestionAnswered(question.number) &&
+                            store.currentQuestionNumber() !== question.number) {
+                                <span class="material-symbols-outlined"
+                                        aria-hidden="true">check</span>
+                            }
+                            @if (store.isQuestionMarked(question.number)) {
+                                <span
+                                        class="question-palette__bookmark material-symbols-outlined"
+                                        aria-hidden="true"
+                                >bookmark</span
+                                >
+                            }
+                        </button>
+                    }
+                </nav>
+
+                <div class="palette-legend">
+          <span
+          ><i class="palette-legend__answered"></i>Đã trả lời ({{ store.answeredCount() }})</span
+          >
+                    <span><i class="palette-legend__current"></i>Đang chọn (1)</span>
+                    <span><i
+                            class="palette-legend__empty"></i>Chưa làm ({{ store.unansweredCount() }}
+                        )</span>
+                </div>
+
+                <div class="submission">
+                    <button
+                            class="submit-button"
+                            type="button"
+                            [disabled]="store.isBusy() || store.isPaused() || store.requiresReload()"
+                            (click)="openSubmitConfirmation()"
+                    >
+                        <span class="material-symbols-outlined" aria-hidden="true">send</span>
+                        Nộp bài thi
+                    </button>
+                    <p>Bạn có thể xem lại và thay đổi đáp án trước khi bấm nộp bài.</p>
+                </div>
+            </section>
+
+            <div class="keyboard-tip">
+                <span class="material-symbols-outlined" aria-hidden="true">keyboard</span>
+                <p>Dùng phím <kbd>←</kbd> và <kbd>→</kbd> để chuyển câu hỏi nhanh chóng.</p>
+            </div>
+        </aside>
+    </main>
+}
+<footer class="exam-footer">
+    <div>
+        <p>
+            Mã phiên: <strong>{{ store.attemptId() ?? 'Chưa tải' }}</strong>
+            <span aria-hidden="true">•</span> Chế độ: Độc lập có giám sát thời gian
+        </p>
+        <p>QuizApp — Nền tảng đánh giá năng lực lập trình</p>
+    </div>
+</footer>
+
+@if (submitDialogOpen() && !store.result()) {
+    <dialog id="submit-confirmation" class="submit-dialog" open aria-labelledby="submit-title">
+        <div class="submit-dialog__icon material-symbols-outlined" aria-hidden="true">
+            assignment_turned_in
+        </div>
+        <h2 id="submit-title">Xác nhận nộp bài?</h2>
+        <p>
+            Bạn còn <strong>{{ store.unansweredCount() }} câu chưa trả lời</strong>. Sau khi nộp,
+            bạn sẽ
+            không thể thay đổi đáp án.
+        </p>
+        <div class="submit-dialog__actions">
+            <button type="button" [disabled]="store.isBusy()" (click)="closeSubmitConfirmation()">
+                Tiếp tục xem lại
+            </button>
+            <button
+                    type="button"
+                    [disabled]="store.isBusy() || store.requiresReload()"
+                    (click)="confirmSubmission()"
+            >
+                {{ store.isBusy() ? 'Đang nộp…' : 'Xác nhận nộp' }}
+            </button>
+        </div>
+    </dialog>
+    <button
+            class="dialog-backdrop"
+            type="button"
+            aria-label="Đóng xác nhận nộp bài"
+            (click)="closeSubmitConfirmation()"
+    ></button>
+}

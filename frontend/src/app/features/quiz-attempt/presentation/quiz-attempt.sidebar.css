@@ -1,0 +1,95 @@
+﻿.attempt-sidebar {
+    @apply flex flex-col gap-5 lg:sticky lg:top-28 lg:col-span-4;
+}
+
+.palette-card {
+    @apply flex flex-col gap-5 rounded-card border border-[#b7cceb] bg-white p-5 shadow-subtle md:p-6;
+}
+
+.palette-card__heading {
+    @apply flex items-center justify-between border-b border-[#c2d5f0] pb-4;
+}
+
+.palette-card__heading h2 {
+    @apply m-0 text-sm font-bold;
+}
+
+.palette-card__heading p {
+    @apply mb-0 mt-1 text-xs text-[#4e626d];
+}
+
+.question-palette {
+    @apply grid grid-cols-4 gap-2.5 sm:grid-cols-5 lg:grid-cols-4;
+}
+
+.question-palette button {
+    @apply relative flex h-11 items-center justify-center gap-1 rounded-control border border-[#94b4e0] bg-white text-xs font-medium hover:bg-[#e5eeff];
+}
+
+.question-palette .question-palette__button--answered {
+    @apply border-[#4a4bd7] bg-[#4a4bd7] text-white;
+}
+
+.question-palette .question-palette__button--current {
+    @apply border-2 border-[#4a4bd7] bg-[#e5eeff] text-sm font-bold text-[#4a4bd7] ring-2 ring-[#4a4bd7]/20;
+}
+
+.question-palette button > .material-symbols-outlined {
+    @apply text-sm;
+}
+
+.question-palette__bookmark {
+    @apply absolute -right-1 -top-1 rounded-full bg-amber-400 p-0.5 text-[10px] text-white;
+}
+
+.palette-legend {
+    @apply grid grid-cols-1 gap-2 border-t border-[#c2d5f0] pt-4 text-[11px] text-[#4e626d] sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3;
+}
+
+.palette-legend span {
+    @apply flex items-center gap-1.5;
+}
+
+.palette-legend i {
+    @apply size-2.5 shrink-0 rounded-full;
+}
+
+.palette-legend__answered {
+    @apply bg-[#4a4bd7];
+}
+
+.palette-legend__current {
+    @apply border-2 border-[#4a4bd7] bg-[#e5eeff];
+}
+
+.palette-legend__empty {
+    @apply border border-[#5d7da6];
+}
+
+.submission {
+    @apply border-t border-[#c2d5f0] pt-5;
+}
+
+.submit-button {
+    @apply flex min-h-12 w-full items-center justify-center gap-2 rounded-control px-4 text-sm font-bold;
+}
+
+.submission p {
+    @apply mb-0 mt-3 text-center text-[11px] leading-5 text-[#4e626d];
+}
+
+.keyboard-tip {
+    @apply flex items-center gap-3 rounded-card border border-[#c2d5f0] bg-[#e5eeff] p-3.5 text-[#4e626d];
+}
+
+.keyboard-tip > span {
+    @apply text-xl text-[#4a4bd7];
+}
+
+.keyboard-tip p {
+    @apply m-0 text-xs leading-5;
+}
+
+kbd {
+    @apply rounded border border-[#94b4e0] bg-white px-1.5 py-0.5 font-mono text-[10px] text-[#0d3459];
+}

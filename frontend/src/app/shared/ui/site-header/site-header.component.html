@@ -1,0 +1,26 @@
+<header class="header">
+    <div class="header__inner">
+        <app-brand/>
+
+        <nav aria-label="Điều hướng chính">
+            <a href="/#quiz-list">Khám phá quiz</a>
+            <button type="button" (click)="information.open('about')">Giới thiệu</button>
+            <button type="button" (click)="information.open('contact')">Liên hệ</button>
+        </nav>
+
+        <div class="header__actions">
+            @if (session.user(); as user) {
+                <span>{{ user.fullName || user.username }}</span>
+                <button type="button" (click)="logout()">Đăng xuất</button>
+            } @else {
+                <button type="button" (click)="auth.open()">Đăng nhập</button>
+                <button class="header__action--primary" type="button" (click)="auth.open(true)">
+                    Đăng ký
+                </button>
+            }
+        </div>
+    </div>
+</header>
+
+<app-auth-dialog #auth (authenticated)="sessionChanged.emit()"/>
+<app-site-info-dialog #information dialogId="header-information"/>

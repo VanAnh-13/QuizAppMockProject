@@ -1,0 +1,156 @@
+<app-site-header />
+
+<main class="explore" id="main-content">
+  <section class="hero" aria-labelledby="hero-title">
+    <span class="hero__shape hero__shape--top" aria-hidden="true"></span>
+    <span class="hero__shape hero__shape--bottom" aria-hidden="true"></span>
+
+    <div class="hero__content">
+      <p class="hero__eyebrow">
+        <span class="material-symbols-outlined" aria-hidden="true">auto_awesome</span>
+        Nền tảng kiểm tra trực tuyến
+      </p>
+      <h1 id="hero-title">Học lập trình với quiz thực chiến</h1>
+      <p class="hero__description">
+        Củng cố tư duy lập trình qua các bộ câu hỏi tập trung vào C#, SQL Server, Angular
+        và thiết kế API.
+      </p>
+
+      <form class="search" role="search" (ngSubmit)="applySearch()">
+        <label class="visually-hidden" for="quiz-search">Tìm kiếm bài quiz</label>
+        <span class="material-symbols-outlined search__icon" aria-hidden="true">search</span>
+        <input
+          id="quiz-search"
+          type="search"
+          autocomplete="off"
+          placeholder="Tìm theo chủ đề hoặc từ khóa..."
+          [formControl]="searchControl"
+        />
+        <button type="submit">Tìm kiếm</button>
+      </form>
+
+      <p class="hero__catalog-note">
+        <span class="material-symbols-outlined" aria-hidden="true">library_books</span>
+        {{ store.totalCatalogCount }} bài quiz mẫu · {{ store.categoryCount }} chủ đề
+      </p>
+    </div>
+  </section>
+
+  <section class="filters" aria-labelledby="filter-title">
+    <h2 class="visually-hidden" id="filter-title">Lọc quiz theo chủ đề</h2>
+    <div class="filters__list">
+      @for (category of store.categories; track category.id) {
+        <button
+          type="button"
+          [class.filters__button--active]="store.selectedCategoryId() === category.id"
+          [attr.aria-pressed]="store.selectedCategoryId() === category.id"
+          (click)="store.selectCategory(category.id)"
+        >
+          {{ category.label }}
+        </button>
+      }
+    </div>
+  </section>
+
+  <section class="catalog" id="quiz-list" aria-labelledby="catalog-title">
+    <div class="catalog__heading">
+      <h2 id="catalog-title">Các bài quiz nổi bật</h2>
+      <p aria-live="polite">Hiển thị {{ store.visibleQuizzes().length }} / {{ store.totalCount() }} bài quiz</p>
+    </div>
+
+    @if (store.visibleQuizzes().length > 0) {
+      <div class="catalog__grid">
+        @for (quiz of store.visibleQuizzes(); track quiz.id) {
+          <article class="quiz-card">
+            <span class="quiz-card__accent" aria-hidden="true"></span>
+            <div>
+              <div class="quiz-card__labels">
+                <span class="quiz-card__category">{{ quiz.categoryLabel }}</span>
+                <span class="quiz-card__status">
+                  <span aria-hidden="true"></span>
+                  {{ statusLabels[quiz.status] }}
+                </span>
+              </div>
+              <h3>{{ quiz.title }}</h3>
+              <p class="quiz-card__description">{{ quiz.description }}</p>
+            </div>
+
+            <div>
+              <dl class="quiz-card__metadata">
+                <div>
+                  <dt class="visually-hidden">Số câu hỏi</dt>
+                  <dd>
+                    <span class="material-symbols-outlined" aria-hidden="true">quiz</span>
+                    {{ quiz.questionCount }} câu
+                  </dd>
+                </div>
+                <div>
+                  <dt class="visually-hidden">Thời gian làm bài</dt>
+                  <dd>
+                    <span class="material-symbols-outlined" aria-hidden="true">timer</span>
+                    {{ quiz.durationMinutes }} phút
+                  </dd>
+                </div>
+              </dl>
+              <button
+                class="quiz-card__detail"
+                type="button"
+                disabled
+                title="Màn hình chi tiết quiz chưa được cung cấp"
+              >
+                Xem chi tiết
+                <span class="material-symbols-outlined" aria-hidden="true">chevron_right</span>
+              </button>
+            </div>
+          </article>
+        }
+      </div>
+    } @else {
+      <div class="catalog__empty" role="status">
+        <span class="material-symbols-outlined" aria-hidden="true">search_off</span>
+        <h3>Chưa tìm thấy bài quiz phù hợp</h3>
+        <p>Hãy thử một từ khóa khác hoặc chọn lại chủ đề.</p>
+      </div>
+    }
+
+    @if (store.totalCount() > 0) {
+      <div class="pagination">
+        <p>
+          Hiển thị <strong>{{ store.rangeStart() }} - {{ store.rangeEnd() }}</strong> của
+          <strong>{{ store.totalCount() }}</strong> bài quiz
+        </p>
+        <nav aria-label="Phân trang danh sách quiz">
+          <button
+            type="button"
+            aria-label="Trang trước"
+            [disabled]="store.currentPage() === 1"
+            (click)="store.goToPage(store.currentPage() - 1)"
+          >
+            <span class="material-symbols-outlined" aria-hidden="true">chevron_left</span>
+          </button>
+          @for (pageNumber of store.pageNumbers(); track pageNumber) {
+            <button
+              type="button"
+              [class.pagination__page--active]="store.currentPage() === pageNumber"
+              [attr.aria-current]="store.currentPage() === pageNumber ? 'page' : null"
+              [attr.aria-label]="'Trang ' + pageNumber"
+              (click)="store.goToPage(pageNumber)"
+            >
+              {{ pageNumber }}
+            </button>
+          }
+          <button
+            type="button"
+            aria-label="Trang sau"
+            [disabled]="store.currentPage() === store.totalPages()"
+            (click)="store.goToPage(store.currentPage() + 1)"
+          >
+            <span class="material-symbols-outlined" aria-hidden="true">chevron_right</span>
+          </button>
+        </nav>
+      </div>
+    }
+  </section>
+</main>
+
+<app-site-footer />

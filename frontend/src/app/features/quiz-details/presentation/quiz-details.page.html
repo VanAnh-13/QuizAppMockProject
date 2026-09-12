@@ -1,0 +1,300 @@
+﻿<a class="skip-link" href="#main-content">Đến nội dung chính</a>
+
+<header class="details-header">
+    <div class="details-header__inner">
+        <div class="details-header__leading">
+            <a class="details-brand" routerLink="/" aria-label="QuizApp — Trang khám phá">
+        <span class="details-brand__mark">
+          <span class="material-symbols-outlined" aria-hidden="true">quiz</span>
+        </span>
+                <span>QuizApp</span>
+            </a>
+            <nav class="details-header__navigation" aria-label="Điều hướng chính">
+                <a routerLink="/" fragment="quiz-list" aria-current="page">Khám phá quiz</a>
+                <button
+                        type="button"
+                        (click)="
+            openInfo(
+              'Giới thiệu QuizApp',
+              'Nội dung giới thiệu đang được hoàn thiện trong bản trải nghiệm này.'
+            )
+          "
+                >
+                    Giới thiệu
+                </button>
+                <button
+                        type="button"
+                        (click)="
+            openInfo('Liên hệ', 'Kênh liên hệ hỗ trợ chưa được tích hợp trong bản trải nghiệm này.')
+          "
+                >
+                    Liên hệ
+                </button>
+            </nav>
+        </div>
+
+        <div class="details-header__actions">
+            <button
+                    class="details-header__icon-button"
+                    type="button"
+                    title="Thông báo"
+                    aria-label="Thông báo"
+                    (click)="openInfo('Thông báo', 'Bạn chưa có thông báo mới trong bản trải nghiệm này.')"
+            >
+                <span class="material-symbols-outlined" aria-hidden="true">notifications</span>
+            </button>
+            <button
+                    class="details-header__icon-button"
+                    type="button"
+                    title="Trợ giúp & Hỏi đáp"
+                    aria-label="Trợ giúp và hỏi đáp"
+                    (click)="
+          openInfo(
+            'Trợ giúp & Hỏi đáp',
+            'Trung tâm trợ giúp chưa được tích hợp trong bản trải nghiệm này.'
+          )
+        "
+            >
+                <span class="material-symbols-outlined" aria-hidden="true">help_outline</span>
+            </button>
+            <span class="details-header__divider" aria-hidden="true"></span>
+            <button
+                    class="details-header__profile"
+                    type="button"
+                    (click)="
+          openInfo(
+            'Hồ sơ học viên',
+            'Anh LV là tài khoản mẫu; quản lý hồ sơ chưa có trong bản trải nghiệm này.'
+          )
+        "
+            >
+                <span class="details-header__avatar" aria-hidden="true">AL</span>
+                <span class="details-header__profile-copy">
+          <strong>Anh LV</strong>
+          <span>Học viên .NET</span>
+        </span>
+                <span class="material-symbols-outlined" aria-hidden="true">expand_more</span>
+            </button>
+        </div>
+    </div>
+</header>
+
+<main class="quiz-details" id="main-content" tabindex="-1">
+    <nav class="breadcrumb" aria-label="Đường dẫn">
+        <ol>
+            <li>
+                <a routerLink="/">
+                    <span class="material-symbols-outlined" aria-hidden="true">explore</span>
+                    <span>Khám phá quiz</span>
+                </a>
+            </li>
+            <li aria-hidden="true"><span class="material-symbols-outlined">chevron_right</span></li>
+            <li aria-current="page">{{ title() || 'Chi tiết quiz' }}</li>
+        </ol>
+    </nav>
+
+    @if (isLoading()) {
+        <div class="details-state" role="status" aria-live="polite">
+            <h2>Đang tải chi tiết quiz</h2>
+            <p>Vui lòng chờ trong giây lát.</p>
+        </div>
+    } @else if (errorMessage(); as errorMessage) {
+        <div class="details-state" role="alert">
+            <h2>Không thể tải chi tiết quiz</h2>
+            <p>{{ errorMessage }}</p>
+            <button type="button" (click)="load()">Thử lại</button>
+        </div>
+    } @else {
+        <div class="quiz-details__layout">
+            <section class="quiz-details__content" aria-labelledby="quiz-title">
+                <article class="overview-card">
+                    <span class="overview-card__glow" aria-hidden="true"></span>
+                    <div class="topic-badge">
+                        <span class="material-symbols-outlined" aria-hidden="true">code</span>
+                        <span>{{ categoryLabel() }}</span>
+                    </div>
+                    <h1 id="quiz-title">{{ title() }}</h1>
+                    <p class="overview-card__description">{{ description() }}</p>
+                    <dl class="metrics-grid">
+                        @for (metric of metrics(); track metric.label) {
+                            <div class="metric-card">
+                <span class="metric-card__icon material-symbols-outlined" aria-hidden="true">{{
+                        metric.icon
+                    }}</span>
+                                <div>
+                                    <dt>{{ metric.label }}</dt>
+                                    <dd>{{ metric.value }}</dd>
+                                </div>
+                            </div>
+                        }
+                    </dl>
+                </article>
+                <section class="topics-card" aria-labelledby="topics-title">
+                    <div class="section-heading">
+                        <span class="material-symbols-outlined" aria-hidden="true">psychology</span>
+                        <h2 id="topics-title">Bạn sẽ kiểm tra kiến thức về:</h2>
+                    </div>
+                    <div class="topics-grid">
+                        @for (topic of topics(); track topic.title) {
+                            <article class="topic-card">
+                <span class="topic-card__check material-symbols-outlined" aria-hidden="true"
+                >check</span
+                >
+                                <div>
+                                    <h3>{{ topic.title }}</h3>
+                                    <p>{{ topic.description }}</p>
+                                </div>
+                            </article>
+                        }
+                    </div>
+                </section>
+
+                <section class="cta-card" aria-labelledby="cta-title">
+                    <div class="cta-card__copy">
+            <span class="cta-card__icon material-symbols-outlined" aria-hidden="true"
+            >play_circle</span
+            >
+                        <div>
+                            <h2 id="cta-title">Sẵn sàng thử thách năng lực?</h2>
+                            <p>Hệ thống sẽ lưu vết kết quả vào hồ sơ học tập của bạn.</p>
+                        </div>
+                    </div>
+                    <div class="cta-card__actions">
+                        <button class="history-button" type="button" (click)="openHistory()">
+                            <span class="material-symbols-outlined"
+                                    aria-hidden="true">history</span>
+                            <span>Xem lịch sử lần thi</span>
+                        </button>
+                        <a class="start-button" [routerLink]="['/quiz', quizId(), 'attempt']">
+                            <span>Bắt đầu làm bài</span>
+                            <span class="material-symbols-outlined"
+                                    aria-hidden="true">arrow_forward</span>
+                        </a>
+                    </div>
+                </section>
+            </section>
+
+            <aside class="quiz-details__sidebar" aria-label="Quy chế và cấu trúc bài thi">
+                <section class="guidelines-card" aria-labelledby="guidelines-title">
+                    <div class="guidelines-card__heading">
+                        <span class="material-symbols-outlined"
+                                aria-hidden="true">verified_user</span>
+                        <h2 id="guidelines-title">Quy chế &amp; Hướng dẫn làm bài</h2>
+                    </div>
+                    <ol class="guidelines-list">
+                        @for (guideline of guidelines(); track guideline.title) {
+                            <li>
+                                <span aria-hidden="true">{{ $index + 1 }}</span>
+                                <div>
+                                    <h3>{{ guideline.title }}</h3>
+                                    <p>{{ guideline.description }}</p>
+                                </div>
+                            </li>
+                        }
+                    </ol>
+                    <div class="guidelines-card__note">
+                        <span class="material-symbols-outlined" aria-hidden="true">info</span>
+                        <p>
+                            Tránh chuyển tab liên tục hoặc tải lại trang để đảm bảo phiên làm bài
+                            diễn ra mượt mà
+                            nhất.
+                        </p>
+                    </div>
+                </section>
+
+                <section class="format-card" aria-labelledby="format-title">
+                    <h2 id="format-title">
+                        <span class="material-symbols-outlined" aria-hidden="true">lightbulb</span>
+                        <span>Cấu trúc đề thi</span>
+                    </h2>
+                    <dl>
+                        @for (fact of formatFacts(); track fact.label) {
+                            <div>
+                                <dt>{{ fact.label }}</dt>
+                                <dd>{{ fact.value }}</dd>
+                            </div>
+                        }
+                    </dl>
+                </section>
+            </aside>
+        </div>
+    }
+</main>
+
+<footer class="details-footer">
+    <div class="details-footer__inner">
+        <p>© 2025 QuizApp. Nền tảng học tập &amp; rèn luyện tư duy lập trình.</p>
+        <nav aria-label="Điều hướng cuối trang">
+            <a routerLink="/">Khám phá quiz</a>
+            <button
+                    type="button"
+                    (click)="
+          openInfo(
+            'Giới thiệu QuizApp',
+            'Nội dung giới thiệu đang được hoàn thiện trong bản trải nghiệm này.'
+          )
+        "
+            >
+                Giới thiệu
+            </button>
+            <button
+                    type="button"
+                    (click)="
+          openInfo('Liên hệ', 'Kênh liên hệ hỗ trợ chưa được tích hợp trong bản trải nghiệm này.')
+        "
+            >
+                Liên hệ
+            </button>
+        </nav>
+    </div>
+</footer>
+
+@if (historyDialogOpen()) {
+    <dialog id="attempt-history" class="details-dialog" open aria-labelledby="history-title">
+        <span class="details-dialog__icon material-symbols-outlined"
+                aria-hidden="true">history</span>
+        <h2 id="history-title">Lịch sử lần thi</h2>
+        @if (historyLoading()) {
+            <p role="status">Đang tải lịch sử lần thi…</p>
+        } @else if (historyError(); as error) {
+            <p role="alert">{{ error }}</p>
+            <button type="button" (click)="historyAuth.open()">Đăng nhập</button>
+            <button type="button" (click)="loadHistory()">Thử lại</button>
+        } @else if (history().length === 0) {
+            <p>Bạn chưa có lần thi nào cho quiz này.</p>
+        } @else {
+            <ul class="history-list">
+                @for (attempt of history(); track attempt.id) {
+                    <li>
+                        <strong>{{ attempt.score }} / 100</strong>
+                        <span>{{ attempt.submittedAt | date: 'dd/MM/yyyy HH:mm' }}</span>
+                    </li>
+                }
+            </ul>
+        }
+        <button type="button" autofocus (click)="closeHistory()">Đã hiểu</button>
+    </dialog>
+    <button
+            class="dialog-backdrop"
+            type="button"
+            aria-label="Đóng lịch sử lần thi"
+            (click)="closeHistory()"
+    ></button>
+}
+
+<app-auth-dialog #historyAuth (authenticated)="loadHistory()"/>
+
+@if (activeInfo(); as info) {
+    <dialog class="details-dialog" open aria-labelledby="info-title">
+        <span class="details-dialog__icon material-symbols-outlined" aria-hidden="true">info</span>
+        <h2 id="info-title">{{ info.title }}</h2>
+        <p>{{ info.message }}</p>
+        <button type="button" autofocus (click)="closeInfo()">Đã hiểu</button>
+    </dialog>
+    <button
+            class="dialog-backdrop"
+            type="button"
+            aria-label="Đóng thông tin"
+            (click)="closeInfo()"
+    ></button>
+}

@@ -1,0 +1,57 @@
+﻿:host {
+    @apply block min-w-0;
+}
+
+.quiz-card {
+    @apply relative flex h-full min-h-72 flex-col justify-between overflow-hidden rounded-card border border-border bg-surface p-6 shadow-subtle transition;
+}
+
+.quiz-card::before {
+    @apply absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-brand to-brand-accent;
+    content: '';
+}
+
+.quiz-card:hover {
+    @apply border-brand/40 shadow-card;
+}
+
+.quiz-card__labels {
+    @apply flex flex-wrap items-center justify-between gap-2;
+}
+
+.quiz-card__category {
+    @apply rounded bg-brand-soft px-2 py-1 text-xs font-semibold text-brand-strong;
+}
+
+.quiz-card__status {
+    @apply inline-flex items-center gap-1 text-xs font-medium text-muted;
+}
+
+.quiz-card h3 {
+    @apply mb-0 mt-4 text-lg font-semibold leading-snug tracking-tight text-ink;
+}
+
+.quiz-card__description {
+    @apply mb-0 mt-3 text-sm leading-6 text-muted;
+}
+
+.quiz-card__metadata {
+    @apply mt-5 flex flex-wrap gap-4 border-t border-border-soft pt-4 text-xs text-muted;
+}
+
+.quiz-card__metadata div,
+.quiz-card__metadata dd {
+    @apply m-0;
+}
+
+.quiz-card__metadata dd {
+    @apply flex items-center gap-1.5;
+}
+
+.quiz-card__metadata svg {
+    @apply text-brand-strong;
+}
+
+.quiz-card__detail {
+    @apply mt-4 flex min-h-11 w-full items-center justify-center gap-2 rounded-control border border-brand/50 bg-surface px-4 py-2.5 text-sm font-medium text-brand-strong transition-colors hover:border-brand-strong hover:bg-brand-soft;
+}
