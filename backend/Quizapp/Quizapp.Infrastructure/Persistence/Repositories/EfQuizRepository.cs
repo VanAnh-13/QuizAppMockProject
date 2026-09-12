@@ -30,7 +30,39 @@ public sealed class EfQuizRepository(QuizAppDbContext db) : IQuizRepository
             .ToListAsync(cancellationToken);
 
         return new PagedResultDto<Quiz>
-            { Items = items, TotalCount = total, PageNumber = pageNumber, PageSize = pageSize };
+        {
+            Items = items,
+            TotalCount = total,
+            PageNumber = pageNumber,
+            PageSize = pageSize
+        };
+    }
+
+    public async Task<PagedResultDto<Quiz>> GetActiveListAsync(int pageNumber, int pageSize, string? search,
+        CancellationToken cancellationToken)
+    {
+        var query = db.Quizzes.Where(q => q.IsActive);
+
+        if (!string.IsNullOrEmpty(search))
+            query = query.Where(q => q.Title.Contains(search));
+
+        var total = await query.CountAsync(cancellationToken);
+
+        var items = await query.OrderBy(q => q.Title)
+            .ThenBy(q => q.Id)
+            .Include(q => q.QuizQuestions)
+            .ThenInclude(qq => qq.QuestionNavigation)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
+
+        return new PagedResultDto<Quiz>
+        {
+            Items = items,
+            TotalCount = total,
+            PageNumber = pageNumber,
+            PageSize = pageSize
+        };
     }
 
     public void Add(Quiz entity) => db.Quizzes.Add(entity);

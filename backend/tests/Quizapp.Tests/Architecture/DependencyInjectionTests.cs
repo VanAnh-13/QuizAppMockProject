@@ -8,6 +8,7 @@ using Quizapp.Application.Abstractions.Persistence;
 using Quizapp.Application.DTOs.QuizManager.Quizzes;
 using Quizapp.Application.Factories.QuizManager.Questions;
 using Quizapp.Application.Factories.RoleManager;
+using Quizapp.Application.Services.QuizTaking;
 using Quizapp.Application.Strategies.QuizManager.Questions;
 using Quizapp.Domain.Enums;
 using Quizapp.Infrastructure;
@@ -107,6 +108,36 @@ public class DependencyInjectionTests
             Assert.DoesNotContain(secondScope.ServiceProvider.GetServices<IQuestionCreationStrategy>(),
                 other => ReferenceEquals(strategy, other));
         }
+    }
+
+    [Fact]
+    public void Public_quiz_catalog_service_is_scoped_and_registration_can_be_repeated()
+    {
+        var services = new ServiceCollection().AddApplication()
+            .AddApplication();
+
+        AddStubs(services);
+
+        var descriptor = Assert.Single(services,
+            service => service.ServiceType == typeof(IPublicQuizCatalogService));
+
+        Assert.Equal(ServiceLifetime.Scoped, descriptor.Lifetime);
+        Assert.Equal(typeof(PublicQuizCatalogService), descriptor.ImplementationType);
+
+        using var provider = services.BuildServiceProvider(new ServiceProviderOptions
+        {
+            ValidateScopes = true,
+            ValidateOnBuild = true
+        });
+
+        using var firstScope = provider.CreateScope();
+        using var secondScope = provider.CreateScope();
+
+        var first = firstScope.ServiceProvider.GetRequiredService<IPublicQuizCatalogService>();
+
+        Assert.IsType<PublicQuizCatalogService>(first);
+        Assert.Same(first, firstScope.ServiceProvider.GetRequiredService<IPublicQuizCatalogService>());
+        Assert.NotSame(first, secondScope.ServiceProvider.GetRequiredService<IPublicQuizCatalogService>());
     }
 
     [Fact]

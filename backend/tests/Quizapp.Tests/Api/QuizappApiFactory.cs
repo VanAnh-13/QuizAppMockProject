@@ -43,12 +43,18 @@ internal sealed class QuizappApiFactory : WebApplicationFactory<AuthController>
     public MemoryQuizzes Quizzes { get; } = new();
     public MemoryQuizAttempts Attempts { get; } = new();
     public TimeProvider Clock { get; set; } = TimeProvider.System;
+    public string EnvironmentName { get; set; } = "Testing";
+    public int? HttpsPort { get; set; }
 
     public QuizappApiFactory() => Users.Add(User);
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        builder.UseEnvironment("Testing");
+        builder.UseEnvironment(EnvironmentName);
+        builder.UseSetting("SampleData:Enabled", "false");
+        if (HttpsPort is not null)
+            builder.UseSetting("HTTPS_PORT", HttpsPort.Value.ToString());
+
         builder.ConfigureLogging(logging => logging.ClearProviders());
         builder.UseSetting($"{JwtOptions.SectionName}:Issuer", _jwt.Issuer);
         builder.UseSetting($"{JwtOptions.SectionName}:Audience", _jwt.Audience);

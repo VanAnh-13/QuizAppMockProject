@@ -29,6 +29,7 @@ public static class DependencyInjection
         services.TryAddScoped<IQuestionService, QuestionService>();
         services.TryAddScoped<IQuizService, QuizService>();
         services.TryAddScoped<IQuizAttemptService, QuizAttemptService>();
+        services.TryAddScoped<IPublicQuizCatalogService, PublicQuizCatalogService>();
         services.TryAddScoped<IRoleFactory, RoleFactory>();
         services.TryAddEnumerable(ServiceDescriptor.Scoped<IQuestionCreationStrategy, SingleChoiceQuestionStrategy>());
 

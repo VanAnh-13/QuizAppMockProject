@@ -1,13 +1,13 @@
 # Quizapp
 
-A quiz-management platform with a .NET backend and an Angular frontend (planned).
+A quiz-management platform with a .NET backend and an Angular frontend prototype.
 
 ## Repository Layout
 
 ```
 Quizapp/
 ├── backend/              # .NET 10 solution — API, domain, application, infrastructure
-├── frontend/             # Angular + TypeScript web client (not yet implemented)
+├── frontend/             # Angular + TypeScript web client prototype
 ├── compose.yaml          # Docker Compose — API container build
 ├── .editorconfig         # Shared editor settings
 ├── .gitignore            # Shared ignore rules
@@ -15,19 +15,19 @@ Quizapp/
 └── README.md             # This file
 ```
 
-| Directory | README | Status |
-| --- | --- | --- |
-| [`backend/`](backend/) | [Backend README](backend/README.md) | Services, controllers, JWT authentication, EF migrations, and tests |
-| [`frontend/`](frontend/) | [Frontend README](frontend/README.md) | 🚧 Not yet implemented |
+| Directory                | README                                | Status                                                                                                  |
+| ------------------------ | ------------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| [`backend/`](backend/)   | [Backend README](backend/README.md)   | Services, controllers, JWT authentication, EF migrations, and tests                                     |
+| [`frontend/`](frontend/) | [Frontend README](frontend/README.md) | Explore/details screens backed by the public quiz catalog API; attempt screen remains a local prototype |
 
 ## Tech Stack
 
-| Layer | Technology |
-| --- | --- |
-| Backend | ASP.NET Core 10, Entity Framework Core 10, SQL Server, FluentValidation |
-| Frontend | Angular, TypeScript (planned) |
-| Testing | xUnit (backend), Jasmine/Jest (frontend — planned) |
-| Containerization | Docker, Docker Compose |
+| Layer            | Technology                                                              |
+| ---------------- | ----------------------------------------------------------------------- |
+| Backend          | ASP.NET Core 10, Entity Framework Core 10, SQL Server, FluentValidation |
+| Frontend         | Angular 22, TypeScript, Tailwind CSS, Angular Signals                   |
+| Testing          | xUnit (backend), Vitest/jsdom (frontend)                                |
+| Containerization | Docker, Docker Compose                                                  |
 
 ## Quick Start
 
@@ -45,17 +45,24 @@ Full setup instructions (SQL Server, migrations, Docker, testing) → [Backend R
 
 ### Frontend
 
-Not yet implemented → [Frontend README](frontend/README.md)
+```powershell
+Set-Location "D:/Homeworks/angular/quiz_app/frontend"
+pnpm install
+pnpm start
+```
+
+Open `http://localhost:4200/`; run the backend HTTP profile first so the public quiz catalog is available. Full frontend instructions → [Frontend README](frontend/README.md)
 
 ## Branching Model
 
-| Branch | Purpose |
-| --- | --- |
-| `main` | Deploy-only. Advances through reviewed pull requests from `dev`. Carries release tags. |
-| `dev` | Integration and testing. Base for feature work and default PR target. |
-| `feature/*` | Short-lived feature branches merged into `dev` via pull request. |
+| Branch      | Purpose                                                                                |
+| ----------- | -------------------------------------------------------------------------------------- |
+| `main`      | Deploy-only. Advances through reviewed pull requests from `dev`. Carries release tags. |
+| `dev`       | Integration and testing. Base for feature work and default PR target.                  |
+| `feature/*` | Short-lived feature branches merged into `dev` via pull request.                       |
 
 **Naming convention:**
+
 - Backend features: `feature/api-<name>` (e.g., `feature/api-auth-login`)
 - Frontend features: `feature/web-<name>` (e.g., `feature/web-quiz-list`)
 
