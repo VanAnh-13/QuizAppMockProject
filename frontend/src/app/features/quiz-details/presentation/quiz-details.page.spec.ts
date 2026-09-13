@@ -134,6 +134,40 @@ describe('QuizDetailsPage', () => {
     );
   });
 
+  it('explains missing topics without showing an empty heading or grid', async () => {
+    const fixture = await createFixture();
+    const element = fixture.nativeElement as HTMLElement;
+
+    expect(element.querySelector('#topics-title')).toBeNull();
+    expect(element.querySelector('.topics-grid')).toBeNull();
+    expect(element.textContent).toContain('Thông tin chủ đề của quiz này chưa được cung cấp.');
+    expect(element.querySelector('.start-button')).not.toBeNull();
+  });
+
+  it('shows topic cards when topic information is available', async () => {
+    load.mockResolvedValue({
+      title: 'C# fundamentals',
+      description: 'Quiz description',
+      categoryLabel: 'Quiz',
+      metrics: [],
+      topics: [{ title: 'Kiểu dữ liệu', description: 'Các kiểu dữ liệu cơ bản trong C#.' }],
+      guidelines: [],
+      formatFacts: [],
+    });
+    const fixture = await createFixture();
+    const element = fixture.nativeElement as HTMLElement;
+
+    expect(element.querySelector('#topics-title')?.textContent).toContain(
+      'Bạn sẽ kiểm tra kiến thức về:',
+    );
+    expect(element.querySelectorAll('.topics-grid .topic-card')).toHaveLength(1);
+    expect(element.querySelector('.topic-card h3')?.textContent).toContain('Kiểu dữ liệu');
+    expect(element.querySelector('.topic-card p')?.textContent).toContain(
+      'Các kiểu dữ liệu cơ bản trong C#.',
+    );
+    expect(element.textContent).not.toContain('Thông tin chủ đề của quiz này chưa được cung cấp.');
+  });
+
   it('loads the signed-in user history for the current quiz', async () => {
     const fixture = await createFixture();
     const element = fixture.nativeElement as HTMLElement;

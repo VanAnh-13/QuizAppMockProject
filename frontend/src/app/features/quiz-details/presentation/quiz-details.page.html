@@ -133,28 +133,34 @@
                     </dl>
                 </article>
 
-                <section class="topics-card" aria-labelledby="topics-title">
-                    <div class="section-heading">
-                        <span class="material-symbols-outlined" aria-hidden="true">psychology</span>
-                        <h2 id="topics-title">Bạn sẽ kiểm tra kiến thức về:</h2>
-                    </div>
-                    <div class="topics-grid">
-                        @for (topic of topics(); track topic.title) {
-                            <article class="topic-card">
-                                <span
-                                        class="topic-card__check material-symbols-outlined"
-                                        aria-hidden="true"
-                                >
-                                    check
-                                </span>
-                                <div>
-                                    <h3>{{ topic.title }}</h3>
-                                    <p>{{ topic.description }}</p>
-                                </div>
-                            </article>
-                        }
-                    </div>
-                </section>
+                @if (topics().length > 0) {
+                    <section class="topics-card" aria-labelledby="topics-title">
+                        <div class="section-heading">
+                            <span class="material-symbols-outlined" aria-hidden="true">
+                                psychology
+                            </span>
+                            <h2 id="topics-title">Bạn sẽ kiểm tra kiến thức về:</h2>
+                        </div>
+                        <div class="topics-grid">
+                            @for (topic of topics(); track topic.title) {
+                                <article class="topic-card">
+                                    <span
+                                            class="topic-card__check material-symbols-outlined"
+                                            aria-hidden="true"
+                                    >
+                                        check
+                                    </span>
+                                    <div>
+                                        <h3>{{ topic.title }}</h3>
+                                        <p>{{ topic.description }}</p>
+                                    </div>
+                                </article>
+                            }
+                        </div>
+                    </section>
+                } @else {
+                    <p class="topics-card">Thông tin chủ đề của quiz này chưa được cung cấp.</p>
+                }
 
                 <section class="cta-card" aria-labelledby="cta-title">
                     <div class="cta-card__copy">
