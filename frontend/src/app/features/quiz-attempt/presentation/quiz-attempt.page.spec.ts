@@ -28,7 +28,26 @@ const start: AttemptStart = {
 };
 
 describe('QuizAttemptPage', () => {
+  const originalShowModal = Object.getOwnPropertyDescriptor(
+    HTMLDialogElement.prototype,
+    'showModal',
+  );
+  const originalClose = Object.getOwnPropertyDescriptor(HTMLDialogElement.prototype, 'close');
+
   beforeEach(async () => {
+    Object.defineProperty(HTMLDialogElement.prototype, 'showModal', {
+      configurable: true,
+      value: vi.fn(function (this: HTMLDialogElement) {
+        this.setAttribute('open', '');
+      }),
+    });
+    Object.defineProperty(HTMLDialogElement.prototype, 'close', {
+      configurable: true,
+      value: vi.fn(function (this: HTMLDialogElement) {
+        this.removeAttribute('open');
+        this.dispatchEvent(new Event('close'));
+      }),
+    });
     const api: Partial<AttemptApi> = {
       unfinished: vi.fn().mockResolvedValue([]),
       start: vi.fn().mockResolvedValue(start),
@@ -53,6 +72,20 @@ describe('QuizAttemptPage', () => {
         },
       })
       .compileComponents();
+  });
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+    if (originalShowModal) {
+      Object.defineProperty(HTMLDialogElement.prototype, 'showModal', originalShowModal);
+    } else {
+      Reflect.deleteProperty(HTMLDialogElement.prototype, 'showModal');
+    }
+    if (originalClose) {
+      Object.defineProperty(HTMLDialogElement.prototype, 'close', originalClose);
+    } else {
+      Reflect.deleteProperty(HTMLDialogElement.prototype, 'close');
+    }
   });
 
   async function createFixture() {
@@ -80,5 +113,61 @@ describe('QuizAttemptPage', () => {
     fixture.detectChanges();
 
     expect(element.querySelector<HTMLDialogElement>('#submit-confirmation')?.open).toBe(true);
+    expect(HTMLDialogElement.prototype.showModal).toHaveBeenCalledOnce();
+  });
+
+  it('cancels confirmation and restores attempt keyboard navigation', async () => {
+    const fixture = await createFixture();
+    const element = fixture.nativeElement as HTMLElement;
+    const store = fixture.debugElement.injector.get(QuizAttemptStore);
+    const next = vi.spyOn(store, 'nextQuestion');
+    element.querySelector<HTMLButtonElement>('.submit-button')!.click();
+    fixture.detectChanges();
+    const dialog = element.querySelector<HTMLDialogElement>('#submit-confirmation')!;
+
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight' }));
+    expect(next).not.toHaveBeenCalled();
+    dialog.dispatchEvent(new Event('cancel', { cancelable: true }));
+    fixture.detectChanges();
+
+    expect(dialog.open).toBe(false);
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight' }));
+    expect(next).toHaveBeenCalledOnce();
+    element.querySelector<HTMLButtonElement>('.submit-button')!.click();
+    expect(dialog.open).toBe(true);
+  });
+
+  it('keeps confirmation modal while submission is busy', async () => {
+    const fixture = await createFixture();
+    const element = fixture.nativeElement as HTMLElement;
+    const store = fixture.debugElement.injector.get(QuizAttemptStore);
+    element.querySelector<HTMLButtonElement>('.submit-button')!.click();
+    store.isBusy.set(true);
+    fixture.detectChanges();
+    const dialog = element.querySelector<HTMLDialogElement>('#submit-confirmation')!;
+    const cancel = new Event('cancel', { cancelable: true });
+
+    dialog.dispatchEvent(cancel);
+
+    expect(cancel.defaultPrevented).toBe(true);
+    expect(dialog.open).toBe(true);
+    expect(dialog.querySelector<HTMLButtonElement>('button[autofocus]')?.disabled).toBe(true);
+  });
+
+  it('closes confirmation when the attempt receives a result', async () => {
+    const fixture = await createFixture();
+    const element = fixture.nativeElement as HTMLElement;
+    const store = fixture.debugElement.injector.get(QuizAttemptStore);
+    element.querySelector<HTMLButtonElement>('.submit-button')!.click();
+    store.result.set({
+      id: start.attemptId,
+      quizId,
+      quizTitle: start.quiz.title,
+      score: 100,
+      submittedAt: '2026-09-12T08:10:00Z',
+    });
+    fixture.detectChanges();
+
+    expect(element.querySelector<HTMLDialogElement>('#submit-confirmation')?.open).toBe(false);
   });
 });

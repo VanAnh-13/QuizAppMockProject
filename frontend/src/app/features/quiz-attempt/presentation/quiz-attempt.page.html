@@ -1,4 +1,4 @@
-﻿<a class="skip-link" href="#question-content">Chuyển đến câu hỏi hiện tại</a>
+<a class="skip-link" href="#question-content">Chuyển đến câu hỏi hiện tại</a>
 
 <header class="exam-header">
     <div class="exam-header__inner">
@@ -304,34 +304,39 @@
     </div>
 </footer>
 
-@if (submitDialogOpen() && !store.result()) {
-    <dialog id="submit-confirmation" class="submit-dialog" open aria-labelledby="submit-title">
-        <div class="submit-dialog__icon material-symbols-outlined" aria-hidden="true">
-            assignment_turned_in
-        </div>
-        <h2 id="submit-title">Xác nhận nộp bài?</h2>
-        <p>
-            Bạn còn <strong>{{ store.unansweredCount() }} câu chưa trả lời</strong>. Sau khi nộp,
-            bạn sẽ
-            không thể thay đổi đáp án.
-        </p>
-        <div class="submit-dialog__actions">
-            <button type="button" [disabled]="store.isBusy()" (click)="closeSubmitConfirmation()">
-                Tiếp tục xem lại
-            </button>
-            <button
-                    type="button"
-                    [disabled]="store.isBusy() || store.requiresReload()"
-                    (click)="confirmSubmission()"
-            >
-                {{ store.isBusy() ? 'Đang nộp…' : 'Xác nhận nộp' }}
-            </button>
-        </div>
-    </dialog>
-    <button
-            class="dialog-backdrop"
-            type="button"
-            aria-label="Đóng xác nhận nộp bài"
-            (click)="closeSubmitConfirmation()"
-    ></button>
-}
+<dialog
+        #submitDialog
+        id="submit-confirmation"
+        class="submit-dialog"
+        aria-labelledby="submit-title"
+        aria-describedby="submit-description"
+        (cancel)="cancelSubmitConfirmation($event)"
+        (close)="submitDialogOpen.set(false)"
+        (click)="dismissSubmitBackdrop($event)"
+>
+    <div class="submit-dialog__icon material-symbols-outlined" aria-hidden="true">
+        assignment_turned_in
+    </div>
+    <h2 id="submit-title">Xác nhận nộp bài?</h2>
+    <p id="submit-description">
+        Bạn còn <strong>{{ store.unansweredCount() }} câu chưa trả lời</strong>. Sau khi nộp,
+        bạn sẽ không thể thay đổi đáp án.
+    </p>
+    <div class="submit-dialog__actions">
+        <button
+                type="button"
+                autofocus
+                [disabled]="store.isBusy()"
+                (click)="closeSubmitConfirmation()"
+        >
+            Tiếp tục xem lại
+        </button>
+        <button
+                type="button"
+                [disabled]="store.isBusy() || store.requiresReload()"
+                (click)="confirmSubmission()"
+        >
+            {{ store.isBusy() ? 'Đang nộp…' : 'Xác nhận nộp' }}
+        </button>
+    </div>
+</dialog>

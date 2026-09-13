@@ -1,10 +1,13 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  effect,
+  ElementRef,
   HostListener,
   inject,
   OnDestroy,
   signal,
+  viewChild,
 } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { Location } from '@angular/common';
@@ -24,12 +27,22 @@ import { AuthDialogComponent } from '../../../shared/ui/auth-dialog/auth-dialog.
 export class QuizAttemptPage implements OnDestroy {
   protected readonly store = inject(QuizAttemptStore);
   protected readonly submitDialogOpen = signal(false);
+  private readonly submitDialog = viewChild<ElementRef<HTMLDialogElement>>('submitDialog');
   private readonly route = inject(ActivatedRoute);
   private readonly location = inject(Location);
   private readonly timerId = setInterval(() => this.store.tick(), inject(ATTEMPT_CONFIG).tickMs);
   private readonly subscription = this.route.paramMap.subscribe(() => {
     void this.load();
   });
+
+  constructor() {
+    effect(() => {
+      if (this.store.result()) {
+        this.submitDialog()?.nativeElement.close();
+        this.submitDialogOpen.set(false);
+      }
+    });
+  }
 
   protected async load(): Promise<void> {
     const quizId = this.route.snapshot.paramMap.get('quizId');
@@ -76,15 +89,44 @@ export class QuizAttemptPage implements OnDestroy {
   }
 
   protected openSubmitConfirmation(): void {
-    if (!this.store.isBusy() && !this.store.result()) this.submitDialogOpen.set(true);
+    if (this.store.isBusy() || this.store.result()) return;
+
+    const dialog = this.submitDialog()?.nativeElement;
+    if (!dialog || dialog.open) return;
+
+    dialog.showModal();
+    this.submitDialogOpen.set(true);
   }
 
   protected closeSubmitConfirmation(): void {
-    if (!this.store.isBusy()) this.submitDialogOpen.set(false);
+    if (this.store.isBusy()) return;
+
+    this.submitDialog()?.nativeElement.close();
+    this.submitDialogOpen.set(false);
+  }
+
+  protected cancelSubmitConfirmation(event: Event): void {
+    event.preventDefault();
+    this.closeSubmitConfirmation();
+  }
+
+  protected dismissSubmitBackdrop(event: MouseEvent): void {
+    const dialog = this.submitDialog()?.nativeElement;
+    if (!dialog || event.target !== dialog) return;
+
+    const bounds = dialog.getBoundingClientRect();
+    if (
+      event.clientX < bounds.left ||
+      event.clientX > bounds.right ||
+      event.clientY < bounds.top ||
+      event.clientY > bounds.bottom
+    ) {
+      this.closeSubmitConfirmation();
+    }
   }
 
   protected async confirmSubmission(): Promise<void> {
-    if (await this.store.submit()) this.submitDialogOpen.set(false);
+    if (await this.store.submit()) this.closeSubmitConfirmation();
   }
 
   @HostListener('window:beforeunload', ['$event'])

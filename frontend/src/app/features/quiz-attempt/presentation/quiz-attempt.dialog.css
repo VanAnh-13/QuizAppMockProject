@@ -1,5 +1,5 @@
-﻿.dialog-backdrop {
-  @apply fixed inset-0 z-40 h-full w-full cursor-default border-0 bg-[#000f21]/50;
+.submit-dialog::backdrop {
+  @apply bg-[#000f21]/50;
 }
 
 .submit-dialog {
