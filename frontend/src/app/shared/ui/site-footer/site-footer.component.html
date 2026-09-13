@@ -1,0 +1,18 @@
+﻿<footer class="footer" id="thong-tin">
+    <div class="footer__inner">
+        <div class="footer__brand">
+            <app-brand/>
+            <p>
+                © {{ currentYear }} QuizApp. Học mỗi ngày, vững từng bước.<br/>Bản trải nghiệm thiết
+                kế ·
+                Dữ liệu mẫu
+            </p>
+        </div>
+        <nav aria-label="Điều hướng cuối trang">
+            @for (item of navigation; track item.id) {
+                <button type="button" (click)="information.open(item.id)">{{ item.label }}</button>
+            }
+        </nav>
+    </div>
+</footer>
+<app-site-info-dialog #information dialogId="footer-information"/>

@@ -1,0 +1,30 @@
+:host {
+  @apply inline-flex;
+}
+
+.brand {
+  @apply inline-flex min-h-11 items-center gap-2 rounded-control p-1 text-xl font-extrabold tracking-[-0.04em] text-ink no-underline;
+}
+
+.brand__mark {
+  @apply inline-flex size-8 items-center justify-center rounded-control bg-brand text-on-brand shadow-subtle;
+}
+
+.brand__mark svg {
+  fill: none;
+  height: 27px;
+  overflow: visible;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 2.2;
+  width: 27px;
+}
+
+.brand__check {
+  stroke-width: 2.5;
+}
+
+.brand:focus-visible {
+  @apply outline-none ring-2 ring-brand ring-offset-2;
+}

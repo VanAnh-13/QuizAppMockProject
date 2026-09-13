@@ -1,13 +1,13 @@
 # Quizapp
 
-A quiz-management platform with a .NET backend and an Angular frontend prototype.
+A quiz-management platform with a .NET backend and an Angular frontend.
 
 ## Repository Layout
 
 ```
 Quizapp/
 ├── backend/              # .NET 10 solution — API, domain, application, infrastructure
-├── frontend/             # Angular + TypeScript web client prototype
+├── frontend/             # Angular + TypeScript web client
 ├── compose.yaml          # Docker Compose — API container build
 ├── .editorconfig         # Shared editor settings
 ├── .gitignore            # Shared ignore rules
@@ -18,7 +18,7 @@ Quizapp/
 | Directory                | README                                | Status                                                                                                  |
 | ------------------------ | ------------------------------------- | ------------------------------------------------------------------------------------------------------- |
 | [`backend/`](backend/)   | [Backend README](backend/README.md)   | Services, controllers, JWT authentication, EF migrations, and tests                                     |
-| [`frontend/`](frontend/) | [Frontend README](frontend/README.md) | Explore/details screens backed by the public quiz catalog API; attempt screen remains a local prototype |
+| [`frontend/`](frontend/) | [Frontend README](frontend/README.md) | Quiz discovery, authentication, attempts, submission, and history |
 
 ## Tech Stack
 
@@ -45,9 +45,12 @@ Full setup instructions (SQL Server, migrations, Docker, testing) → [Backend R
 
 ### Frontend
 
+Run these commands from the repository root:
+
 ```powershell
-Set-Location "D:/Homeworks/angular/quiz_app/frontend"
+Set-Location "./frontend"
 pnpm install
+$env:QUIZAPP_API_TARGET = 'http://localhost:5269'
 pnpm start
 ```
 

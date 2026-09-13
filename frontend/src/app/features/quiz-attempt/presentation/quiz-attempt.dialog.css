@@ -1,0 +1,35 @@
+.submit-dialog::backdrop {
+  @apply bg-[#000f21]/50;
+}
+
+.submit-dialog {
+  @apply fixed inset-0 z-50 m-auto w-[calc(100%-2rem)] max-w-md rounded-card border border-[#c2d5f0] bg-white p-6 text-center text-[#0d3459] shadow-card;
+}
+
+.submit-dialog__icon {
+  @apply mx-auto flex size-12 items-center justify-center rounded-full bg-[#e5eeff] text-2xl text-[#4a4bd7];
+}
+
+.submit-dialog h2 {
+  @apply mb-0 mt-4 text-xl font-bold;
+}
+
+.submit-dialog p {
+  @apply mb-0 mt-3 text-sm leading-6 text-[#4e626d];
+}
+
+.submit-dialog__actions {
+  @apply mt-6 flex flex-col-reverse gap-2 sm:flex-row;
+}
+
+.submit-dialog__actions button {
+  @apply min-h-11 flex-1 rounded-control border border-[#94b4e0] px-3 text-sm font-semibold;
+}
+
+.submit-dialog__actions button:last-child {
+  @apply border-[#4a4bd7] bg-[#4a4bd7] text-white hover:bg-[#3d3dcb];
+}
+
+.submission-toast {
+  @apply fixed bottom-4 right-4 z-40 flex items-center gap-2 rounded-control bg-[#0d3459] px-4 py-3 text-sm font-medium text-white shadow-card;
+}

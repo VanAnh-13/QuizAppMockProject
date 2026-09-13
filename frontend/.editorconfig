@@ -1,0 +1,13 @@
+# Frontend editor settings. Extends the repository root .editorconfig.
+# HTML templates follow the IDE (WebStorm/Rider) code style, with
+# src/app/features/quiz-attempt/presentation/quiz-attempt.page.html as the canonical example.
+# TypeScript, CSS, JSON, and Markdown remain governed by .prettierrc instead.
+
+[*.html]
+indent_style = space
+indent_size = 4
+tab_width = 4
+max_line_length = 100
+ij_continuation_indent_size = 8
+ij_html_wrap_attributes = wrap_if_long
+ij_html_align_attributes = false

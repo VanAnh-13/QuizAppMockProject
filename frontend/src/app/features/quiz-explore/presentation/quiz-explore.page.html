@@ -1,0 +1,227 @@
+﻿<app-site-header/>
+
+<main class="explore" id="main-content" tabindex="-1">
+    <section class="hero" aria-labelledby="hero-title">
+        <div class="hero__content">
+            <p class="hero__eyebrow">
+                <svg
+                        width="18"
+                        height="18"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.7"
+                        aria-hidden="true"
+                >
+                    <path d="m12 3 2.4 6.6L21 12l-6.6 2.4L12 21l-2.4-6.6L3 12l6.6-2.4z"/>
+                </svg>
+                Học có mục tiêu, tiến bộ mỗi ngày
+            </p>
+            <h1 id="hero-title">
+                Học lập trình với<br class="hero__line-break"/>
+                quiz thực chiến
+            </h1>
+            <p class="hero__description">
+                Hiểu sâu kiến thức, vững vàng tư duy. Thử sức với các bài quiz về C#, SQL Server,
+                Angular và
+                nhiều chủ đề lập trình thiết thực.
+            </p>
+            <form class="search" role="search" (submit)="applySearch($event)">
+                <label class="visually-hidden" for="quiz-search">Tìm kiếm bài quiz</label>
+                <svg
+                        class="search__icon"
+                        width="20"
+                        height="20"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        aria-hidden="true"
+                >
+                    <circle cx="10.5" cy="10.5" r="6.5"/>
+                    <path d="m16 16 5 5"/>
+                </svg>
+                <input
+                        id="quiz-search"
+                        type="search"
+                        autocomplete="off"
+                        placeholder="Tìm theo chủ đề hoặc từ khóa..."
+                        [formControl]="searchControl"
+                />
+                <button type="submit">Tìm kiếm</button>
+            </form>
+            <p class="hero__catalog-note">
+                <svg
+                        width="17"
+                        height="17"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.7"
+                        aria-hidden="true"
+                >
+                    <path d="M3 5h7l2 2 2-2h7v15h-7l-2 2-2-2H3zM12 7v15"/>
+                </svg>
+                {{ store.totalCatalogCount() }} bài quiz mẫu · {{ store.categoryCount() }} chủ đề
+            </p>
+        </div>
+        <app-learning-illustration class="hero__illustration"/>
+    </section>
+
+    <section class="filters" aria-labelledby="filter-title">
+        <h2 class="visually-hidden" id="filter-title">Lọc quiz theo chủ đề</h2>
+        <div class="filters__list">
+            @for (category of store.categories(); track category.id) {
+                <button
+                        type="button"
+                        [class.filters__button--active]="store.selectedCategoryId() === category.id"
+                        [attr.aria-pressed]="store.selectedCategoryId() === category.id"
+                        (click)="store.selectCategory(category.id)"
+                >
+                    {{ category.label }}
+                </button>
+            }
+        </div>
+    </section>
+
+    <section
+            class="catalog"
+            id="quiz-list"
+            aria-labelledby="catalog-title"
+            [attr.aria-busy]="store.isLoading()"
+    >
+        <div class="catalog__heading">
+            <div>
+                <h2 id="catalog-title">
+                    {{
+                        store.searchTerm() || store.selectedCategoryId() !== 'all'
+                                ? 'Bài quiz dành cho bạn'
+                                : 'Khám phá các bài quiz'
+                    }}
+                </h2>
+                <p class="catalog__subtitle">Chọn một chủ đề. Bắt đầu từ điều bạn muốn hiểu rõ
+                    hơn.</p>
+            </div>
+            <p class="catalog__count" aria-live="polite" aria-atomic="true">
+                {{ store.totalCount() }} bài quiz
+            </p>
+        </div>
+        @if (store.searchTerm() || store.selectedCategoryId() !== 'all') {
+            <div class="catalog__active-filters">
+                <p>
+                    {{
+                        store.searchTerm() ? 'Kết quả cho “' + store.searchTerm() + '”' : 'Đang lọc theo chủ đề'
+                    }}
+                </p>
+                <button type="button" (click)="resetFilters()">
+                    Xóa bộ lọc <span aria-hidden="true">×</span>
+                </button>
+            </div>
+        }
+        @if (store.isLoading()) {
+            <div class="catalog__loading" role="status" aria-live="polite">
+                <p class="visually-hidden">Đang tải danh sách quiz. Vui lòng chờ trong giây lát.</p>
+                <div class="catalog__grid" aria-hidden="true">
+                    @for (item of [1, 2, 3, 4, 5, 6]; track item) {
+                        <div class="catalog__skeleton-card">
+                            <div class="catalog__skeleton-heading"></div>
+                            <div class="catalog__skeleton-title"></div>
+                            <div class="catalog__skeleton-line"></div>
+                            <div class="catalog__skeleton-line catalog__skeleton-line--short"></div>
+                            <div class="catalog__skeleton-footer"></div>
+                        </div>
+                    }
+                </div>
+            </div>
+        } @else if (store.errorMessage(); as errorMessage) {
+            <div class="catalog__empty" role="alert">
+                <h3>Không thể tải danh sách quiz</h3>
+                <p>{{ errorMessage }}</p>
+                <button type="button" (click)="store.refresh()">Thử lại</button>
+            </div>
+        } @else if (store.visibleQuizzes().length > 0) {
+            <div class="catalog__grid">
+                @for (quiz of store.visibleQuizzes(); track quiz.id) {
+                    <app-quiz-card [quiz]="quiz" (detailRequested)="openDetails($event)"/>
+                }
+            </div>
+        } @else {
+            <div class="catalog__empty" role="status">
+                <svg
+                        width="40"
+                        height="40"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.3"
+                        aria-hidden="true"
+                >
+                    <circle cx="10.5" cy="10.5" r="6.5"/>
+                    <path d="m16 16 5 5M8 10.5h5"/>
+                </svg>
+                <h3>Chưa tìm thấy bài quiz phù hợp</h3>
+                <p>Hãy thử một từ khóa khác hoặc xóa bộ lọc để khám phá lại.</p>
+                <button type="button" (click)="resetFilters()">Xem tất cả bài quiz</button>
+            </div>
+        }
+        @if (!store.isLoading() && !store.errorMessage() && store.totalCount() > 0) {
+            <div class="pagination">
+                <p>
+                    Hiển thị <strong>{{ store.rangeStart() }}–{{ store.rangeEnd() }}</strong> trong
+                    <strong>{{ store.totalCount() }}</strong> bài quiz mẫu
+                </p>
+                <nav aria-label="Phân trang danh sách quiz">
+                    <button
+                            type="button"
+                            aria-label="Trang trước"
+                            [disabled]="store.currentPage() === 1"
+                            (click)="store.goToPage(store.currentPage() - 1)"
+                    >
+                        <svg
+                                width="18"
+                                height="18"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.8"
+                                aria-hidden="true"
+                        >
+                            <path d="m15 5-7 7 7 7"/>
+                        </svg>
+                    </button>
+                    @for (pageNumber of store.pageNumbers(); track pageNumber) {
+                        <button
+                                type="button"
+                                [class.pagination__page--active]="store.currentPage() === pageNumber"
+                                [attr.aria-current]="store.currentPage() === pageNumber ? 'page' : null"
+                                [attr.aria-label]="'Trang ' + pageNumber"
+                                (click)="store.goToPage(pageNumber)"
+                        >
+                            {{ pageNumber }}
+                        </button>
+                    }
+                    <button
+                            type="button"
+                            aria-label="Trang sau"
+                            [disabled]="store.currentPage() === store.totalPages()"
+                            (click)="store.goToPage(store.currentPage() + 1)"
+                    >
+                        <svg
+                                width="18"
+                                height="18"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="1.8"
+                                aria-hidden="true"
+                        >
+                            <path d="m9 5 7 7-7 7"/>
+                        </svg>
+                    </button>
+                </nav>
+            </div>
+        }
+    </section>
+</main>
+
+<app-site-footer/>

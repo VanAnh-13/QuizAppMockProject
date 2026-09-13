@@ -1,0 +1,7 @@
+# HTML templates are formatted by the IDE code style in .editorconfig
+# (see AGENTS.md), not by Prettier.
+**/*.html
+
+# Build output
+/dist
+/coverage
