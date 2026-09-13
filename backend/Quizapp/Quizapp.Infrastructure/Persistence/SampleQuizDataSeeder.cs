@@ -9,7 +9,8 @@ public static class SampleQuizDataSeeder
 {
     private static readonly DateTime SeedTimestamp = new(2026, 9, 1, 0, 0, 0, DateTimeKind.Utc);
 
-    // Fixed deterministic IDs matching database stubs and ensuring idempotency
+    // Deterministic IDs for fresh rows; existing rows are resolved by their unique natural keys
+    // (RoleName, Username, Email) and reused so seeding never violates the unique indexes.
     public static readonly Guid RoleAdminId = Guid.Parse("a0000000-0000-0000-0000-000000000001");
     public static readonly Guid RoleUserId = Guid.Parse("a0000000-0000-0000-0000-000000000002");
     public static readonly Guid DemoUserId = Guid.Parse("b0000000-0000-0000-0000-000000000001");
@@ -42,7 +43,8 @@ public static class SampleQuizDataSeeder
 
     private static async Task SeedRolesAndUserAsync(QuizAppDbContext db, CancellationToken cancellationToken)
     {
-        var adminRole = await db.Roles.FindAsync([RoleAdminId], cancellationToken);
+        var adminRole = await db.Roles
+            .FirstOrDefaultAsync(role => role.RoleName == "Admin", cancellationToken);
         if (adminRole is null)
         {
             adminRole = new Role
@@ -54,7 +56,8 @@ public static class SampleQuizDataSeeder
             db.Roles.Add(adminRole);
         }
 
-        var userRole = await db.Roles.FindAsync([RoleUserId], cancellationToken);
+        var userRole = await db.Roles
+            .FirstOrDefaultAsync(role => role.RoleName == "User", cancellationToken);
         if (userRole is null)
         {
             userRole = new Role
@@ -66,7 +69,10 @@ public static class SampleQuizDataSeeder
             db.Roles.Add(userRole);
         }
 
-        var demoUser = await db.Users.FindAsync([DemoUserId], cancellationToken);
+        var demoUser = await db.Users
+            .FirstOrDefaultAsync(user => user.Username == "demo_user", cancellationToken)
+            ?? await db.Users
+                .FirstOrDefaultAsync(user => user.Email == "demo@quizapp.local", cancellationToken);
         if (demoUser is null)
         {
             var hasher = new PasswordHasher<object>();
@@ -85,11 +91,17 @@ public static class SampleQuizDataSeeder
                 UpdateAt = SeedTimestamp
             };
             db.Users.Add(demoUser);
+        }
 
+        var hasUserRoleAssignment = await db.UserRoles.AnyAsync(
+            assignment => assignment.UserId == demoUser.Id && assignment.RoleId == userRole.Id,
+            cancellationToken);
+        if (!hasUserRoleAssignment)
+        {
             db.UserRoles.Add(new UserRole
             {
-                UserId = DemoUserId,
-                RoleId = RoleUserId
+                UserId = demoUser.Id,
+                RoleId = userRole.Id
             });
         }
     }
