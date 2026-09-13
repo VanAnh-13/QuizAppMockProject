@@ -19,6 +19,27 @@
                 </button>
             }
         </div>
+
+        <details class="header__mobile-menu">
+            <summary aria-label="Mở trình đơn tài khoản">
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+                <span aria-hidden="true"></span>
+            </summary>
+            <div class="header__mobile-panel">
+                <div class="header__mobile-actions">
+                    @if (session.user(); as user) {
+                        <span>{{ user.fullName || user.username }}</span>
+                        <button type="button" (click)="logout()">Đăng xuất</button>
+                    } @else {
+                        <button type="button" (click)="auth.open()">Đăng nhập</button>
+                        <button class="header__mobile-primary" type="button" (click)="auth.open(true)">
+                            Đăng ký
+                        </button>
+                    }
+                </div>
+            </div>
+        </details>
     </div>
 </header>
 
