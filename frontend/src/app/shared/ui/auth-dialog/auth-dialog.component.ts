@@ -93,6 +93,11 @@ export class AuthDialogComponent {
         apiErrorMessage(
           error,
           'Không thể đăng nhập hoặc tạo tài khoản. Vui lòng kiểm tra thông tin.',
+          {
+            conflictMessage: this.registering()
+              ? 'Tên đăng nhập hoặc email đã được sử dụng. Vui lòng chọn thông tin khác hoặc đăng nhập vào tài khoản hiện có.'
+              : undefined,
+          },
         ),
       );
     } finally {

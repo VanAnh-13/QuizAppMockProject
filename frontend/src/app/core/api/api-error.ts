@@ -1,6 +1,10 @@
 import { HttpErrorResponse } from '@angular/common/http';
 
-export function apiErrorMessage(error: unknown, fallback: string): string {
+export function apiErrorMessage(
+  error: unknown,
+  fallback: string,
+  options: { conflictMessage?: string } = {},
+): string {
   if (!(error instanceof HttpErrorResponse)) return fallback;
 
   switch (error.status) {
@@ -13,7 +17,10 @@ export function apiErrorMessage(error: unknown, fallback: string): string {
     case 404:
       return 'Không tìm thấy quiz hoặc lượt làm bài này.';
     case 409:
-      return 'Dữ liệu đã thay đổi ở phiên khác hoặc bài đã được nộp. Hãy tải lại trạng thái từ máy chủ.';
+      return (
+        options.conflictMessage ??
+        'Dữ liệu đã thay đổi ở phiên khác hoặc bài đã được nộp. Hãy tải lại trạng thái từ máy chủ.'
+      );
     case 422:
       return 'Thông tin gửi lên chưa hợp lệ. Vui lòng kiểm tra và thử lại.';
     default:
