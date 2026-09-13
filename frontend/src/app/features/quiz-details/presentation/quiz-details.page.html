@@ -4,32 +4,15 @@
     <div class="details-header__inner">
         <div class="details-header__leading">
             <a class="details-brand" routerLink="/" aria-label="QuizApp — Trang khám phá">
-        <span class="details-brand__mark">
-          <span class="material-symbols-outlined" aria-hidden="true">quiz</span>
-        </span>
+                <span class="details-brand__mark">
+                    <span class="material-symbols-outlined" aria-hidden="true">quiz</span>
+                </span>
                 <span>QuizApp</span>
             </a>
             <nav class="details-header__navigation" aria-label="Điều hướng chính">
                 <a routerLink="/" fragment="quiz-list" aria-current="page">Khám phá quiz</a>
-                <button
-                        type="button"
-                        (click)="
-            openInfo(
-              'Giới thiệu QuizApp',
-              'Nội dung giới thiệu đang được hoàn thiện trong bản trải nghiệm này.'
-            )
-          "
-                >
-                    Giới thiệu
-                </button>
-                <button
-                        type="button"
-                        (click)="
-            openInfo('Liên hệ', 'Kênh liên hệ hỗ trợ chưa được tích hợp trong bản trải nghiệm này.')
-          "
-                >
-                    Liên hệ
-                </button>
+                <button type="button" (click)="openInfo('about')">Giới thiệu</button>
+                <button type="button" (click)="openInfo('contact')">Liên hệ</button>
             </nav>
         </div>
 
@@ -39,7 +22,7 @@
                     type="button"
                     title="Thông báo"
                     aria-label="Thông báo"
-                    (click)="openInfo('Thông báo', 'Bạn chưa có thông báo mới trong bản trải nghiệm này.')"
+                    (click)="openInfo('notifications')"
             >
                 <span class="material-symbols-outlined" aria-hidden="true">notifications</span>
             </button>
@@ -48,33 +31,50 @@
                     type="button"
                     title="Trợ giúp & Hỏi đáp"
                     aria-label="Trợ giúp và hỏi đáp"
-                    (click)="
-          openInfo(
-            'Trợ giúp & Hỏi đáp',
-            'Trung tâm trợ giúp chưa được tích hợp trong bản trải nghiệm này.'
-          )
-        "
+                    (click)="openInfo('help')"
             >
                 <span class="material-symbols-outlined" aria-hidden="true">help_outline</span>
             </button>
             <span class="details-header__divider" aria-hidden="true"></span>
-            <button
-                    class="details-header__profile"
-                    type="button"
-                    (click)="
-          openInfo(
-            'Hồ sơ học viên',
-            'Anh LV là tài khoản mẫu; quản lý hồ sơ chưa có trong bản trải nghiệm này.'
-          )
-        "
-            >
-                <span class="details-header__avatar" aria-hidden="true">AL</span>
-                <span class="details-header__profile-copy">
-          <strong>Anh LV</strong>
-          <span>Học viên .NET</span>
-        </span>
-                <span class="material-symbols-outlined" aria-hidden="true">expand_more</span>
-            </button>
+            @if (session.user(); as user) {
+                <div class="details-header__profile">
+                    <span
+                            class="details-header__avatar material-symbols-outlined"
+                            aria-hidden="true"
+                    >
+                        person
+                    </span>
+                    <span class="details-header__profile-copy">
+                        <strong>{{ user.fullName || user.username }}</strong>
+                        <span>Đã đăng nhập</span>
+                    </span>
+                </div>
+                <button
+                        class="details-header__auth-button"
+                        type="button"
+                        data-testid="header-logout"
+                        (click)="logout()"
+                >
+                    Đăng xuất
+                </button>
+            } @else {
+                <button
+                        class="details-header__auth-button"
+                        type="button"
+                        data-testid="header-login"
+                        (click)="historyAuth.open()"
+                >
+                    Đăng nhập
+                </button>
+                <button
+                        class="details-header__auth-button details-header__auth-button--primary"
+                        type="button"
+                        data-testid="header-register"
+                        (click)="historyAuth.open(true)"
+                >
+                    Đăng ký
+                </button>
+            }
         </div>
     </div>
 </header>
@@ -118,9 +118,12 @@
                     <dl class="metrics-grid">
                         @for (metric of metrics(); track metric.label) {
                             <div class="metric-card">
-                <span class="metric-card__icon material-symbols-outlined" aria-hidden="true">{{
-                        metric.icon
-                    }}</span>
+                                <span
+                                        class="metric-card__icon material-symbols-outlined"
+                                        aria-hidden="true"
+                                >
+                                    {{ metric.icon }}
+                                </span>
                                 <div>
                                     <dt>{{ metric.label }}</dt>
                                     <dd>{{ metric.value }}</dd>
@@ -129,6 +132,7 @@
                         }
                     </dl>
                 </article>
+
                 <section class="topics-card" aria-labelledby="topics-title">
                     <div class="section-heading">
                         <span class="material-symbols-outlined" aria-hidden="true">psychology</span>
@@ -137,9 +141,12 @@
                     <div class="topics-grid">
                         @for (topic of topics(); track topic.title) {
                             <article class="topic-card">
-                <span class="topic-card__check material-symbols-outlined" aria-hidden="true"
-                >check</span
-                >
+                                <span
+                                        class="topic-card__check material-symbols-outlined"
+                                        aria-hidden="true"
+                                >
+                                    check
+                                </span>
                                 <div>
                                     <h3>{{ topic.title }}</h3>
                                     <p>{{ topic.description }}</p>
@@ -151,9 +158,12 @@
 
                 <section class="cta-card" aria-labelledby="cta-title">
                     <div class="cta-card__copy">
-            <span class="cta-card__icon material-symbols-outlined" aria-hidden="true"
-            >play_circle</span
-            >
+                        <span
+                                class="cta-card__icon material-symbols-outlined"
+                                aria-hidden="true"
+                        >
+                            play_circle
+                        </span>
                         <div>
                             <h2 id="cta-title">Sẵn sàng thử thách năng lực?</h2>
                             <p>Hệ thống sẽ lưu vết kết quả vào hồ sơ học tập của bạn.</p>
@@ -161,14 +171,14 @@
                     </div>
                     <div class="cta-card__actions">
                         <button class="history-button" type="button" (click)="openHistory()">
-                            <span class="material-symbols-outlined"
-                                    aria-hidden="true">history</span>
+                            <span class="material-symbols-outlined" aria-hidden="true">history</span>
                             <span>Xem lịch sử lần thi</span>
                         </button>
                         <a class="start-button" [routerLink]="['/quiz', quizId(), 'attempt']">
                             <span>Bắt đầu làm bài</span>
-                            <span class="material-symbols-outlined"
-                                    aria-hidden="true">arrow_forward</span>
+                            <span class="material-symbols-outlined" aria-hidden="true">
+                                arrow_forward
+                            </span>
                         </a>
                     </div>
                 </section>
@@ -177,8 +187,9 @@
             <aside class="quiz-details__sidebar" aria-label="Quy chế và cấu trúc bài thi">
                 <section class="guidelines-card" aria-labelledby="guidelines-title">
                     <div class="guidelines-card__heading">
-                        <span class="material-symbols-outlined"
-                                aria-hidden="true">verified_user</span>
+                        <span class="material-symbols-outlined" aria-hidden="true">
+                            verified_user
+                        </span>
                         <h2 id="guidelines-title">Quy chế &amp; Hướng dẫn làm bài</h2>
                     </div>
                     <ol class="guidelines-list">
@@ -196,8 +207,7 @@
                         <span class="material-symbols-outlined" aria-hidden="true">info</span>
                         <p>
                             Tránh chuyển tab liên tục hoặc tải lại trang để đảm bảo phiên làm bài
-                            diễn ra mượt mà
-                            nhất.
+                            diễn ra mượt mà nhất.
                         </p>
                     </div>
                 </section>
@@ -226,33 +236,17 @@
         <p>© 2025 QuizApp. Nền tảng học tập &amp; rèn luyện tư duy lập trình.</p>
         <nav aria-label="Điều hướng cuối trang">
             <a routerLink="/">Khám phá quiz</a>
-            <button
-                    type="button"
-                    (click)="
-          openInfo(
-            'Giới thiệu QuizApp',
-            'Nội dung giới thiệu đang được hoàn thiện trong bản trải nghiệm này.'
-          )
-        "
-            >
-                Giới thiệu
-            </button>
-            <button
-                    type="button"
-                    (click)="
-          openInfo('Liên hệ', 'Kênh liên hệ hỗ trợ chưa được tích hợp trong bản trải nghiệm này.')
-        "
-            >
-                Liên hệ
-            </button>
+            <button type="button" (click)="openInfo('about')">Giới thiệu</button>
+            <button type="button" (click)="openInfo('contact')">Liên hệ</button>
         </nav>
     </div>
 </footer>
 
 @if (historyDialogOpen()) {
     <dialog id="attempt-history" class="details-dialog" open aria-labelledby="history-title">
-        <span class="details-dialog__icon material-symbols-outlined"
-                aria-hidden="true">history</span>
+        <span class="details-dialog__icon material-symbols-outlined" aria-hidden="true">
+            history
+        </span>
         <h2 id="history-title">Lịch sử lần thi</h2>
         @if (historyLoading()) {
             <p role="status">Đang tải lịch sử lần thi…</p>
@@ -282,7 +276,7 @@
     ></button>
 }
 
-<app-auth-dialog #historyAuth (authenticated)="loadHistory()"/>
+<app-auth-dialog #historyAuth (authenticated)="historyDialogOpen() && loadHistory()"/>
 
 @if (activeInfo(); as info) {
     <dialog class="details-dialog" open aria-labelledby="info-title">
