@@ -45,8 +45,10 @@ Full setup instructions (SQL Server, migrations, Docker, testing) → [Backend R
 
 ### Frontend
 
+Run these commands from the repository root:
+
 ```powershell
-Set-Location "D:/Homeworks/angular/quiz_app/frontend"
+Set-Location "./frontend"
 pnpm install
 $env:QUIZAPP_API_TARGET = 'http://localhost:5269'
 pnpm start

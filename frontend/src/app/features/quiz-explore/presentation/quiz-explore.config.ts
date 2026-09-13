@@ -1,10 +1,10 @@
-﻿import {InjectionToken} from '@angular/core';
+﻿import { InjectionToken } from '@angular/core';
 
 export interface QuizExploreConfig {
-    readonly pageSize: number;
+  readonly pageSize: number;
 }
 
 export const QUIZ_EXPLORE_CONFIG = new InjectionToken<QuizExploreConfig>('QUIZ_EXPLORE_CONFIG', {
-    providedIn: 'root',
-    factory: () => ({pageSize: 6}),
+  providedIn: 'root',
+  factory: () => ({ pageSize: 6 }),
 });

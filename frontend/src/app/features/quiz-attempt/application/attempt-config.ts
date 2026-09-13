@@ -1,9 +1,9 @@
-import {InjectionToken} from '@angular/core';
+import { InjectionToken } from '@angular/core';
 
 export const ATTEMPT_CONFIG = new InjectionToken<{
-    readonly saveDelayMs: number;
-    readonly tickMs: number;
+  readonly saveDelayMs: number;
+  readonly tickMs: number;
 }>('ATTEMPT_CONFIG', {
-    providedIn: 'root',
-    factory: () => ({saveDelayMs: 400, tickMs: 250}),
+  providedIn: 'root',
+  factory: () => ({ saveDelayMs: 400, tickMs: 250 }),
 });

@@ -1,5 +1,5 @@
-import {AttemptQuestion} from '../domain/quiz-attempt';
+import { AttemptQuestion } from '../domain/quiz-attempt';
 
 export interface AttemptContent {
-    listQuestions(): readonly AttemptQuestion[];
+  listQuestions(): readonly AttemptQuestion[];
 }

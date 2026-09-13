@@ -1,35 +1,35 @@
 ﻿.dialog-backdrop {
-    @apply fixed inset-0 z-40 h-full w-full cursor-default border-0 bg-[#000f21]/50;
+  @apply fixed inset-0 z-40 h-full w-full cursor-default border-0 bg-[#000f21]/50;
 }
 
 .details-dialog {
-    @apply fixed inset-0 z-50 m-auto w-[calc(100%-2rem)] max-w-md rounded-xl border border-[#dce9ff] bg-white p-6 text-center text-[#0d3459] shadow-card;
+  @apply fixed inset-0 z-50 m-auto w-[calc(100%-2rem)] max-w-md rounded-xl border border-[#dce9ff] bg-white p-6 text-center text-[#0d3459] shadow-card;
 }
 
 .details-dialog__icon {
-    @apply mx-auto flex size-12 items-center justify-center rounded-full bg-[#eff4ff] text-2xl text-[#4a4bd7];
+  @apply mx-auto flex size-12 items-center justify-center rounded-full bg-[#eff4ff] text-2xl text-[#4a4bd7];
 }
 
 .details-dialog h2 {
-    @apply mb-0 mt-4 text-xl font-bold;
+  @apply mb-0 mt-4 text-xl font-bold;
 }
 
 .details-dialog p {
-    @apply mb-0 mt-3 text-sm leading-6 text-[#4e626d];
+  @apply mb-0 mt-3 text-sm leading-6 text-[#4e626d];
 }
 
 .details-dialog > button {
-    @apply mt-6 min-h-11 w-full rounded-lg bg-[#4a4bd7] px-4 text-sm font-semibold text-white hover:bg-[#3d3dcb];
+  @apply mt-6 min-h-11 w-full rounded-lg bg-[#4a4bd7] px-4 text-sm font-semibold text-white hover:bg-[#3d3dcb];
 }
 
 .history-list {
-    @apply mt-4 max-h-64 list-none space-y-2 overflow-auto p-0 text-left;
+  @apply mt-4 max-h-64 list-none space-y-2 overflow-auto p-0 text-left;
 }
 
 .history-list li {
-    @apply flex items-center justify-between gap-3 rounded-lg bg-[#eff4ff] px-4 py-3 text-sm;
+  @apply flex items-center justify-between gap-3 rounded-lg bg-[#eff4ff] px-4 py-3 text-sm;
 }
 
 .history-list span {
-    @apply text-xs text-[#4e626d];
+  @apply text-xs text-[#4e626d];
 }
