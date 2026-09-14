@@ -22,38 +22,21 @@ These instructions apply to everything under `frontend/`. They extend the reposi
 
 ## Formatting is mandatory
 
-HTML templates and all other file types use different formatters:
+The current formatting already applied by the user in WebStorm is the source of truth for every
+frontend source file, including HTML, CSS, and TypeScript.
 
-- HTML templates (`*.html`) follow the IDE code style in `.editorconfig`, with
-  `src/app/features/quiz-attempt/presentation/quiz-attempt.page.html` as the canonical example:
-  four-space indentation, eight-space continuation indent, attributes wrapped when a line exceeds
-  100 characters, and the closing `>` of a multi-line tag on its own line. Format HTML with the
-  IDE's Reformat Code action, which reads `.editorconfig` directly. Do not run Prettier on HTML;
-  `**/*.html` is listed in `.prettierignore`. Inline templates inside TypeScript files stay with
-  the TypeScript rules below.
-- TypeScript, CSS, JSON, and Markdown follow `.prettierrc`: two-space indentation, single quotes,
-  and a 100-character print width.
-
-TypeScript style details:
-
-- Put spaces inside import and object braces: `{ inject, Injectable }`.
-- Never place multiple properties, statements, methods, or template blocks on one line.
-- Put each method body on multiple lines when it contains logic or a conditional.
-- Add a blank line between the import block and the first declaration.
-- Add a blank line between interfaces, types, classes, and top-level functions.
-- In classes, keep related fields together, then add a blank line before the first method.
-- Keep a blank line between methods and between distinct logical blocks inside a method.
-- Split long parameter lists, object types, object literals, and chained expressions across lines.
-- Do not reformat generated files or unrelated files.
-
-Format every touched TypeScript and CSS file before completion:
-
-```powershell
-.\node_modules\.bin\prettier.cmd --write "src/path/to/touched-file.ts"
-.\node_modules\.bin\prettier.cmd --check "src/**/*.{ts,css}"
-```
-
-Do not report formatting as complete while the Prettier check reports warnings.
+- Before editing a file, inspect its current formatting and the neighboring files. Preserve that
+  indentation, spacing, wrapping, blank-line placement, attribute layout, and line-ending style.
+- After editing, run WebStorm's **Reformat Code** action on every touched HTML, CSS, and TypeScript
+  file using the project's current WebStorm code-style settings.
+- Do not run Prettier or another formatter on HTML, CSS, or TypeScript unless the user explicitly
+  requests it. A formatter must never replace or override the current WebStorm formatting.
+- Do not manually impose a different brace-spacing, indentation, wrapping, or blank-line convention
+  from examples, personal preference, framework defaults, or a formatter configuration.
+- Limit formatting to files changed for the current request. Do not reformat generated files,
+  untouched files, or unrelated code.
+- Before completion, review the final diff and confirm that each touched HTML, CSS, and TypeScript
+  file still matches the existing WebStorm-formatted style around it.
 
 ## Angular and TypeScript conventions
 
