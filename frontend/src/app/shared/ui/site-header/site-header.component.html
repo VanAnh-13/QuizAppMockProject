@@ -2,10 +2,14 @@
     <div class="header__inner">
         <app-brand/>
 
-        <nav aria-label="Điều hướng chính">
-            <a href="/#quiz-list">Khám phá quiz</a>
-            <button type="button" (click)="information.open('about')">Giới thiệu</button>
-            <button type="button" (click)="information.open('contact')">Liên hệ</button>
+        <nav class="header__navigation" aria-label="Điều hướng chính">
+            <a class="header__navigation-link" routerLink="/" fragment="quiz-list">Khám phá quiz</a>
+            <button class="header__navigation-link" type="button"
+                    (click)="information.open('about')">Giới thiệu
+            </button>
+            <button class="header__navigation-link" type="button"
+                    (click)="information.open('contact')">Liên hệ
+            </button>
         </nav>
 
         <div class="header__actions">
@@ -13,10 +17,12 @@
                 <span>{{ user.fullName || user.username }}</span>
                 <button type="button" (click)="logout()">Đăng xuất</button>
             } @else {
-                <button type="button" (click)="auth.open()">Đăng nhập</button>
-                <button class="header__action--primary" type="button" (click)="auth.open(true)">
+                <a class="header__action header__action--text" routerLink="/login"
+                        [queryParams]="{ returnUrl: returnAfterAuth() ?? router.url }">Đăng nhập</a>
+                <a class="header__action header__action--primary" routerLink="/register"
+                        [queryParams]="{ returnUrl: returnAfterAuth() ?? router.url }">
                     Đăng ký
-                </button>
+                </a>
             }
         </div>
 
@@ -32,10 +38,13 @@
                         <span>{{ user.fullName || user.username }}</span>
                         <button type="button" (click)="logout()">Đăng xuất</button>
                     } @else {
-                        <button type="button" (click)="auth.open()">Đăng nhập</button>
-                        <button class="header__mobile-primary" type="button" (click)="auth.open(true)">
+                        <a routerLink="/login"
+                                [queryParams]="{ returnUrl: returnAfterAuth() ?? router.url }">Đăng
+                            nhập</a>
+                        <a class="header__mobile-primary" routerLink="/register"
+                                [queryParams]="{ returnUrl: returnAfterAuth() ?? router.url }">
                             Đăng ký
-                        </button>
+                        </a>
                     }
                 </div>
             </div>
@@ -43,5 +52,4 @@
     </div>
 </header>
 
-<app-auth-dialog #auth (authenticated)="sessionChanged.emit()"/>
 <app-site-info-dialog #information dialogId="header-information"/>

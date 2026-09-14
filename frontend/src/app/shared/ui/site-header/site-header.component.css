@@ -1,112 +1,112 @@
 :host {
-  @apply sticky top-0 z-40 block;
+    @apply sticky top-0 z-40 block;
 }
 
 .header {
-  @apply border-b border-border bg-surface shadow-subtle;
+    @apply border-b border-border bg-surface shadow-subtle;
 }
 
 .header__inner {
-  @apply mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-4;
+    @apply mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-4;
 }
 
 .header__leading,
 .header__actions {
-  @apply flex items-center;
+    @apply flex items-center;
 }
 
 .header__leading {
-  @apply gap-8;
+    @apply gap-8;
 }
 
 .header__navigation {
-  @apply hidden items-center gap-6;
+    @apply hidden items-center gap-6;
 }
 
 .header__navigation-link {
-  @apply relative inline-flex min-h-11 items-center text-[0.94rem] font-medium text-muted no-underline transition-colors;
+    @apply relative inline-flex min-h-11 items-center text-[0.94rem] font-medium text-muted no-underline transition-colors;
 }
 
 .header__navigation-link::after {
-  @apply absolute right-0 bottom-1 left-0 h-0.5 bg-transparent;
-  content: '';
+    @apply absolute right-0 bottom-1 left-0 h-0.5 bg-transparent;
+    content: '';
 }
 
 .header__navigation-link:hover,
 .header__navigation-link--active {
-  @apply text-brand;
+    @apply text-brand;
 }
 
 .header__navigation-link--active {
-  @apply font-semibold;
+    @apply font-semibold;
 }
 
 .header__navigation-link--active::after {
-  @apply bg-brand;
+    @apply bg-brand;
 }
 
 .header__actions {
-  @apply hidden gap-1;
+    @apply hidden gap-1;
 }
 
 .header__action {
-  @apply min-h-11 rounded-control border-0 px-4 text-sm font-semibold;
+    @apply inline-flex min-h-11 items-center rounded-control border-0 px-4 text-sm font-semibold;
 }
 
 .header__action:disabled,
 .header__mobile-actions button:disabled {
-  @apply cursor-not-allowed opacity-100;
+    @apply cursor-not-allowed opacity-100;
 }
 
 .header__action--text {
-  @apply bg-transparent text-muted;
+    @apply bg-transparent text-muted;
 }
 
 .header__action--primary {
-  @apply bg-gradient-to-r from-brand to-brand-accent px-5 text-on-brand shadow-subtle;
+    @apply bg-gradient-to-r from-brand to-brand-accent px-5 text-on-brand shadow-subtle;
 }
 
 .header__mobile-menu {
-  @apply relative;
+    @apply relative;
 }
 
 .header__mobile-menu summary {
-  @apply flex size-11 cursor-pointer list-none flex-col items-center justify-center gap-1 rounded-control;
+    @apply flex size-11 cursor-pointer list-none flex-col items-center justify-center gap-1 rounded-control;
 }
 
 .header__mobile-menu summary::-webkit-details-marker {
-  display: none;
+    display: none;
 }
 
 .header__mobile-menu summary span {
-  @apply h-0.5 w-5 rounded-full bg-ink;
+    @apply h-0.5 w-5 rounded-full bg-ink;
 }
 
 .header__mobile-panel {
-  @apply absolute top-[50px] right-0 w-[min(280px,calc(100vw-32px))] rounded-card border border-border bg-surface p-2 shadow-card;
+    @apply absolute top-[50px] right-0 w-[min(280px,calc(100vw-32px))] rounded-card border border-border bg-surface p-2 shadow-card;
 }
 
 .header__mobile-panel nav,
 .header__mobile-actions {
-  @apply grid gap-1;
+    @apply grid gap-1;
 }
 
 .header__mobile-panel a,
 .header__mobile-actions button {
-  @apply flex min-h-11 w-full items-center rounded-control border-0 bg-transparent px-3 text-sm font-medium text-ink no-underline;
+    @apply flex min-h-11 w-full items-center rounded-control border-0 bg-transparent px-3 text-sm font-medium text-ink no-underline;
 }
 
 .header__mobile-panel a:hover,
 .header__mobile-link--active {
-  @apply bg-brand-soft text-brand-strong;
+    @apply bg-brand-soft text-brand-strong;
 }
 
 .header__mobile-actions {
-  @apply mt-2 border-t border-border-soft pt-2;
+    @apply mt-2 border-t border-border-soft pt-2;
 }
 
 .header__mobile-primary {
-  @apply bg-gradient-to-r from-brand to-brand-accent text-on-brand;
+    @apply bg-gradient-to-r from-brand to-brand-accent text-on-brand;
 }
 
 .header__navigation-link:focus-visible,
@@ -114,29 +114,29 @@
 .header__mobile-menu summary:focus-visible,
 .header__mobile-panel a:focus-visible,
 .header__mobile-actions button:focus-visible {
-  @apply outline-none ring-2 ring-brand ring-offset-2;
+    @apply outline-none ring-2 ring-brand ring-offset-2;
 }
 
 @media (min-width: 40rem) {
-  .header__inner {
-    @apply px-5;
-  }
+    .header__inner {
+        @apply px-5;
+    }
 
-  .header__actions {
-    @apply flex;
-  }
+    .header__actions {
+        @apply flex;
+    }
 
-  .header__mobile-menu {
-    @apply hidden;
-  }
+    .header__mobile-menu {
+        @apply hidden;
+    }
 }
 
 @media (min-width: 64rem) {
-  .header__inner {
-    @apply px-6;
-  }
+    .header__inner {
+        @apply px-6;
+    }
 
-  .header__navigation {
-    @apply flex;
-  }
+    .header__navigation {
+        @apply flex;
+    }
 }

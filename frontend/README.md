@@ -31,7 +31,11 @@ pnpm build
 The main routes are:
 
 - `/` — public quiz catalog
+- `/login` — sign in, optional remembered session, and guest browsing
+- `/register` — create an account, then return to sign in
 - `/quiz/:quizId` — public quiz details and authenticated attempt history
 - `/quiz/:quizId/attempt` — authenticated quiz attempt
 
-JWTs are kept in session storage and attached only to requests under the configured API base path.
+JWTs are kept in session storage by default. Selecting “Ghi nhớ đăng nhập” uses local storage until token expiry or logout. They are attached only to requests under the configured API base path. Passwords are never stored by the frontend.
+
+The authentication pages follow the supplied Vietnamese designs. Registration accepts required name, username, email, and matching passwords, plus optional phone number and date of birth. Password reset and official policy documents are not yet available; their controls explain that status. Existing quiz dialogs continue to use the same authentication adapter.
