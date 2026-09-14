@@ -1,0 +1,146 @@
+.welcome {
+    position: relative;
+    display: flex;
+    overflow: hidden;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 3rem;
+    padding: clamp(2rem, 4vw, 4rem);
+    color: white;
+    background: linear-gradient(140deg, #6366f1 0%, #8258ee 55%, #a855f7 100%);
+}
+
+.welcome::before,
+.welcome::after {
+    position: absolute;
+    width: 25rem;
+    height: 25rem;
+    border: 1px solid #ffffff1f;
+    border-radius: 50%;
+    content: '';
+    pointer-events: none;
+}
+
+.welcome::before {
+    top: -10rem;
+    right: -10rem;
+    box-shadow: 0 0 0 4rem #ffffff05, 0 0 0 8rem #ffffff05;
+}
+
+.welcome::after {
+    bottom: -17rem;
+    left: -8rem;
+    box-shadow: 0 0 0 4rem #ffffff08;
+}
+
+.welcome__brand {
+    @apply relative inline-flex w-fit items-center gap-3 text-2xl font-bold;
+}
+
+.welcome__logo {
+    @apply flex size-10 items-center justify-center rounded-xl border border-white/30 bg-white/15 font-mono text-xl;
+}
+
+.welcome__content {
+    position: relative;
+    width: 100%;
+    max-width: 31rem;
+    margin: auto 0;
+}
+
+.welcome__eyebrow {
+    font-size: 0.625rem;
+    font-weight: 600;
+    letter-spacing: 0.17em;
+    color: #ffffffd9;
+}
+
+.welcome h1 {
+    margin: 1rem 0;
+    font-size: clamp(2rem, 3.1vw, 2.8rem);
+    font-weight: 800;
+    line-height: 1.25;
+    letter-spacing: -0.035em;
+}
+
+.welcome__intro {
+    color: #ffffffe0;
+    font-size: 0.875rem;
+    line-height: 1.85;
+}
+
+.code-card {
+    overflow: hidden;
+    margin: 1.75rem 0;
+    border: 1px solid #ffffff38;
+    border-radius: 0.875rem;
+    background: #27276326;
+    box-shadow: 0 12px 28px #39217715;
+}
+
+.code-card__bar {
+    @apply flex items-center gap-1.5 border-b border-white/15 px-4 py-3;
+}
+
+.code-card__bar i {
+    @apply size-1.5 rounded-full bg-white/50;
+}
+
+.code-card__bar span {
+    margin-left: auto;
+    font-family: monospace;
+    font-size: 0.625rem;
+    color: #ffffffbf;
+}
+
+.code-card__body {
+    display: grid;
+    gap: 0.35rem;
+    padding: 1.25rem;
+    font-family: monospace;
+    font-size: clamp(0.625rem, 1.1vw, 0.8rem);
+}
+
+.code-card__line b {
+    color: #f4c9ff;
+}
+
+.code-card__line em {
+    color: #c8ffdc;
+    font-style: normal;
+}
+
+.code-card__footer {
+    @apply flex items-center gap-2 border-t border-white/15 px-4 py-2.5 text-[0.625rem] text-white/90;
+}
+
+.code-card__footer span {
+    color: #b9ffcf;
+}
+
+.benefits {
+    @apply grid list-none gap-5 p-0;
+}
+
+.benefits li {
+    @apply flex items-start gap-3;
+}
+
+.benefits__icon {
+    @apply flex size-9 shrink-0 items-center justify-center rounded-lg border border-white/20 bg-white/15 text-xl;
+}
+
+.benefits h2 {
+    @apply mb-1 text-sm font-semibold;
+}
+
+.benefits p {
+    font-size: 0.7rem;
+    line-height: 1.6;
+    color: #ffffffe0;
+}
+
+.welcome__copyright {
+    @apply relative border-t border-white/20 pt-5 text-[0.625rem] text-white/80;
+}
+
