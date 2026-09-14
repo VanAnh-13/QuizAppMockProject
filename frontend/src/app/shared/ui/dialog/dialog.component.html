@@ -1,10 +1,9 @@
 <dialog
-  #dialog
-  [id]="dialogId()"
-  [attr.aria-labelledby]="dialogId() + '-title'"
-  class="app-dialog"
->
-  <h2 [id]="dialogId() + '-title'">{{ title() }}</h2>
-  <ng-content />
-  <button type="button" (click)="close()">Đóng</button>
+        #dialog
+        [id]="dialogId()"
+        [attr.aria-labelledby]="dialogId() + '-title'"
+        class="app-dialog">
+    <h2 [id]="dialogId() + '-title'">{{ title() }}</h2>
+    <ng-content/>
+    <button type="button" (click)="close()">Đóng</button>
 </dialog>
