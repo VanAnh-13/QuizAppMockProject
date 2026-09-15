@@ -70,14 +70,29 @@ export class AuthSession {
 
     private readStoredSession(kind: 'sessionStorage' | 'localStorage'): AuthResponse | null {
         try {
-            const raw = globalThis[kind].getItem(SESSION_KEY);
-            const value = raw ? (JSON.parse(raw) as AuthResponse) : null;
-            return value &&
-            typeof value.token === 'string' &&
-            value.userDto?.id &&
-            Date.parse(value.expiresAt) > Date.now()
-                ? value
-                : null;
+            const storage = globalThis[kind];
+            const raw = storage.getItem(SESSION_KEY);
+
+            if (!raw) {
+                return null;
+            }
+
+            const value = JSON.parse(raw) as AuthResponse;
+
+            if (
+                typeof value.token === 'string' &&
+                value.userDto?.id &&
+                Date.parse(value.expiresAt) > Date.now()
+            ) {
+                return value;
+            }
+
+            try {
+                storage.removeItem(SESSION_KEY);
+            } catch {
+                /* Best-effort cleanup when storage is restricted. */
+            }
+            return null;
         } catch {
             return null;
         }

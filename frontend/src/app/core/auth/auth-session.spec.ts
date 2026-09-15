@@ -63,6 +63,15 @@ describe('AuthSession expiration', () => {
         expect(new AuthSession().token()).toBeNull();
     });
 
+    it('removes stale localStorage entry when restoring an expired remembered session', () => {
+        localStorage.setItem('quizapp.session', JSON.stringify(response));
+        vi.setSystemTime(new Date(response.expiresAt));
+
+        new AuthSession();
+
+        expect(localStorage.getItem('quizapp.session')).toBeNull();
+    });
+
     it('keeps memory login working when browser storage is blocked', () => {
         vi.spyOn(Storage.prototype, 'setItem').mockImplementation(() => {
             throw new Error('Storage unavailable');
