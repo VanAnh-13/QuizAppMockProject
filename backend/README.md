@@ -8,9 +8,9 @@ The backend currently provides:
 
 - Domain models for users, roles, quizzes, a reusable question bank, answer options, quiz attempts, and user responses.
 - DTOs for authentication, user and role management, quiz management, quiz taking, and attempt history.
-- Nested builders in all DTOs, using `new CreateQuizDto.Builder().WithTitle(...).Build()`; see [DTO builder examples](docs/dto-builders.md).
+- DTOs initialized directly with object initializers; see [DTO construction](docs/dto-construction.md).
 - FluentValidation validators registered through dependency injection.
-- Role and question factories, with creation strategies for all six question types; see [creation patterns](docs/creation-patterns.md).
+- Role creation in `RoleService` and a question factory with creation strategies for all six question types; see [creation patterns](docs/creation-patterns.md).
 - SQL Server entity mappings and EF Core migrations.
 - A development API host with OpenAPI and Swagger UI.
 - A read-only public quiz catalog endpoint, `GET /api/public/quizzes`, for active quiz metadata without answers or grading keys.

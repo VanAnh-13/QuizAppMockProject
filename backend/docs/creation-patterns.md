@@ -1,14 +1,15 @@
 # Role and question creation
 
-Creation logic lives in Application. Factories validate requests and create new
-domain entities in memory. They do not save to SQL Server, assign roles to users,
-authorize callers, or expose HTTP endpoints.
+Creation logic lives in Application. `RoleService.CreateAsync` authorizes the
+caller, validates the request, checks name uniqueness and saves the new role.
+`QuestionFactory` validates and builds a question graph in memory; the question
+service handles authorization and persistence.
 
 ## Responsibilities
 
 | Type / namespace | Responsibility |
 | --- | --- |
-| `Factories.RoleManager.IRoleFactory` | Creates a `Role` from `CreateRoleDto` using its validator and a new ID. Custom role names remain supported. |
+| `Services.RoleManager.IRoleService` | Creates and saves a `Role` from `CreateRoleDto` after authorization, validation and name-uniqueness checks. Custom role names remain supported. |
 | `Factories.QuizManager.Questions.IQuestionFactory` | Validates `CreateQuestionDto`, selects the registered strategy, and creates a `Question` with its `Answer` entities. |
 | `Strategies.QuizManager.Questions.IQuestionCreationStrategy` | Defines the answer-shape rules for its supported question types. |
 | `DTOs.QuizManager.Questions.CreateQuestionAnswerDto` | Carries answer text, correctness and activity when creating a question. IDs and navigation properties are supplied by the factory. |
@@ -16,8 +17,8 @@ authorize callers, or expose HTTP endpoints.
 All namespaces above start with `Quizapp.Application.`. Each public type has its
 own file in the corresponding folder. Question strategies validate the part of
 creation that varies by type; common ID generation and entity mapping remain in
-`QuestionFactory`. Role creation currently has one workflow, so it uses a factory
-without artificial strategies for hardcoded role names.
+`QuestionFactory`. Role creation has one workflow and stays in `RoleService`
+without a separate factory or strategies for hardcoded role names.
 
 ## Question creation rules
 
@@ -42,46 +43,49 @@ The factory generates a new ID for the question and every answer. Each answer's
 `QuestionId` and `QuestionNavigation` point to the newly created question. No client
 answer IDs or question IDs are accepted by the nested creation DTO.
 
-## Use with builders
+## Create requests directly
 
-Inject `IRoleFactory` and `IQuestionFactory` into the Application workflow that
-needs them. `AddApplication()` registers the factories, strategies, and validators
-with scoped lifetime. The following snippets assume injected variables named
-`roleFactory` and `questionFactory`.
+`AddApplication()` registers the role service, question factory, strategies and
+validators with scoped lifetime. The following snippets assume injected variables
+named `roleService` and `questionFactory`. The role service requires an
+authenticated administrator and persists the new role; the question factory only
+builds the entity graph.
 
 ```csharp
 using Quizapp.Application.DTOs.RoleManager;
 
-var role = roleFactory.Create(new CreateRoleDto.Builder()
-    .WithRoleName("Question Reviewer")
-    .WithDescription("Reviews question content")
-    .WithIsActive(true)
-    .Build());
+var role = await roleService.CreateAsync(new CreateRoleDto
+{
+    RoleName = "Question Reviewer",
+    Description = "Reviews question content",
+    IsActive = true
+});
 ```
 
 ```csharp
 using Quizapp.Application.DTOs.QuizManager.Questions;
 using Quizapp.Domain.Enums;
 
-var request = new CreateQuestionDto.Builder()
-    .WithContent("Which keyword declares a class in C#?")
-    .WithQuestionType(QuestionType.SingleChoice)
-    .WithLevel(QuestionLevel.Easy)
-    .WithIsActive(true)
-    .WithAnswers([
-        new CreateQuestionAnswerDto.Builder()
-            .WithText("class").WithIsCorrect(true).Build(),
-        new CreateQuestionAnswerDto.Builder()
-            .WithText("namespace").WithIsCorrect(false).Build()
-    ])
-    .Build();
+var request = new CreateQuestionDto
+{
+    Content = "Which keyword declares a class in C#?",
+    QuestionType = QuestionType.SingleChoice,
+    Level = QuestionLevel.Easy,
+    IsActive = true,
+    Answers =
+    [
+        new CreateQuestionAnswerDto { Text = "class", IsCorrect = true },
+        new CreateQuestionAnswerDto { Text = "namespace", IsCorrect = false }
+    ]
+};
 
 var question = questionFactory.Create(request);
 ```
 
-The DTO builder assigns mutable properties and copies its internal DTO when built.
-Unset properties use DTO defaults. The factories run FluentValidation;
-`QuestionFactory` additionally applies the selected strategy.
+Object initializers assign the mutable DTO properties directly. Unset properties
+use DTO defaults. `RoleService` and `QuestionFactory` run FluentValidation;
+`QuestionFactory` additionally applies the selected strategy. See
+[DTO construction](dto-construction.md) for collection-copying guidance.
 Invalid request data produces `ValidationException`. Missing strategy registration
 produces `NotSupportedException`; conflicting registrations fail with
 `InvalidOperationException`. `AddApplication()` can be called repeatedly without

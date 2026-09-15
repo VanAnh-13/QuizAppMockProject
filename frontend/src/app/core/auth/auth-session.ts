@@ -20,17 +20,13 @@ export class AuthSession {
 
     constructor() {
         const onStorage = (event: StorageEvent): void => {
-            if (event.key !== SESSION_KEY && event.key !== null) {
-                return;
-            }
             try {
-                if (event.storageArea !== localStorage) {
-                    return;
+                if ((event.key === SESSION_KEY || event.key === null) && event.storageArea === localStorage) {
+                    this.synchronizeRememberedSession();
                 }
             } catch {
-                return;
+                /* Memory session works when storage is unavailable. */
             }
-            this.synchronizeRememberedSession();
         };
         window.addEventListener('storage', onStorage);
         inject(DestroyRef).onDestroy(() => window.removeEventListener('storage', onStorage));
@@ -75,15 +71,12 @@ export class AuthSession {
     clear(): void {
         this.rememberedValue = null;
         this.session.set(null);
-        try {
-            sessionStorage.removeItem(SESSION_KEY);
-        } catch {
-            /* No persistent session is available. */
-        }
-        try {
-            localStorage.removeItem(SESSION_KEY);
-        } catch {
-            /* Memory logout still works when storage is unavailable. */
+        for (const kind of ['sessionStorage', 'localStorage'] as const) {
+            try {
+                globalThis[kind].removeItem(SESSION_KEY);
+            } catch {
+                /* Continue clearing the other storage when one is unavailable. */
+            }
         }
     }
 
@@ -128,11 +121,7 @@ export class AuthSession {
                 return value;
             }
 
-            try {
-                storage.removeItem(SESSION_KEY);
-            } catch {
-                /* Best-effort cleanup when storage is restricted. */
-            }
+            storage.removeItem(SESSION_KEY);
             return null;
         } catch {
             return null;
