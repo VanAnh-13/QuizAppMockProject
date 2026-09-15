@@ -154,4 +154,34 @@ describe('AuthSession expiration', () => {
         expect(session.user()).toEqual(renewedSession.userDto);
         controller.verify();
     });
+
+    it('does not attach a bearer token to auth endpoints and preserves the session on auth 401', () => {
+        TestBed.configureTestingModule({
+            providers: [
+                provideHttpClient(withInterceptors([authInterceptor])),
+                provideHttpClientTesting(),
+            ],
+        });
+
+        const session = TestBed.inject(AuthSession);
+        const http = TestBed.inject(HttpClient);
+        const controller = TestBed.inject(HttpTestingController);
+        const baseUrl = TestBed.inject(API_CONFIG).baseUrl.replace(/\/$/, '');
+        const onError = vi.fn();
+
+        session.set(response);
+        expect(session.token()).toBe(response.token);
+
+        http.post(`${baseUrl}/auth/login`, {username: 'other', password: 'wrong'}).subscribe({error: onError});
+
+        const request = controller.expectOne(`${baseUrl}/auth/login`);
+        expect(request.request.headers.has('Authorization')).toBe(false);
+
+        request.flush({}, {status: 401, statusText: 'Unauthorized'});
+
+        expect(onError).toHaveBeenCalledOnce();
+        expect(session.token()).toBe(response.token);
+        expect(session.user()).toEqual(response.userDto);
+        controller.verify();
+    });
 });
