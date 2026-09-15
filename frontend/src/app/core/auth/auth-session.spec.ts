@@ -35,7 +35,7 @@ describe('AuthSession expiration', () => {
         const session = TestBed.inject(AuthSession);
         session.set(response, true);
         expect(sessionStorage.getItem('quizapp.session')).toBeNull();
-        expect(new AuthSession().token()).toBe(response.token);
+        expect(TestBed.runInInjectionContext(() => new AuthSession()).token()).toBe(response.token);
     });
 
     it('removes the remembered session when a later login is not remembered', () => {
@@ -43,7 +43,7 @@ describe('AuthSession expiration', () => {
         session.set(response, true);
         session.set({...response, token: 'temporary-token'});
         expect(localStorage.getItem('quizapp.session')).toBeNull();
-        expect(new AuthSession().token()).toBe('temporary-token');
+        expect(TestBed.runInInjectionContext(() => new AuthSession()).token()).toBe('temporary-token');
     });
 
     it('removes both storage entries on logout', () => {
@@ -52,22 +52,22 @@ describe('AuthSession expiration', () => {
         session.clear();
         expect(localStorage.getItem('quizapp.session')).toBeNull();
         expect(sessionStorage.getItem('quizapp.session')).toBeNull();
-        expect(new AuthSession().user()).toBeNull();
+        expect(TestBed.runInInjectionContext(() => new AuthSession()).user()).toBeNull();
     });
 
     it('does not restore expired or malformed remembered sessions', () => {
         localStorage.setItem('quizapp.session', 'invalid-json');
-        expect(new AuthSession().token()).toBeNull();
+        expect(TestBed.runInInjectionContext(() => new AuthSession()).token()).toBeNull();
         localStorage.setItem('quizapp.session', JSON.stringify(response));
         vi.setSystemTime(new Date(response.expiresAt));
-        expect(new AuthSession().token()).toBeNull();
+        expect(TestBed.runInInjectionContext(() => new AuthSession()).token()).toBeNull();
     });
 
     it('removes stale localStorage entry when restoring an expired remembered session', () => {
         localStorage.setItem('quizapp.session', JSON.stringify(response));
         vi.setSystemTime(new Date(response.expiresAt));
 
-        new AuthSession();
+        TestBed.runInInjectionContext(() => new AuthSession());
 
         expect(localStorage.getItem('quizapp.session')).toBeNull();
     });
