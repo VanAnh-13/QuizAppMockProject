@@ -155,33 +155,60 @@ describe('AuthSession expiration', () => {
         controller.verify();
     });
 
-    it('does not attach a bearer token to auth endpoints and preserves the session on auth 401', () => {
-        TestBed.configureTestingModule({
-            providers: [
-                provideHttpClient(withInterceptors([authInterceptor])),
-                provideHttpClientTesting(),
-            ],
+    it.each(['login', 'register', 'login?source=quiz', 'register?source=quiz'])(
+        'omits the bearer token for public auth route %s and preserves the session on 401', (route) => {
+            TestBed.configureTestingModule({
+                providers: [
+                    provideHttpClient(withInterceptors([authInterceptor])),
+                    provideHttpClientTesting(),
+                ],
+            });
+
+            const session = TestBed.inject(AuthSession);
+            const http = TestBed.inject(HttpClient);
+            const controller = TestBed.inject(HttpTestingController);
+            const baseUrl = TestBed.inject(API_CONFIG).baseUrl.replace(/\/$/, '');
+            const onError = vi.fn();
+
+            session.set(response);
+            expect(session.token()).toBe(response.token);
+
+            http.post(`${baseUrl}/auth/${route}`, {username: 'other', password: 'wrong'}).subscribe({error: onError});
+
+            const request = controller.expectOne(`${baseUrl}/auth/${route}`);
+            expect(request.request.headers.has('Authorization')).toBe(false);
+
+            request.flush({}, {status: 401, statusText: 'Unauthorized'});
+
+            expect(onError).toHaveBeenCalledOnce();
+            expect(session.token()).toBe(response.token);
+            expect(session.user()).toEqual(response.userDto);
+            controller.verify();
         });
 
-        const session = TestBed.inject(AuthSession);
-        const http = TestBed.inject(HttpClient);
-        const controller = TestBed.inject(HttpTestingController);
-        const baseUrl = TestBed.inject(API_CONFIG).baseUrl.replace(/\/$/, '');
-        const onError = vi.fn();
+    it.each(['change-password', 'change-password?source=profile', 'login/audit'])(
+        'attaches the bearer token to protected auth route %s', (route) => {
+            TestBed.configureTestingModule({
+                providers: [
+                    provideHttpClient(withInterceptors([authInterceptor])),
+                    provideHttpClientTesting(),
+                ],
+            });
 
-        session.set(response);
-        expect(session.token()).toBe(response.token);
+            const session = TestBed.inject(AuthSession);
+            const http = TestBed.inject(HttpClient);
+            const controller = TestBed.inject(HttpTestingController);
+            const baseUrl = TestBed.inject(API_CONFIG).baseUrl.replace(/\/$/, '');
+            const url = `${baseUrl}/auth/${route}`;
 
-        http.post(`${baseUrl}/auth/login`, {username: 'other', password: 'wrong'}).subscribe({error: onError});
+            session.set(response);
+            http.post(url, {}).subscribe();
 
-        const request = controller.expectOne(`${baseUrl}/auth/login`);
-        expect(request.request.headers.has('Authorization')).toBe(false);
+            const request = controller.expectOne(url);
+            request.flush(null, {status: 204, statusText: 'No Content'});
 
-        request.flush({}, {status: 401, statusText: 'Unauthorized'});
-
-        expect(onError).toHaveBeenCalledOnce();
-        expect(session.token()).toBe(response.token);
-        expect(session.user()).toEqual(response.userDto);
-        controller.verify();
-    });
+            expect(request.request.method).toBe('POST');
+            expect(request.request.headers.get('Authorization')).toBe(`Bearer ${response.token}`);
+            controller.verify();
+        });
 });
