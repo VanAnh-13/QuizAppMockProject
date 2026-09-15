@@ -2,7 +2,6 @@ using FluentValidation;
 using Quizapp.Application.Abstractions.Persistence;
 using Quizapp.Application.DTOs.Common;
 using Quizapp.Application.DTOs.RoleManager;
-using Quizapp.Application.Factories.RoleManager;
 using Quizapp.Application.Services.Common;
 using Quizapp.Domain.Entities;
 using Quizapp.Domain.Exceptions;
@@ -12,7 +11,7 @@ namespace Quizapp.Application.Services.RoleManager;
 public sealed class RoleService(
     IRoleRepository roles,
     IUnitOfWork unitOfWork,
-    IRoleFactory factory,
+    IValidator<CreateRoleDto> createValidator,
     IValidator<UpdateRoleDto> updateValidator,
     ServiceAuthorization authorization) : IRoleService
 {
@@ -38,8 +37,16 @@ public sealed class RoleService(
     {
         await authorization.RequireAdminAsync(cancellationToken);
 
-        var role = factory.Create(request);
-        role.RoleName = role.RoleName.Trim();
+        ArgumentNullException.ThrowIfNull(request);
+        createValidator.ValidateAndThrow(request);
+
+        var role = new Role
+        {
+            Id = Guid.NewGuid(),
+            RoleName = request.RoleName.Trim(),
+            Description = request.Description,
+            IsActive = request.IsActive
+        };
 
         await EnsureUniqueAsync(role.RoleName, null, cancellationToken);
 

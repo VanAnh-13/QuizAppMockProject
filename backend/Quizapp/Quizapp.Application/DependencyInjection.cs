@@ -2,7 +2,6 @@ using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Quizapp.Application.Factories.QuizManager.Questions;
-using Quizapp.Application.Factories.RoleManager;
 using Quizapp.Application.Services.Authentication;
 using Quizapp.Application.Services.Common;
 using Quizapp.Application.Services.QuestionManager;
@@ -30,7 +29,6 @@ public static class DependencyInjection
         services.TryAddScoped<IQuizService, QuizService>();
         services.TryAddScoped<IQuizAttemptService, QuizAttemptService>();
         services.TryAddScoped<IPublicQuizCatalogService, PublicQuizCatalogService>();
-        services.TryAddScoped<IRoleFactory, RoleFactory>();
         services.TryAddEnumerable(ServiceDescriptor.Scoped<IQuestionCreationStrategy, SingleChoiceQuestionStrategy>());
 
         services.TryAddEnumerable(ServiceDescriptor

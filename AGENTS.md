@@ -70,10 +70,11 @@ For entity or mapping changes, read the tests in `D:/Homeworks/c#/Quizapp/tests/
 
 ## Database and secret safety
 
-- Use `ConnectionStrings__DefaultConnection` for local API overrides and `QUIZAPP_TEST_SQLSERVER_CONNECTION_STRING` for opt-in SQL Server tests. Keep values out of logs, documentation, and commits.
-- Run database-mutating commands only against a verified development/test target. A connection setting already present in the environment is not evidence that its target is safe.
-- SQL tests create, migrate, and drop unique `QuizappRelationTests_<guid>` databases. Use a dedicated test instance and an account permitted to create/drop databases; never target production. Read `D:/Homeworks/c#/Quizapp/tests/Quizapp.Tests/Data/SqlServerFixture.cs` before changing fixture cleanup.
-- If no safe test connection is available, run database-independent tests and explicitly report skipped integration coverage. Do not replace SQL Server constraint tests with an in-memory provider and claim equivalent coverage.
+- SQL Server integration tests are mandatory for backend verification. Always use the project's current configuration: prefer `QUIZAPP_TEST_SQLSERVER_CONNECTION_STRING` when configured; otherwise resolve the API's effective `ConnectionStrings:DefaultConnection` from its current configuration sources, including `ConnectionStrings__DefaultConnection`, and pass it to `QUIZAPP_TEST_SQLSERVER_CONNECTION_STRING` for the test process. Keep connection values out of logs, documentation, and commits.
+- Do not clear the SQL test connection variable, deliberately exclude SQL tests, or report them as skipped merely because a separate test connection has not been configured. Inspect and use the existing development/test configuration first; do not invent replacement server addresses or credentials.
+- Run database-mutating commands only against a verified development/test target. Confirm the current configuration identifies that target before running SQL tests; never target production.
+- SQL tests create, migrate, and drop unique `QuizappRelationTests_<guid>` databases on the currently configured development/test SQL Server instance. Use an account permitted to create/drop these databases. Never create, clear, migrate, or drop the application's configured database as part of test execution. Read `backend/tests/Quizapp.Tests/Data/SqlServerFixture.cs` before changing fixture cleanup.
+- If the configured SQL Server is unavailable, access is denied, or the target cannot be verified as development/test, report the concrete blocker and any skipped SQL tests. Database-independent tests may still run, but backend verification remains incomplete until SQL tests pass. Do not replace SQL Server constraint tests with an in-memory provider and claim equivalent coverage.
 
 ## Verification workflow
 
@@ -93,6 +94,7 @@ dotnet test "$Tests" --no-build --no-restore
 - For behavioral fixes, add a regression test at the affected contract/validation/model/persistence boundary and verify it fails before the fix where practical.
 - For a focused test run, append `--filter 'FullyQualifiedName~RequestValidationTests'` (substitute the relevant class). Finish with the full suite for code changes.
 - `--no-build` uses previously compiled tests. Rebuild after source changes and match configurations when testing Release output.
+- Before running the backend suite, populate `QUIZAPP_TEST_SQLSERVER_CONNECTION_STRING` from the current configuration as described above. Run the full suite including SQL Server tests and check the runner's skipped-test count; a SQL-disabled run is not sufficient for completion.
 - For HTTP changes, smoke-test the actual route, status, and response. A successful build or an empty Swagger document does not validate business behavior.
 - For documentation-only changes, check referenced paths and commands against the current repository and reread the completed file.
 - Review all edited files and the final diff. Report what changed, the commands actually run, pass/fail results, and any skipped or unverified checks. Do not record fixed test counts here; obtain current results from the test runner.

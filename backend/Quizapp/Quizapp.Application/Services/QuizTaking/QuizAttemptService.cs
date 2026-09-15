@@ -332,7 +332,6 @@ public sealed class QuizAttemptService(
         var answerMap = responses.ToDictionary(a => a.QuestionId);
 
         var totalPoints = 0.0;
-        var userAnswerResults = new List<UserAnswerResultDto>();
         var pendingAnswers = new List<(Guid QuestionId, Guid? AnswerId, string? ResponseText)>();
 
         foreach (var question in orderedQuestions)
@@ -341,22 +340,6 @@ public sealed class QuizAttemptService(
 
             var points = Score(question, submission);
             totalPoints += points;
-
-            var selectedAnswers = question.Answers
-                .Where(a => submission?.AnswerIds.Contains(a.Id) == true)
-                .Select(a => new AnswerOptionDto { Id = a.Id, Text = a.Text })
-                .ToArray();
-
-            userAnswerResults.Add(new UserAnswerResultDto
-            {
-                QuestionId = question.Id,
-                QuestionContent = question.Content,
-                QuestionType = question.QuestionType,
-                Image = question.Image,
-                Level = question.Level,
-                SelectedAnswers = selectedAnswers,
-                ResponseText = submission?.ResponseText
-            });
 
             if (submission is null) continue;
 
@@ -389,15 +372,7 @@ public sealed class QuizAttemptService(
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
 
-        return new QuizAttemptDetailDto
-        {
-            Id = attempt.Id,
-            QuizId = quiz.Id,
-            QuizTitle = quiz.Title,
-            Score = finalScore,
-            SubmittedAt = submittedAt,
-            Answers = userAnswerResults
-        };
+        return MapToDetail(attempt);
     }
 
     public async Task<QuizAttemptDetailDto> GetResultAsync(Guid attemptId,

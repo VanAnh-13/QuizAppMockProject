@@ -7,7 +7,6 @@ using Quizapp.Application.Abstractions.Authentication;
 using Quizapp.Application.Abstractions.Persistence;
 using Quizapp.Application.DTOs.QuizManager.Quizzes;
 using Quizapp.Application.Factories.QuizManager.Questions;
-using Quizapp.Application.Factories.RoleManager;
 using Quizapp.Application.Services.QuizTaking;
 using Quizapp.Application.Strategies.QuizManager.Questions;
 using Quizapp.Domain.Enums;
@@ -68,7 +67,7 @@ public class DependencyInjectionTests
     }
 
     [Fact]
-    public void Creation_factories_and_strategies_are_scoped_and_registration_can_be_repeated()
+    public void Question_factory_and_strategies_are_scoped_and_registration_can_be_repeated()
     {
         var services = new ServiceCollection().AddApplication()
             .AddApplication();
@@ -84,12 +83,9 @@ public class DependencyInjectionTests
         using var firstScope = provider.CreateScope();
         using var secondScope = provider.CreateScope();
 
-        foreach (var contract in new[] { typeof(IRoleFactory), typeof(IQuestionFactory) })
-        {
-            var first = firstScope.ServiceProvider.GetRequiredService(contract);
-            Assert.Same(first, firstScope.ServiceProvider.GetRequiredService(contract));
-            Assert.NotSame(first, secondScope.ServiceProvider.GetRequiredService(contract));
-        }
+        var factory = firstScope.ServiceProvider.GetRequiredService<IQuestionFactory>();
+        Assert.Same(factory, firstScope.ServiceProvider.GetRequiredService<IQuestionFactory>());
+        Assert.NotSame(factory, secondScope.ServiceProvider.GetRequiredService<IQuestionFactory>());
 
         var strategies = firstScope.ServiceProvider.GetServices<IQuestionCreationStrategy>()
             .ToArray();
