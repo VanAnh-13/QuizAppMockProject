@@ -1,8 +1,7 @@
 <app-dialog
         #dialog
         dialogId="authentication"
-        [title]="registering() ? 'Tạo tài khoản' : 'Đăng nhập'"
->
+        [title]="registering() ? 'Tạo tài khoản' : 'Đăng nhập'">
     <form [formGroup]="form" (ngSubmit)="submit()" class="auth-form">
         <label>
             Tên đăng nhập

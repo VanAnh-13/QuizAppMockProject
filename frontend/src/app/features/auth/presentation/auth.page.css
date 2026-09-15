@@ -1,0 +1,392 @@
+:host {
+    --auth-background: #f8f8ff;
+    --auth-error: #b42338;
+    display: flex;
+    min-height: 100dvh;
+    flex-direction: column;
+    background: var(--auth-background);
+}
+
+.auth-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    flex: 1;
+    min-height: 100dvh;
+}
+
+.form-panel {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: clamp(1.5rem, 4vw, 3.5rem);
+}
+
+.support-link {
+    @apply mb-10 ml-auto flex items-center gap-1.5 text-xs text-muted;
+}
+
+.support-link .material-symbols-outlined {
+    font-size: 1.1rem;
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 28rem;
+    margin-top: auto;
+    padding: clamp(1.5rem, 3vw, 2.5rem);
+    border: 1px solid #e2e8f0;
+    border-radius: 1rem;
+    background: white;
+    box-shadow: 0 18px 45px -16px #46468126;
+}
+
+.auth-card__heading {
+    margin-bottom: 1.75rem;
+}
+
+.auth-card__heading h1,
+.auth-card__heading h2 {
+    @apply text-[1.8rem] font-bold tracking-tight text-ink;
+    line-height: 1.3;
+}
+
+.auth-card__heading p {
+    @apply mt-2 text-sm leading-relaxed text-muted;
+}
+
+.auth-card__heading--centered {
+    text-align: center;
+}
+
+.auth-badge {
+    @apply mb-4 inline-flex items-center gap-2 rounded-full border border-indigo-200 bg-brand-soft px-3 py-1.5 text-[0.625rem] font-semibold text-brand-strong;
+}
+
+fieldset {
+    min-width: 0;
+}
+
+.fields {
+    display: grid;
+    gap: 1.1rem;
+}
+
+.fields--register {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.field label {
+    @apply mb-1.5 block text-xs font-semibold text-ink;
+}
+
+.required {
+    color: var(--auth-error);
+}
+
+.field__input {
+    position: relative;
+}
+
+.field input {
+    @apply h-11 w-full min-w-0 rounded-lg border border-border bg-white px-3.5 text-sm text-ink placeholder:text-slate-400;
+    transition: border-color 150ms, box-shadow 150ms;
+}
+
+.field input:focus {
+    @apply border-brand outline-none ring-2 ring-brand-soft;
+}
+
+.field input[aria-invalid='true'] {
+    border-color: var(--auth-error);
+    background: #fffafb;
+}
+
+.field input[aria-invalid='true']:focus {
+    box-shadow: 0 0 0 3px #ffe4e8;
+}
+
+.field__icon {
+    @apply pointer-events-none absolute top-1/2 left-3.5 -translate-y-1/2 text-lg text-slate-400;
+}
+
+.field__input--icon input {
+    padding-left: 2.5rem;
+}
+
+.field input.field__password {
+    padding-right: 2.75rem;
+}
+
+.password-toggle {
+    @apply absolute top-0 right-0 flex size-11 items-center justify-center rounded-lg text-muted hover:text-brand-strong;
+}
+
+.password-toggle span {
+    font-size: 1.2rem;
+}
+
+.field-error {
+    margin-top: 0.4rem;
+    color: var(--auth-error);
+    font-size: 0.7rem;
+    line-height: 1.6;
+}
+
+.login-options,
+.terms-row {
+    @apply mt-5 flex items-start gap-2 text-xs leading-relaxed;
+}
+
+.login-options {
+    justify-content: space-between;
+    flex-wrap: wrap;
+}
+
+.login-options label {
+    @apply inline-flex items-center gap-2;
+}
+
+input[type='checkbox'] {
+    width: 1rem;
+    height: 1rem;
+    flex-shrink: 0;
+    accent-color: #6366f1;
+}
+
+.terms-row input {
+    margin-top: 0.125rem;
+}
+
+.text-link,
+.switch-mode a {
+    @apply font-semibold text-brand-strong hover:underline;
+}
+
+.primary-button,
+.guest-button {
+    @apply flex min-h-11 w-full items-center justify-center gap-2 rounded-lg px-3 text-center text-sm font-semibold;
+}
+
+.primary-button {
+    margin-top: 1.5rem;
+    color: white;
+    background: linear-gradient(135deg, #6366f1, #a855f7);
+    box-shadow: 0 4px 10px #6366f133;
+}
+
+.primary-button:hover:not(:disabled) {
+    filter: brightness(0.96);
+}
+
+.primary-button:disabled {
+    cursor: wait;
+    opacity: 0.65;
+}
+
+.primary-button span,
+.guest-button span {
+    font-size: 1.1rem;
+}
+
+.guest-button {
+    @apply border border-brand text-brand-strong hover:bg-brand-soft;
+}
+
+.divider {
+    @apply relative my-5 flex items-center justify-center text-[0.625rem] font-semibold uppercase tracking-widest text-muted;
+}
+
+.divider::before {
+    position: absolute;
+    width: 100%;
+    height: 1px;
+    background: #e2e8f0;
+    content: '';
+}
+
+.divider span {
+    position: relative;
+    padding: 0 0.75rem;
+    background: white;
+}
+
+.switch-mode {
+    @apply mt-6 border-t border-border pt-5 text-center text-xs leading-loose text-muted;
+}
+
+.switch-mode a {
+    margin-left: 0.25rem;
+}
+
+.notice,
+.error-notice {
+    @apply my-4 rounded-lg border p-3 text-xs leading-relaxed;
+}
+
+.notice {
+    @apply border-emerald-200 bg-emerald-50 text-emerald-800;
+}
+
+.error-notice {
+    border-color: #fecdd3;
+    background: #fff1f2;
+    color: var(--auth-error);
+}
+
+.session-note,
+.privacy-note {
+    @apply mt-5 text-center text-[0.625rem] leading-relaxed text-muted;
+}
+
+.privacy-note {
+    @apply flex items-center justify-center gap-1.5;
+}
+
+.privacy-note span {
+    font-size: 0.9rem;
+}
+
+.login-footer {
+    @apply mt-auto flex w-full flex-wrap items-center justify-between gap-3 border-t border-border pt-4 text-[0.625rem] text-muted;
+    margin-top: auto;
+    padding-top: 1rem;
+}
+
+.session-note {
+    margin-bottom: 3rem;
+}
+
+.login-footer div {
+    @apply flex flex-wrap gap-4;
+}
+
+.auth-layout--register {
+    display: block;
+    min-height: 0;
+}
+
+.auth-layout--register .form-panel {
+    padding: 3rem 1.25rem;
+}
+
+.auth-card--register {
+    max-width: 36rem;
+    margin-top: 0;
+    border-radius: 0.75rem;
+    box-shadow: 0 4px 20px -4px #6366f114;
+}
+
+.register-footer {
+    @apply flex flex-wrap items-center justify-between gap-4 border-t border-border bg-white px-6 py-6 text-xs text-muted;
+}
+
+.register-footer nav {
+    @apply flex flex-wrap gap-6;
+}
+
+a:focus-visible,
+button:focus-visible,
+input[type='checkbox']:focus-visible {
+    @apply outline-none ring-2 ring-brand ring-offset-2;
+}
+
+.welcome a:focus-visible {
+    @apply ring-white ring-offset-brand;
+}
+
+@media (min-width: 80rem) {
+    .register-footer {
+        padding-inline: max(1.5rem, calc((100vw - 76rem) / 2));
+    }
+}
+
+@media (max-width: 55rem) {
+    .auth-layout {
+        grid-template-columns: 5fr 7fr;
+    }
+
+    .welcome {
+        padding: 2rem;
+    }
+
+    .form-panel {
+        padding: 1.75rem;
+    }
+
+    .code-card {
+        display: none;
+    }
+
+    .benefits {
+        margin-top: 2rem;
+    }
+}
+
+@media (max-width: 44rem) {
+    .auth-layout {
+        display: block;
+    }
+
+    .welcome {
+        gap: 1.5rem;
+        padding: 1.5rem;
+    }
+
+    .welcome__content {
+        max-width: none;
+    }
+
+    .welcome__eyebrow,
+    .welcome__copyright,
+    .benefits,
+    .welcome__intro {
+        display: none;
+    }
+
+    .welcome h1 {
+        margin: 0;
+        font-size: 1.75rem;
+    }
+
+    .welcome h1 br {
+        display: none;
+    }
+
+    .support-link {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-panel {
+        padding: 1.25rem;
+    }
+
+    .auth-card {
+        padding: 1.5rem;
+    }
+
+    .login-footer {
+        justify-content: center;
+    }
+
+    .auth-layout--register .form-panel {
+        padding: 1.5rem 1rem;
+    }
+
+    .register-footer {
+        justify-content: center;
+        text-align: center;
+    }
+}
+
+@media (max-width: 30rem) {
+    .fields--register {
+        grid-template-columns: 1fr;
+    }
+
+    .auth-card__heading h1,
+    .auth-card__heading h2 {
+        font-size: 1.5rem;
+    }
+}
