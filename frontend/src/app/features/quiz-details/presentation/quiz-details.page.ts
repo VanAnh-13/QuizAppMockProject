@@ -1,11 +1,10 @@
-﻿import {ChangeDetectionStrategy, Component, inject, signal} from '@angular/core';
+﻿import {ChangeDetectionStrategy, Component, computed, inject, signal} from '@angular/core';
 import {DatePipe} from '@angular/common';
-import {ActivatedRoute, RouterLink} from '@angular/router';
+import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {ATTEMPT_API, AttemptResult} from '../../quiz-attempt/application/attempt-api';
 import {attemptContentProvider} from '../../quiz-attempt/infrastructure/attempt-content.provider';
 import {apiErrorMessage} from '../../../core/api/api-error';
 import {AuthSession} from '../../../core/auth/auth-session';
-import {AuthDialogComponent} from '../../../shared/ui/auth-dialog/auth-dialog.component';
 import {QuizDetailsSnapshot} from '../application/quiz-details-content';
 import {QUIZ_DETAILS_CONTENT, quizDetailsContentProvider,} from '../infrastructure/quiz-details-content.provider';
 
@@ -35,7 +34,7 @@ const INFO_MESSAGES = {
 
 @Component({
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [AuthDialogComponent, DatePipe, RouterLink],
+    imports: [DatePipe, RouterLink],
     providers: [quizDetailsContentProvider, attemptContentProvider],
     selector: 'app-quiz-details-page',
     styleUrls: [
@@ -51,10 +50,12 @@ export class QuizDetailsPage {
     private readonly content = inject(QUIZ_DETAILS_CONTENT);
     private readonly attempts = inject(ATTEMPT_API);
     private readonly route = inject(ActivatedRoute);
+    private readonly router = inject(Router);
 
     protected readonly session = inject(AuthSession);
 
     protected readonly quizId = signal('');
+    protected readonly quizUrl = computed(() => `/quiz/${encodeURIComponent(this.quizId())}`);
     protected readonly title = signal('');
     protected readonly description = signal('');
     protected readonly categoryLabel = signal('C# / .NET');
@@ -118,7 +119,12 @@ export class QuizDetailsPage {
         this.historyError.set(null);
     }
 
-    protected openHistory(): void {
+    protected async openHistory(): Promise<void> {
+        if (!this.session.token()) {
+            await this.router.navigate(['/login'], {queryParams: {returnUrl: this.quizUrl()}});
+            return;
+        }
+
         this.historyDialogOpen.set(true);
         void this.loadHistory();
     }

@@ -1,6 +1,4 @@
-﻿<a class="skip-link" href="#main-content">Đến nội dung chính</a>
-
-<header class="details-header">
+﻿<header class="details-header">
     <div class="details-header__inner">
         <div class="details-header__leading">
             <a class="details-brand" routerLink="/" aria-label="QuizApp — Trang khám phá">
@@ -58,22 +56,22 @@
                     Đăng xuất
                 </button>
             } @else {
-                <button
+                <a
                         class="details-header__auth-button"
-                        type="button"
                         data-testid="header-login"
-                        (click)="historyAuth.open()"
+                        routerLink="/login"
+                        [queryParams]="{returnUrl: quizUrl()}"
                 >
                     Đăng nhập
-                </button>
-                <button
+                </a>
+                <a
                         class="details-header__auth-button details-header__auth-button--primary"
-                        type="button"
                         data-testid="header-register"
-                        (click)="historyAuth.open(true)"
+                        routerLink="/register"
+                        [queryParams]="{returnUrl: quizUrl()}"
                 >
                     Đăng ký
-                </button>
+                </a>
             }
         </div>
     </div>
@@ -258,7 +256,7 @@
             <p role="status">Đang tải lịch sử lần thi…</p>
         } @else if (historyError(); as error) {
             <p role="alert">{{ error }}</p>
-            <button type="button" (click)="historyAuth.open()">Đăng nhập</button>
+            <a routerLink="/login" [queryParams]="{returnUrl: quizUrl()}">Đăng nhập</a>
             <button type="button" (click)="loadHistory()">Thử lại</button>
         } @else if (history().length === 0) {
             <p>Bạn chưa có lần thi nào cho quiz này.</p>
@@ -281,8 +279,6 @@
             (click)="closeHistory()"
     ></button>
 }
-
-<app-auth-dialog #historyAuth (authenticated)="historyDialogOpen() && loadHistory()"/>
 
 @if (activeInfo(); as info) {
     <dialog class="details-dialog" open aria-labelledby="info-title">

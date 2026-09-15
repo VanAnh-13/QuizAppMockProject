@@ -44,5 +44,5 @@ export const AUTH_LIMITS = {
 } as const;
 
 export function authReturnUrl(value: string | null): string {
-    return value && /^\/quiz\/[a-zA-Z0-9-]+(?:\/attempt)?$/.test(value) ? value : '/';
+    return value && /^\/quiz\/[a-zA-Z0-9-]+(?:\/attempt(?:\?attemptId=[a-zA-Z0-9-]+)?)?$/.test(value) ? value : '/';
 }
