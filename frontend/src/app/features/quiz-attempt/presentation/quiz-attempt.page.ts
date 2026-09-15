@@ -14,11 +14,10 @@ import {Location} from '@angular/common';
 import {attemptContentProvider} from '../infrastructure/attempt-content.provider';
 import {ATTEMPT_CONFIG} from '../application/attempt-config';
 import {QuizAttemptStore} from './quiz-attempt.store';
-import {AuthDialogComponent} from '../../../shared/ui/auth-dialog/auth-dialog.component';
 
 @Component({
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [RouterLink, AuthDialogComponent],
+    imports: [RouterLink],
     providers: [attemptContentProvider, QuizAttemptStore],
     selector: 'app-quiz-attempt-page',
     styleUrls: ['./quiz-attempt.page.css', './quiz-attempt.sidebar.css', './quiz-attempt.dialog.css'],
@@ -70,6 +69,10 @@ export class QuizAttemptPage implements OnDestroy {
         )
             return;
         await this.load();
+    }
+
+    protected loginReturnUrl(): string {
+        return this.location.path();
     }
 
     async canLeave(): Promise<boolean> {

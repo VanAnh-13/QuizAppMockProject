@@ -105,11 +105,11 @@ describe('AuthFormStore', () => {
 });
 
 describe('authReturnUrl', () => {
-    it.each(['https://example.com', '//example.com', '/\\example.com', '/login', '/register', '/quiz/id?redirect=https://example.com', null])('rejects unsafe or recursive destination %s', (value) => {
+    it.each(['https://example.com', '//example.com', '/\\example.com', '/login', '/register', '/quiz/id?redirect=https://example.com', '/quiz/id/attempt?attemptId=abc&redirect=https://example.com', '/quiz/id/attempt?attemptId=https://example.com', '/quiz/id/attempt?attemptId=', null])('rejects unsafe or recursive destination %s', (value) => {
         expect(authReturnUrl(value)).toBe('/');
     });
 
-    it.each(['/quiz/abc-123', '/quiz/abc-123/attempt'])('keeps a quiz destination %s', (value) => {
+    it.each(['/quiz/abc-123', '/quiz/abc-123/attempt', '/quiz/abc-123/attempt?attemptId=attempt-123'])('keeps a quiz destination %s', (value) => {
         expect(authReturnUrl(value)).toBe(value);
     });
 });

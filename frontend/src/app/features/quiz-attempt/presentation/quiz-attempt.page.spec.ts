@@ -105,6 +105,19 @@ describe('QuizAttemptPage', () => {
     expect(element.querySelectorAll('.question-palette button')).toHaveLength(1);
   });
 
+  it('keeps the current attempt in the login destination after an authentication error', async () => {
+    const fixture = await createFixture();
+    const store = fixture.debugElement.injector.get(QuizAttemptStore);
+    store.errorMessage.set('Vui lòng đăng nhập lại để tiếp tục.');
+    fixture.detectChanges();
+    const element = fixture.nativeElement as HTMLElement;
+
+    expect(element.querySelector('[role="alert"] a')?.getAttribute('href')).toBe(
+      `/login?returnUrl=${encodeURIComponent(`/quiz/${quizId}/attempt?attemptId=${start.attemptId}`)}`,
+    );
+    expect(element.querySelector('app-auth-dialog')).toBeNull();
+  });
+
   it('opens submission confirmation for the loaded attempt', async () => {
     const fixture = await createFixture();
     const element = fixture.nativeElement as HTMLElement;

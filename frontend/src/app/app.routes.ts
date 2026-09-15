@@ -1,5 +1,6 @@
 import {Routes} from '@angular/router';
 import {leaveAttemptGuard} from './features/quiz-attempt/presentation/leave-attempt.guard';
+import {requireAuthGuard} from './core/auth/require-auth.guard';
 
 export const routes: Routes = [
     {
@@ -22,6 +23,7 @@ export const routes: Routes = [
     },
     {
         path: 'quiz/:quizId/attempt',
+        canActivate: [requireAuthGuard],
         loadComponent: () =>
             import('./features/quiz-attempt/presentation/quiz-attempt.page').then(
                 (m) => m.QuizAttemptPage,

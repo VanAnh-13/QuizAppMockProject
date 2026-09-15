@@ -18,8 +18,13 @@
     @apply mb-0 mt-3 text-sm leading-6 text-[#4e626d];
 }
 
-.details-dialog > button {
+.details-dialog > button,
+.details-dialog > a {
     @apply mt-6 min-h-11 w-full rounded-lg bg-[#4a4bd7] px-4 text-sm font-semibold text-white hover:bg-[#3d3dcb];
+}
+
+.details-dialog > a {
+    @apply inline-flex items-center justify-center no-underline;
 }
 
 .history-list {

@@ -1,8 +1,8 @@
 import {TestBed} from '@angular/core/testing';
-import {ActivatedRoute, convertToParamMap, provideRouter} from '@angular/router';
+import {HttpErrorResponse} from '@angular/common/http';
+import {ActivatedRoute, convertToParamMap, provideRouter, Router} from '@angular/router';
 import {of} from 'rxjs';
 import {AuthSession} from '../../../core/auth/auth-session';
-import {AuthDialogComponent} from '../../../shared/ui/auth-dialog/auth-dialog.component';
 import {ATTEMPT_API} from '../../quiz-attempt/application/attempt-api';
 import {QUIZ_DETAILS_CONTENT} from '../infrastructure/quiz-details-content.provider';
 import {QuizDetailsPage} from './quiz-details.page';
@@ -67,18 +67,32 @@ describe('QuizDetailsPage', () => {
     });
 
     it('shows working login and registration controls for anonymous visitors', async () => {
-        const open = vi.spyOn(AuthDialogComponent.prototype, 'open').mockImplementation(() => {
-        });
         const fixture = await createFixture();
         const header = (fixture.nativeElement as HTMLElement).querySelector('header')!;
 
         expect(header.querySelector('.details-header__profile')).toBeNull();
         expect(header.textContent).not.toContain('Anh LV');
-        header.querySelector<HTMLButtonElement>('[data-testid="header-login"]')!.click();
-        expect(open).toHaveBeenLastCalledWith();
-        header.querySelector<HTMLButtonElement>('[data-testid="header-register"]')!.click();
-        expect(open).toHaveBeenLastCalledWith(true);
+        expect(header.querySelector('[data-testid="header-login"]')?.getAttribute('href')).toBe(
+            `/login?returnUrl=${encodeURIComponent(`/quiz/${quizId}`)}`,
+        );
+        expect(header.querySelector('[data-testid="header-register"]')?.getAttribute('href')).toBe(
+            `/register?returnUrl=${encodeURIComponent(`/quiz/${quizId}`)}`,
+        );
+        expect((fixture.nativeElement as HTMLElement).querySelector('app-auth-dialog')).toBeNull();
         expect(history).not.toHaveBeenCalled();
+    });
+
+    it('sends anonymous history visitors to the login page without requesting protected history', async () => {
+        const navigate = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
+        const fixture = await createFixture();
+        const element = fixture.nativeElement as HTMLElement;
+
+        element.querySelector<HTMLButtonElement>('.history-button')!.click();
+        await fixture.whenStable();
+
+        expect(navigate).toHaveBeenCalledWith(['/login'], {queryParams: {returnUrl: `/quiz/${quizId}`}});
+        expect(history).not.toHaveBeenCalled();
+        expect(element.querySelector('#attempt-history')).toBeNull();
     });
 
     it('updates the header on login and returns to signed-out controls on logout', async () => {
@@ -170,6 +184,11 @@ describe('QuizDetailsPage', () => {
     });
 
     it('loads the signed-in user history for the current quiz', async () => {
+        TestBed.inject(AuthSession).set({
+            token: 'test-token',
+            expiresAt: new Date(Date.now() + 60_000).toISOString(),
+            userDto: {id: 'learner-id', username: 'learner', fullName: null},
+        });
         const fixture = await createFixture();
         const element = fixture.nativeElement as HTMLElement;
 
@@ -179,5 +198,24 @@ describe('QuizDetailsPage', () => {
 
         expect(history).toHaveBeenCalledWith(quizId);
         expect(element.querySelector('.history-list')?.textContent).toContain('80 / 100');
+    });
+
+    it('links an expired history session to the full login page', async () => {
+        TestBed.inject(AuthSession).set({
+            token: 'test-token',
+            expiresAt: new Date(Date.now() + 60_000).toISOString(),
+            userDto: {id: 'learner-id', username: 'learner', fullName: null},
+        });
+        history.mockRejectedValue(new HttpErrorResponse({status: 401}));
+        const fixture = await createFixture();
+        const element = fixture.nativeElement as HTMLElement;
+
+        element.querySelector<HTMLButtonElement>('.history-button')!.click();
+        await fixture.whenStable();
+        fixture.detectChanges();
+
+        expect(element.querySelector('#attempt-history a')?.getAttribute('href')).toBe(
+            `/login?returnUrl=${encodeURIComponent(`/quiz/${quizId}`)}`,
+        );
     });
 });

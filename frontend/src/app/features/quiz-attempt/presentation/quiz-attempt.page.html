@@ -1,3 +1,4 @@
+<!--suppress HtmlUnknownAnchorTarget -->
 <a class="skip-link" href="#question-content">Chuyển đến câu hỏi hiện tại</a>
 
 <header class="exam-header">
@@ -72,10 +73,9 @@
         <button type="button" [disabled]="store.isBusy() || store.isSaving()" (click)="reload()">
             Tải lại trạng thái
         </button>
-        <button type="button" (click)="auth.open()">Đăng nhập</button>
+        <a routerLink="/login" [queryParams]="{returnUrl: loginReturnUrl()}">Đăng nhập</a>
     </section>
 }
-<app-auth-dialog #auth (authenticated)="reload()"/>
 @if (store.result(); as result) {
     <section class="api-state" role="status">
         <h2>Đã nộp bài thành công</h2>
