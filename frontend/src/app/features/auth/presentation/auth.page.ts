@@ -3,6 +3,7 @@ import {
     ChangeDetectionStrategy,
     ChangeDetectorRef,
     Component,
+    DestroyRef,
     ElementRef,
     inject,
     signal
@@ -38,9 +39,13 @@ export class AuthPage {
     protected readonly benefits = AUTH_BENEFITS;
     protected readonly year = new Date().getFullYear();
     protected readonly visiblePasswords = signal<ReadonlySet<string>>(new Set());
+    private destroyed = false;
 
     constructor() {
         this.store.configure(this.registering);
+        inject(DestroyRef).onDestroy(() => {
+            this.destroyed = true;
+        });
         afterNextRender(() => {
             this.viewport.scrollToPosition([0, 0]);
         });
@@ -60,6 +65,9 @@ export class AuthPage {
 
     protected async submit(): Promise<void> {
         const succeeded = await this.store.submit();
+        if (this.destroyed) {
+            return;
+        }
         this.visiblePasswords.set(new Set());
         if (!succeeded) {
             this.changeDetector.detectChanges();

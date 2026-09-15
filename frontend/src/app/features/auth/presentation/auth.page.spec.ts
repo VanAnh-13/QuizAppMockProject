@@ -86,6 +86,37 @@ describe('AuthPage routes', () => {
         expect(session.set).toHaveBeenCalledOnce();
         expect(navigate).toHaveBeenCalledWith('/quiz/abc');
     });
+
+    it('does not redirect when the user navigates away before login resolves', async () => {
+        let resolveLogin!: (value: object) => void;
+        const slowLogin = new Promise<object>((resolve) => {
+            resolveLogin = resolve;
+        });
+        const api = {register: vi.fn(), login: vi.fn().mockReturnValue(slowLogin)};
+        const session = {set: vi.fn(), user: signal(null), clear: vi.fn()};
+        TestBed.configureTestingModule({
+            providers: [provideRouter(routes), {
+                provide: AuthApi,
+                useValue: api
+            }, {provide: AuthSession, useValue: session}, {provide: ViewportScroller, useValue: {scrollToPosition: vi.fn()}}]
+        });
+        const harness = await RouterTestingHarness.create();
+        await harness.navigateByUrl('/login?returnUrl=%2Fquiz%2Fabc', AuthPage);
+        const element = harness.routeNativeElement!;
+        fill(element, 'username', 'learner');
+        fill(element, 'password', 'Password-123!');
+        element.querySelector<HTMLButtonElement>('button[type="submit"]')!.click();
+        expect(api.login).toHaveBeenCalledOnce();
+
+        const router = TestBed.inject(Router);
+        await harness.navigateByUrl('/');
+        const navigate = vi.spyOn(router, 'navigateByUrl');
+
+        resolveLogin({token: 't', expiresAt: '2099-01-01T00:00:00Z', userDto: {id: '1', username: 'u', fullName: null}});
+        await harness.fixture.whenStable();
+
+        expect(navigate).not.toHaveBeenCalled();
+    });
 });
 
 function fill(element: HTMLElement, name: string, value: string): void {
