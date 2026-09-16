@@ -3,6 +3,8 @@ import {ApiClient} from '../../../core/api/api-client';
 import {PublicQuizSummaryDto, validatePublicQuiz} from '../../../core/api/quiz-contracts';
 import {QuizDetailsContent, QuizDetailsSnapshot} from '../application/quiz-details-content';
 
+import {resolveQuizImageUrl} from '../../../core/utils/quiz-image';
+
 @Injectable()
 export class ApiQuizDetailsContent implements QuizDetailsContent {
     private readonly api = inject(ApiClient);
@@ -16,6 +18,10 @@ export class ApiQuizDetailsContent implements QuizDetailsContent {
 
         if (!quiz) throw new Error('Không tìm thấy quiz đang mở.');
         return {
+            imageUrl: resolveQuizImageUrl(
+                quiz.title,
+                (quiz as {imageUrl?: string | null}).imageUrl,
+            ),
             title: quiz.title,
             description: quiz.description ?? '',
             categoryLabel: 'Quiz',

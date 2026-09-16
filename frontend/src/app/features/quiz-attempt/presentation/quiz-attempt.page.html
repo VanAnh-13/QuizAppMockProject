@@ -45,6 +45,7 @@
             <button
                     class="pause-button"
                     type="button"
+                    [attr.aria-label]="store.isPaused() ? 'Tiếp tục làm bài' : 'Tạm dừng bài thi'"
                     [attr.aria-pressed]="store.isPaused()"
                     [disabled]="
           store.isLoading() ||
@@ -77,17 +78,101 @@
     </section>
 }
 @if (store.result(); as result) {
-    <section class="api-state" role="status">
-        <h2>Đã nộp bài thành công</h2>
-        <p>
-            Điểm: <strong>{{ result.score }} / 100</strong>
-        </p>
-        <a [routerLink]="['/quiz', result.quizId]">Về chi tiết và lịch sử bài thi</a>
-    </section>
+    <main class="result-view">
+        <section class="api-state result-card glass-card" role="status">
+            <div class="result-card__header">
+                <div class="result-icon-badge" [class.result-icon-badge--pass]="result.score >= 80">
+                    <span class="material-symbols-outlined" aria-hidden="true">
+                        {{ result.score >= 80 ? 'verified' : 'history_edu' }}
+                    </span>
+                </div>
+                <h2>Đã nộp bài thành công</h2>
+                <p class="result-quiz-title">{{ result.quizTitle }}</p>
+            </div>
+
+            <!-- Radial Score Donut Chart -->
+            <div class="score-chart-wrapper">
+                <div class="score-gauge">
+                    <svg class="score-gauge__svg" width="160" height="160" viewBox="0 0 160 160"
+                            aria-hidden="true">
+                        <defs>
+                            <linearGradient id="scoreGaugeGradient" x1="0%" y1="0%" x2="100%"
+                                    y2="100%">
+                                <stop offset="0%"
+                                        [attr.stop-color]="result.score >= 80 ? '#10b981' : '#6366f1'"/>
+                                <stop offset="100%"
+                                        [attr.stop-color]="result.score >= 80 ? '#059669' : '#4338ca'"/>
+                            </linearGradient>
+                        </defs>
+                        <circle class="score-gauge__track" cx="80" cy="80" r="62" fill="none"
+                                stroke="#e0e7ff" stroke-width="12" stroke-linecap="round"/>
+                        <circle class="score-gauge__progress" cx="80" cy="80" r="62" fill="none"
+                                stroke="url(#scoreGaugeGradient)" stroke-width="12"
+                                stroke-linecap="round"
+                                stroke-dasharray="389.56"
+                                [attr.stroke-dashoffset]="389.56 - (389.56 * (result.score / 100))"
+                                transform="rotate(-90 80 80)"/>
+                    </svg>
+                    <div class="score-gauge__content">
+                        <span class="score-gauge__number">{{ result.score }}</span>
+                        <span class="score-gauge__max">/ 100</span>
+                    </div>
+                </div>
+
+                <div class="score-status-pill" [class.score-status-pill--pass]="result.score >= 80">
+                    <span class="material-symbols-outlined" aria-hidden="true">
+                        {{ result.score >= 80 ? 'check_circle' : 'info' }}
+                    </span>
+                    <span>{{ result.score >= 80 ? 'ĐẠT TIÊU CHUẨN' : 'CHƯA ĐẠT CHUẨN (CẦN ≥80%)' }}</span>
+                </div>
+            </div>
+
+            <!-- Visual Performance Comparison Bar Chart -->
+            <div class="result-breakdown">
+                <div class="breakdown-item">
+                    <div class="breakdown-labels">
+                        <span>Điểm của bạn</span>
+                        <strong>{{ result.score }}%</strong>
+                    </div>
+                    <div class="breakdown-bar">
+                        <div class="breakdown-bar__fill" [style.width.%]="result.score"
+                                [class.breakdown-bar__fill--pass]="result.score >= 80"></div>
+                    </div>
+                </div>
+                <div class="breakdown-item">
+                    <div class="breakdown-labels">
+                        <span>Mục tiêu chuẩn</span>
+                        <strong>80%</strong>
+                    </div>
+                    <div class="breakdown-bar">
+                        <div class="breakdown-bar__fill breakdown-bar__fill--target"
+                                style="width: 80%;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <p class="result-score-text">
+                Điểm: <strong>{{ result.score }} / 100</strong>
+            </p>
+
+            <!-- Centered Action Buttons with Clean Whitespace -->
+            <div class="result-card__actions">
+                <a class="result-button result-button--primary"
+                        [routerLink]="['/quiz', result.quizId]">
+                    <span class="material-symbols-outlined" aria-hidden="true">assessment</span>
+                    Về chi tiết và lịch sử bài thi
+                </a>
+                <a class="result-button result-button--secondary" routerLink="/">
+                    <span class="material-symbols-outlined" aria-hidden="true">explore</span>
+                    Khám phá thêm quiz
+                </a>
+            </div>
+        </section>
+    </main>
 } @else if (!store.isLoading() && store.currentQuestion(); as question) {
-    <p class="api-state" role="status">{{ store.saveStatus() }}</p>
+    <p class="attempt-status" role="status">{{ store.saveStatus() }}</p>
     @if (store.isPaused()) {
-        <p class="api-state" role="status">
+        <p class="attempt-status attempt-status--paused" role="status">
             Bài thi đang tạm dừng. Nhấn “Tiếp tục làm bài” để trả lời.
         </p>
     }

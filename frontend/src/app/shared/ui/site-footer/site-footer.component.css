@@ -1,13 +1,16 @@
-﻿:host {
+:host {
     @apply block;
 }
 
 .footer {
-    @apply border-t border-border bg-surface;
+    background: var(--glass-raised);
+    backdrop-filter: var(--glass-filter);
+    -webkit-backdrop-filter: var(--glass-filter);
+    border-top: 1px solid var(--glass-border);
 }
 
 .footer__inner {
-    @apply mx-auto flex max-w-7xl flex-col items-start gap-4 px-4 py-6;
+    @apply mx-auto flex max-w-[1200px] flex-col items-start gap-4 px-4 py-6;
 }
 
 .footer__brand {
@@ -16,7 +19,7 @@
 
 .footer p,
 .footer button {
-    @apply text-xs leading-6 text-muted;
+    @apply text-xs leading-6 text-muted transition-colors;
 }
 
 .footer p {
@@ -32,11 +35,11 @@
 }
 
 .footer button:hover {
-    @apply text-brand-strong;
+    color: var(--ink);
 }
 
 .footer button:focus-visible {
-    @apply outline-none ring-2 ring-brand ring-offset-2;
+    @apply outline-none ring-2 ring-brand ring-offset-2 ring-offset-canvas;
 }
 
 @media (min-width: 24rem) {

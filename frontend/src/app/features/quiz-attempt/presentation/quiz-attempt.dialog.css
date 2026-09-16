@@ -1,21 +1,33 @@
 .submit-dialog::backdrop {
-    @apply bg-[#000f21]/50;
+    backdrop-filter: var(--glass-filter);
+    -webkit-backdrop-filter: var(--glass-filter);
+    @apply bg-slate-900/20;
 }
 
 .submit-dialog {
-    @apply fixed inset-0 z-50 m-auto w-[calc(100%-2rem)] max-w-md rounded-card border border-[#c2d5f0] bg-white p-6 text-center text-[#0d3459] shadow-card;
+    border-radius: var(--glass-radius);
+    border: 1px solid var(--glass-border);
+    background: var(--glass-raised);
+    backdrop-filter: var(--glass-filter);
+    -webkit-backdrop-filter: var(--glass-filter);
+    color: var(--ink);
+    box-shadow: var(--glass-shadow);
+    @apply fixed inset-0 z-50 m-auto w-[calc(100%-2rem)] max-w-md p-6 text-center;
 }
 
 .submit-dialog__icon {
-    @apply mx-auto flex size-12 items-center justify-center rounded-full bg-[#e5eeff] text-2xl text-[#4a4bd7];
+    border: 1px solid var(--glass-border);
+    background: var(--brand-soft);
+    color: var(--brand);
+    @apply mx-auto flex size-12 items-center justify-center rounded-full text-2xl shadow-sm;
 }
 
 .submit-dialog h2 {
-    @apply mb-0 mt-4 text-xl font-bold;
+    @apply mb-0 mt-4 text-xl font-bold text-ink;
 }
 
 .submit-dialog p {
-    @apply mb-0 mt-3 text-sm leading-6 text-[#4e626d];
+    @apply mb-0 mt-3 text-sm leading-6 text-muted;
 }
 
 .submit-dialog__actions {
@@ -23,13 +35,23 @@
 }
 
 .submit-dialog__actions button {
-    @apply min-h-11 flex-1 rounded-control border border-[#94b4e0] px-3 text-sm font-semibold;
+    border: 1px solid var(--glass-border);
+    background: var(--glass-surface);
+    color: var(--ink);
+    @apply min-h-11 flex-1 rounded-xl px-3 text-sm font-semibold transition-all hover:bg-[var(--glass-hover)];
 }
 
 .submit-dialog__actions button:last-child {
-    @apply border-[#4a4bd7] bg-[#4a4bd7] text-white hover:bg-[#3d3dcb];
+    background: var(--brand-gradient);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    @apply text-on-brand hover:opacity-95;
 }
 
 .submission-toast {
-    @apply fixed bottom-4 right-4 z-40 flex items-center gap-2 rounded-control bg-[#0d3459] px-4 py-3 text-sm font-medium text-white shadow-card;
+    border: 1px solid var(--glass-border);
+    background: var(--glass-raised);
+    backdrop-filter: var(--glass-filter);
+    box-shadow: var(--glass-shadow);
+    @apply fixed bottom-4 right-4 z-40 flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-medium text-ink;
 }

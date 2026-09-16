@@ -52,4 +52,22 @@ describe('QuizExplorePage', () => {
 
         expect(element.querySelector('.header__action--primary')?.getAttribute('href')).toBe('/register?returnUrl=%2F');
     });
+    it('shows an empty search result and restores the catalog when filters are cleared', async () => {
+        const fixture = await createFixture();
+        const element = fixture.nativeElement as HTMLElement;
+        const search = element.querySelector<HTMLInputElement>('#quiz-search')!;
+        search.value = 'no-matching-quiz';
+        search.dispatchEvent(new Event('input'));
+        element.querySelector('form')!.dispatchEvent(new Event('submit', {cancelable: true}));
+        fixture.detectChanges();
+        await fixture.whenStable();
+        fixture.detectChanges();
+        expect(element.querySelector('.catalog__empty')?.textContent).toContain('Chưa tìm thấy');
+        element.querySelector<HTMLButtonElement>('.catalog__empty button')!.click();
+        fixture.detectChanges();
+        await fixture.whenStable();
+        fixture.detectChanges();
+        expect(search.value).toBe('');
+        expect(element.querySelectorAll('.quiz-card')).toHaveLength(6);
+    });
 });

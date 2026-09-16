@@ -1,4 +1,4 @@
-﻿export type QuizCategoryId = 'csharp' | 'sql-server' | 'angular' | 'typescript' | 'api';
+export type QuizCategoryId = 'csharp' | 'sql-server' | 'angular' | 'typescript' | 'api';
 
 export interface QuizCategory {
     readonly id: QuizCategoryId;
@@ -14,4 +14,5 @@ export interface QuizSummary {
     readonly questionCount: number | null;
     readonly durationMinutes: number;
     readonly status: 'open';
+    readonly imageUrl?: string | null;
 }

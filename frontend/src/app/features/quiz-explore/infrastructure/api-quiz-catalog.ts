@@ -4,6 +4,8 @@ import {PublicQuizSummaryDto, validatePublicQuiz} from '../../../core/api/quiz-c
 import {QuizCatalog} from '../application/quiz-catalog';
 import {QuizSummary} from '../domain/quiz-summary';
 
+import {resolveQuizImageUrl} from '../../../core/utils/quiz-image';
+
 @Injectable()
 export class ApiQuizCatalog implements QuizCatalog {
     private readonly api = inject(ApiClient);
@@ -20,6 +22,7 @@ export class ApiQuizCatalog implements QuizCatalog {
                 categoryLabel: 'Kiến thức tổng hợp',
                 questionCount: quiz.questionCount,
                 status: 'open',
+                imageUrl: resolveQuizImageUrl(quiz.title, (quiz as {imageUrl?: string | null}).imageUrl),
             }));
     }
 }

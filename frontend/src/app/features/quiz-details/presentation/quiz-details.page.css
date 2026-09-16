@@ -1,5 +1,7 @@
 :host {
-    @apply flex min-h-dvh flex-col bg-[#f8f9ff] text-[#0d3459];
+    @apply flex min-h-dvh flex-col;
+    background: transparent;
+    color: var(--ink);
 }
 
 button {
@@ -7,7 +9,7 @@ button {
 }
 
 .quiz-details {
-    @apply mx-auto w-full max-w-6xl flex-1 px-4 py-6 sm:px-6 lg:py-8;
+    @apply relative mx-auto w-full max-w-[1200px] flex-1 px-4 py-6 sm:px-6 lg:py-8;
 }
 
 .breadcrumb {
@@ -15,7 +17,7 @@ button {
 }
 
 .breadcrumb ol {
-    @apply m-0 flex list-none items-center gap-2 p-0 text-sm font-medium text-[#4e626d];
+    @apply m-0 flex list-none items-center gap-2 p-0 text-sm font-medium text-muted;
 }
 
 .breadcrumb li {
@@ -23,66 +25,118 @@ button {
 }
 
 .breadcrumb a {
-    @apply flex min-h-11 items-center gap-1 hover:text-[#4a4bd7];
+    @apply flex min-h-11 items-center gap-1 text-muted transition-colors hover:text-ink;
 }
 
 .breadcrumb li[aria-current='page'] {
-    @apply truncate font-medium text-[#0d3459];
+    @apply truncate font-semibold text-ink;
 }
 
 .details-state {
-    @apply flex min-h-80 flex-col items-center justify-center rounded-xl border border-[#dce9ff] bg-white p-8 text-center shadow-subtle;
+    border-radius: var(--glass-radius);
+    border: 1px solid var(--glass-border);
+    background: var(--glass-surface);
+    backdrop-filter: var(--glass-filter);
+    -webkit-backdrop-filter: var(--glass-filter);
+    @apply flex min-h-80 flex-col items-center justify-center p-8 text-center text-ink shadow-card;
 }
 
 .details-state h2 {
-    @apply m-0 text-xl font-bold text-[#0d3459];
+    @apply m-0 text-xl font-bold text-ink;
 }
 
 .details-state p {
-    @apply mb-0 mt-3 text-sm text-[#4e626d];
+    @apply mb-0 mt-3 text-sm text-muted;
 }
 
 .details-state button {
-    @apply mt-5 min-h-11 rounded-lg bg-[#4a4bd7] px-5 text-sm font-semibold text-white hover:bg-[#3d3dcb];
+    background: var(--brand-gradient);
+    border: 1px solid var(--glass-border);
+    @apply mt-5 min-h-11 rounded-xl px-6 text-sm font-semibold text-on-brand shadow-md transition-all hover:opacity-95 active:scale-[0.98];
 }
 
 .quiz-details__layout {
-    @apply grid grid-cols-1 items-start gap-6 lg:grid-cols-12 lg:gap-8;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+    align-items: start;
 }
 
 .quiz-details__content,
 .quiz-details__sidebar {
-    @apply flex flex-col gap-6;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
 }
 
-.quiz-details__content {
-    @apply lg:col-span-8;
+.quiz-details__actions--desktop {
+    display: none;
 }
 
-.quiz-details__sidebar {
-    @apply lg:col-span-4;
+@media (min-width: 64rem) {
+    .quiz-details__layout {
+        grid-template-columns: minmax(0, 1fr) 320px;
+    }
+
+    .quiz-details__actions--desktop {
+        display: contents;
+    }
+
+    .quiz-details__actions--mobile {
+        display: none;
+    }
 }
 
 .overview-card,
 .topics-card,
 .cta-card {
-    @apply rounded-xl border border-[#dce9ff] bg-white shadow-subtle;
+    border-radius: var(--glass-radius);
+    border: 1px solid var(--glass-border);
+    background: var(--glass-surface);
+    backdrop-filter: var(--glass-filter);
+    -webkit-backdrop-filter: var(--glass-filter);
+    box-shadow: var(--glass-shadow);
+    @apply relative transition-all;
 }
 
 .overview-card {
-    @apply relative overflow-hidden p-6 md:p-8;
+    @apply overflow-hidden p-6 md:p-8;
 }
 
 .overview-card__glow {
-    @apply pointer-events-none absolute -right-12 -top-12 size-48 rounded-full bg-[#eff4ff] blur-2xl;
+    @apply pointer-events-none absolute -right-12 -top-12 size-48 rounded-full bg-brand/15 blur-3xl;
+}
+
+.overview-card__top {
+    @apply mb-4 flex flex-col gap-4 ;
+}
+
+.course-thumb {
+    border: 1px solid var(--glass-border);
+    @apply relative w-full h-48 shrink-0 overflow-hidden rounded-2xl shadow-lg sm:h-56;
+}
+
+.course-thumb__img {
+    @apply size-full object-cover;
+}
+
+.course-thumb__shine {
+    @apply pointer-events-none absolute inset-0 bg-gradient-to-tr from-brand/20 via-transparent to-white/30;
+}
+
+.overview-card__heading {
+    @apply order-first min-w-0 flex-1;
 }
 
 .topic-badge {
-    @apply relative inline-flex items-center gap-1.5 rounded-full border border-[#4a4bd7]/20 bg-[#eff4ff] px-3 py-1 text-xs font-semibold text-[#4a4bd7];
+    border: 1px solid rgba(168, 85, 247, 0.35);
+    background: var(--brand-soft);
+    color: var(--brand);
+    @apply relative inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold backdrop-blur-md;
 }
 
 .topic-badge .material-symbols-outlined {
-    @apply text-sm;
+    @apply text-sm text-brand-accent;
     font-variation-settings: 'FILL' 1,
     'wght' 400,
     'GRAD' 0,
@@ -90,15 +144,17 @@ button {
 }
 
 .overview-card h1 {
-    @apply relative mb-4 mt-3 text-2xl font-bold leading-tight tracking-tight text-[#0d3459] md:text-[32px];
+    @apply mb-0 mt-2 text-xl font-bold leading-tight tracking-tight text-ink sm:text-2xl md:text-[28px];
 }
 
 .overview-card__description {
-    @apply relative mb-6 max-w-3xl text-sm leading-7 text-[#4e626d] md:text-base;
+    @apply relative mb-6 mt-3 max-w-3xl text-sm leading-relaxed text-muted md:text-base;
 }
 
 .metrics-grid {
-    @apply relative m-0 grid grid-cols-1 gap-3 rounded-xl border border-[#e5eeff] bg-[#eff4ff] p-4 sm:grid-cols-2 xl:grid-cols-4;
+    border: 1px solid var(--glass-border);
+    background: var(--glass-inset);
+    @apply relative m-0 grid grid-cols-1 gap-3 rounded-xl p-4 sm:grid-cols-2 xl:grid-cols-4;
 }
 
 .metric-card {
@@ -106,15 +162,18 @@ button {
 }
 
 .metric-card__icon {
-    @apply flex size-10 shrink-0 items-center justify-center rounded-lg bg-white text-xl text-[#4a4bd7] shadow-subtle;
+    border: 1px solid var(--glass-border);
+    background: var(--glass-inset);
+    color: var(--brand);
+    @apply flex size-10 shrink-0 items-center justify-center rounded-xl text-xl shadow-sm;
 }
 
 .metric-card dt {
-    @apply text-[11px] font-medium uppercase tracking-wider text-[#4e626d];
+    @apply text-[11px] font-medium uppercase tracking-wider text-muted;
 }
 
 .metric-card dd {
-    @apply m-0 text-sm font-bold text-[#0d3459];
+    @apply m-0 text-sm font-bold text-ink;
 }
 
 .topics-card {
@@ -126,11 +185,11 @@ button {
 }
 
 .section-heading > .material-symbols-outlined {
-    @apply text-xl text-[#4a4bd7];
+    @apply text-xl text-brand-accent;
 }
 
 .section-heading h2 {
-    @apply m-0 text-xl font-semibold leading-snug text-[#0d3459] md:text-2xl;
+    @apply m-0 text-xl font-semibold leading-snug text-ink md:text-2xl;
 }
 
 .topics-grid {
@@ -138,28 +197,35 @@ button {
 }
 
 .topic-card {
-    @apply flex items-start gap-3.5 rounded-xl border border-[#e5eeff] bg-white p-4 transition-colors hover:border-[#94b4e0];
+    border: 1px solid var(--glass-border);
+    background: var(--glass-inset);
+    @apply flex items-start gap-3.5 rounded-xl p-4 transition-all duration-200 hover:-translate-y-0.5 hover:border-white/25 hover:bg-[var(--glass-hover)];
 }
 
 .topic-card__check {
-    @apply mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg bg-[#eff4ff] text-base font-bold text-[#4a4bd7];
+    border: 1px solid rgba(168, 85, 247, 0.35);
+    background: var(--brand-soft);
+    color: var(--brand);
+    @apply mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg text-base font-bold shadow-sm;
 }
 
 .topic-card h3 {
-    @apply mb-0.5 mt-0 text-sm font-semibold text-[#0d3459];
+    @apply mb-0.5 mt-0 text-sm font-semibold text-ink;
 }
 
 .topic-card p {
-    @apply m-0 text-xs leading-relaxed text-[#4e626d];
+    @apply m-0 text-xs leading-relaxed text-muted;
 }
 
 .cta-card {
+    border: 1px solid var(--glass-border);
+    background: var(--glass-surface);
+    box-shadow: var(--glass-shadow);
     @apply relative flex flex-col items-stretch gap-6 overflow-hidden p-6 md:p-8;
-    background: linear-gradient(135deg, #ffffff 0%, #f8faff 100%);
 }
 
 .cta-card__glow {
-    @apply pointer-events-none absolute -bottom-10 -right-10 size-44 rounded-full bg-[#eff4ff] blur-2xl;
+    @apply pointer-events-none absolute -bottom-10 -right-10 size-44 rounded-full bg-brand-accent/20 blur-3xl;
 }
 
 .cta-card__copy {
@@ -167,30 +233,45 @@ button {
 }
 
 .cta-card__icon {
-    @apply flex size-11 shrink-0 items-center justify-center rounded-xl border border-[#4a4bd7]/15 bg-gradient-to-br from-[#eff4ff] to-[#dce9ff] text-2xl text-[#4a4bd7] shadow-sm;
+    border: 1px solid var(--glass-border);
+    background: var(--brand-soft);
+    color: var(--brand);
+    @apply flex size-11 shrink-0 items-center justify-center rounded-xl text-2xl shadow-sm;
 }
 
 .cta-card__copy h2 {
-    @apply m-0 text-base font-bold leading-snug text-[#0d3459] sm:text-lg;
+    @apply m-0 text-base font-bold leading-snug text-ink sm:text-lg;
 }
 
 .cta-card__copy p {
-    @apply mb-0 mt-1 text-xs leading-relaxed text-[#4e626d] sm:text-sm;
+    @apply mb-0 mt-1 text-xs leading-relaxed text-muted sm:text-sm;
 }
 
 .cta-card__actions {
-    @apply relative flex w-full flex-row items-center justify-center gap-4 sm:gap-6;
+    @apply relative flex w-full flex-col items-stretch gap-3;
 }
 
 .history-button,
 .start-button {
-    @apply inline-flex min-h-11 flex-initial items-center justify-center gap-2 whitespace-nowrap rounded-xl px-4 py-2.5 text-xs font-semibold transition-all duration-200 sm:min-h-12 sm:px-6 sm:py-3 sm:text-sm active:scale-[0.98];
+    @apply inline-flex min-h-11 flex-initial items-center justify-center gap-2 whitespace-normal rounded-xl px-4 py-2.5 text-xs font-semibold transition-all duration-200 sm:min-h-12 sm:px-6 sm:py-3 sm:text-sm active:scale-[0.98];
 }
 
 .history-button {
-    @apply border border-[#d2e0f8] bg-white text-[#4a4bd7] shadow-sm hover:border-[#4a4bd7]/40 hover:bg-[#eff4ff] hover:text-[#3d3dcb] hover:shadow;
+    border: 1px solid var(--glass-border);
+    background: var(--glass-inset);
+    color: var(--ink);
+    @apply hover:border-white/35 hover:bg-[var(--glass-hover)] hover:shadow;
 }
 
 .start-button {
-    @apply bg-gradient-to-r from-[#4a4bd7] via-[#5c4be2] to-[#842cd3] text-white shadow-md shadow-[#4a4bd7]/20 hover:from-[#3d3dcb] hover:via-[#503dd4] hover:to-[#7724c4] hover:shadow-lg hover:shadow-[#4a4bd7]/30;
+    background: var(--brand-gradient);
+    border: 1px solid var(--glass-border);
+    color: var(--on-brand);
+    box-shadow: var(--glass-shadow);
+    @apply hover:shadow-lg hover:shadow-brand/50 hover:brightness-110;
+}
+
+.breadcrumb li:first-child {
+    flex-shrink: 0;
+    white-space: nowrap;
 }

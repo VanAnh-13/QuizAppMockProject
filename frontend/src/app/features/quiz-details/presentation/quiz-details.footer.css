@@ -1,9 +1,13 @@
-﻿.details-footer {
-    @apply mt-12 border-t border-[#dce9ff] bg-white py-6;
+.details-footer {
+    background: var(--glass-raised);
+    backdrop-filter: var(--glass-filter);
+    -webkit-backdrop-filter: var(--glass-filter);
+    border-top: 1px solid var(--glass-border);
+    @apply mt-12 py-6;
 }
 
 .details-footer__inner {
-    @apply mx-auto flex max-w-7xl flex-col items-start gap-4 px-4 text-xs text-[#4e626d] sm:px-6 md:flex-row md:items-center md:justify-between;
+    @apply mx-auto flex max-w-[1200px] flex-col items-start gap-4 px-4 text-xs text-muted sm:px-6 md:flex-row md:items-center md:justify-between;
 }
 
 .details-footer p {
@@ -16,7 +20,7 @@
 
 .details-footer a,
 .details-footer button {
-    @apply inline-flex min-h-11 items-center p-0 text-xs text-[#4e626d] hover:text-[#4a4bd7];
+    @apply inline-flex min-h-11 items-center p-0 text-xs text-muted transition-colors hover:text-ink;
 }
 
 @media (max-width: 47.99rem) {
@@ -33,7 +37,7 @@
     }
 
     .metric-card {
-        @apply rounded-lg bg-white/60 p-2;
+        @apply rounded-lg bg-[var(--glass-inset)] p-2;
     }
 }
 

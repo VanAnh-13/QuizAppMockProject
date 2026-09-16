@@ -1,5 +1,13 @@
 ﻿<article class="quiz-card">
     <div>
+        <div class="quiz-card__media">
+            <img [src]="quiz().imageUrl ?? 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=400&auto=format&fit=crop'"
+                    [alt]="quiz().title"
+                    class="quiz-card__media-img"
+                    loading="lazy"/>
+            <div class="quiz-card__media-gloss"></div>
+        </div>
+
         <div class="quiz-card__labels">
             <span class="quiz-card__category">{{ quiz().categoryLabel }}</span>
             <span class="quiz-card__status">

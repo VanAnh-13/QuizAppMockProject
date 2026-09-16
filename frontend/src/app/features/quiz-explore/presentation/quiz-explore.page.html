@@ -1,6 +1,7 @@
-﻿<app-site-header/>
+<app-site-header/>
 
 <main class="explore" id="main-content" tabindex="-1">
+
     <section class="hero" aria-labelledby="hero-title">
         <div class="hero__content">
             <p class="hero__eyebrow">
@@ -62,10 +63,10 @@
                 >
                     <path d="M3 5h7l2 2 2-2h7v15h-7l-2 2-2-2H3zM12 7v15"/>
                 </svg>
-                {{ store.totalCatalogCount() }} bài quiz mẫu · {{ store.categoryCount() }} chủ đề
+                {{ store.totalCatalogCount() }} bài quiz · {{ store.categoryCount() }} chủ đề
             </p>
         </div>
-        <app-learning-illustration class="hero__illustration"/>
+
     </section>
 
     <section class="filters" aria-labelledby="filter-title">
@@ -168,7 +169,7 @@
             <div class="pagination">
                 <p>
                     Hiển thị <strong>{{ store.rangeStart() }}–{{ store.rangeEnd() }}</strong> trong
-                    <strong>{{ store.totalCount() }}</strong> bài quiz mẫu
+                    <strong>{{ store.totalCount() }}</strong> bài quiz
                 </p>
                 <nav aria-label="Phân trang danh sách quiz">
                     <button

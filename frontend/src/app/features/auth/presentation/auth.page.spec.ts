@@ -28,6 +28,8 @@ describe('AuthPage routes', () => {
     it('renders an initially clean login form and toggles password visibility accessibly', async () => {
         const {element, harness, scrollToPosition} = await setup('/login');
         expect(scrollToPosition).toHaveBeenCalledWith([0, 0]);
+        expect(element.querySelectorAll('h1')).toHaveLength(1);
+        expect(element.querySelector('h1')?.textContent).toBe('Đăng nhập');
         expect(element.querySelector('[aria-invalid="true"]')).toBeNull();
         expect(element.querySelector('input[type="email"]')).toBeNull();
         const toggle = element.querySelector<HTMLButtonElement>('[aria-controls="password"]')!;

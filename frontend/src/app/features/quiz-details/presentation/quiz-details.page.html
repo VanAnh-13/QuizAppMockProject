@@ -103,15 +103,57 @@
             <button type="button" (click)="load()">Thử lại</button>
         </div>
     } @else {
+        <ng-template #quizActions let-titleId="titleId">
+            <section class="cta-card" [attr.aria-labelledby]="titleId">
+                <span class="cta-card__glow" aria-hidden="true"></span>
+                <div class="cta-card__copy">
+                        <span
+                                class="cta-card__icon material-symbols-outlined"
+                                aria-hidden="true"
+                        >
+                            play_circle
+                        </span>
+                    <div>
+                        <h2 [id]="titleId">Sẵn sàng thử thách năng lực?</h2>
+                        <p>Hệ thống sẽ lưu vết kết quả vào hồ sơ học tập của bạn.</p>
+                    </div>
+                </div>
+                <div class="cta-card__actions">
+                    <button class="history-button" type="button" (click)="openHistory()">
+                            <span class="material-symbols-outlined"
+                                    aria-hidden="true">history</span>
+                        <span>Xem lịch sử lần thi</span>
+                    </button>
+                    <a class="start-button" [routerLink]="['/quiz', quizId(), 'attempt']">
+                        <span>Bắt đầu làm bài</span>
+                        <span class="material-symbols-outlined" aria-hidden="true">
+                                arrow_forward
+                            </span>
+                    </a>
+                </div>
+            </section>
+        </ng-template>
         <div class="quiz-details__layout">
-            <section class="quiz-details__content" aria-labelledby="quiz-title">
+            <div class="quiz-details__content">
                 <article class="overview-card">
                     <span class="overview-card__glow" aria-hidden="true"></span>
-                    <div class="topic-badge">
-                        <span class="material-symbols-outlined" aria-hidden="true">code</span>
-                        <span>{{ categoryLabel() }}</span>
+                    <div class="overview-card__top">
+                        @if (imageUrl(); as imgUrl) {
+                            <div class="course-thumb">
+                                <img [src]="imgUrl" [alt]="title()" class="course-thumb__img"
+                                        loading="eager"/>
+                                <div class="course-thumb__shine" aria-hidden="true"></div>
+                            </div>
+                        }
+                        <div class="overview-card__heading">
+                            <div class="topic-badge">
+                                <span class="material-symbols-outlined"
+                                        aria-hidden="true">code</span>
+                                <span>{{ categoryLabel() }}</span>
+                            </div>
+                            <h1 id="quiz-title">{{ title() }}</h1>
+                        </div>
                     </div>
-                    <h1 id="quiz-title">{{ title() }}</h1>
                     <p class="overview-card__description">{{ description() }}</p>
                     <dl class="metrics-grid">
                         @for (metric of metrics(); track metric.label) {
@@ -130,6 +172,11 @@
                         }
                     </dl>
                 </article>
+
+                <div class="quiz-details__actions--mobile">
+                    <ng-container
+                            *ngTemplateOutlet="quizActions; context: {titleId: 'cta-title-mobile'}"/>
+                </div>
 
                 @if (topics().length > 0) {
                     <section class="topics-card" aria-labelledby="topics-title">
@@ -160,36 +207,12 @@
                     <p class="topics-card">Thông tin chủ đề của quiz này chưa được cung cấp.</p>
                 }
 
-                <section class="cta-card" aria-labelledby="cta-title">
-                    <span class="cta-card__glow" aria-hidden="true"></span>
-                    <div class="cta-card__copy">
-                        <span
-                                class="cta-card__icon material-symbols-outlined"
-                                aria-hidden="true"
-                        >
-                            play_circle
-                        </span>
-                        <div>
-                            <h2 id="cta-title">Sẵn sàng thử thách năng lực?</h2>
-                            <p>Hệ thống sẽ lưu vết kết quả vào hồ sơ học tập của bạn.</p>
-                        </div>
-                    </div>
-                    <div class="cta-card__actions">
-                        <button class="history-button" type="button" (click)="openHistory()">
-                            <span class="material-symbols-outlined" aria-hidden="true">history</span>
-                            <span>Xem lịch sử lần thi</span>
-                        </button>
-                        <a class="start-button" [routerLink]="['/quiz', quizId(), 'attempt']">
-                            <span>Bắt đầu làm bài</span>
-                            <span class="material-symbols-outlined" aria-hidden="true">
-                                arrow_forward
-                            </span>
-                        </a>
-                    </div>
-                </section>
-            </section>
-
-            <aside class="quiz-details__sidebar" aria-label="Quy chế và cấu trúc bài thi">
+            </div>
+            <aside class="quiz-details__sidebar" aria-label="Bắt đầu và thông tin bài thi">
+                <div class="quiz-details__actions--desktop">
+                    <ng-container
+                            *ngTemplateOutlet="quizActions; context: {titleId: 'cta-title-desktop'}"/>
+                </div>
                 <section class="guidelines-card" aria-labelledby="guidelines-title">
                     <div class="guidelines-card__heading">
                         <span class="material-symbols-outlined" aria-hidden="true">
@@ -248,7 +271,8 @@
 </footer>
 
 @if (historyDialogOpen()) {
-    <dialog id="attempt-history" class="details-dialog" open aria-labelledby="history-title">
+    <dialog id="attempt-history" class="details-dialog" appModal (modalDismissed)="closeHistory()"
+            aria-labelledby="history-title">
         <span class="details-dialog__icon material-symbols-outlined" aria-hidden="true">
             history
         </span>
@@ -262,6 +286,23 @@
         } @else if (history().length === 0) {
             <p>Bạn chưa có lần thi nào cho quiz này.</p>
         } @else {
+            <div class="history-chart" aria-label="Biểu đồ điểm số">
+                <div class="history-chart__bars">
+                    @for (attempt of history(); track attempt.id) {
+                        <div class="history-chart__col">
+                            <span class="history-chart__val">{{ attempt.score }}%</span>
+                            <div class="history-chart__bar-wrap">
+                                <div
+                                        class="history-chart__bar"
+                                        [style.height.%]="attempt.score"
+                                        [class.history-chart__bar--passed]="attempt.score >= 80"
+                                ></div>
+                            </div>
+                            <span class="history-chart__idx">Lần {{ history().length - $index }}</span>
+                        </div>
+                    }
+                </div>
+            </div>
             <ul class="history-list">
                 @for (attempt of history(); track attempt.id) {
                     <li>
@@ -273,25 +314,14 @@
         }
         <button type="button" autofocus (click)="closeHistory()">Đã hiểu</button>
     </dialog>
-    <button
-            class="dialog-backdrop"
-            type="button"
-            aria-label="Đóng lịch sử lần thi"
-            (click)="closeHistory()"
-    ></button>
 }
 
 @if (activeInfo(); as info) {
-    <dialog class="details-dialog" open aria-labelledby="info-title">
+    <dialog class="details-dialog" appModal (modalDismissed)="closeInfo()"
+            aria-labelledby="info-title">
         <span class="details-dialog__icon material-symbols-outlined" aria-hidden="true">info</span>
         <h2 id="info-title">{{ info.title }}</h2>
         <p>{{ info.message }}</p>
         <button type="button" autofocus (click)="closeInfo()">Đã hiểu</button>
     </dialog>
-    <button
-            class="dialog-backdrop"
-            type="button"
-            aria-label="Đóng thông tin"
-            (click)="closeInfo()"
-    ></button>
 }

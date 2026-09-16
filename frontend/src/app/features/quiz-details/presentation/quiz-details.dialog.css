@@ -1,26 +1,40 @@
-﻿.dialog-backdrop {
-    @apply fixed inset-0 z-40 h-full w-full cursor-default border-0 bg-[#000f21]/50;
+﻿.details-dialog::backdrop {
+    backdrop-filter: blur(8px);
+    background: rgba(23, 32, 51, 0.2);
 }
 
 .details-dialog {
-    @apply fixed inset-0 z-50 m-auto w-[calc(100%-2rem)] max-w-md rounded-xl border border-[#dce9ff] bg-white p-6 text-center text-[#0d3459] shadow-card;
+    border-radius: var(--glass-radius);
+    border: 1px solid var(--glass-border);
+    background: var(--glass-raised);
+    backdrop-filter: var(--glass-filter);
+    -webkit-backdrop-filter: var(--glass-filter);
+    color: var(--ink);
+    box-shadow: var(--glass-shadow);
+    @apply fixed inset-0 z-50 m-auto w-[calc(100%-2rem)] max-w-md p-6 text-center;
 }
 
 .details-dialog__icon {
-    @apply mx-auto flex size-12 items-center justify-center rounded-full bg-[#eff4ff] text-2xl text-[#4a4bd7];
+    border: 1px solid var(--glass-border);
+    background: var(--brand-soft);
+    color: var(--brand);
+    @apply mx-auto flex size-12 items-center justify-center rounded-full text-2xl shadow-sm;
 }
 
 .details-dialog h2 {
-    @apply mb-0 mt-4 text-xl font-bold;
+    @apply mb-0 mt-4 text-xl font-bold text-ink;
 }
 
 .details-dialog p {
-    @apply mb-0 mt-3 text-sm leading-6 text-[#4e626d];
+    @apply mb-0 mt-3 text-sm leading-6 text-muted;
 }
 
 .details-dialog > button,
 .details-dialog > a {
-    @apply mt-6 min-h-11 w-full rounded-lg bg-[#4a4bd7] px-4 text-sm font-semibold text-white hover:bg-[#3d3dcb];
+    background: var(--brand-gradient);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    @apply mt-6 min-h-11 w-full rounded-xl px-4 text-sm font-semibold text-on-brand transition-all hover:opacity-95;
 }
 
 .details-dialog > a {
@@ -32,9 +46,47 @@
 }
 
 .history-list li {
-    @apply flex items-center justify-between gap-3 rounded-lg bg-[#eff4ff] px-4 py-3 text-sm;
+    border: 1px solid var(--glass-border);
+    background: var(--glass-inset);
+    color: var(--ink);
+    @apply flex items-center justify-between gap-3 rounded-xl px-4 py-3 text-sm;
 }
 
 .history-list span {
-    @apply text-xs text-[#4e626d];
+    @apply text-xs text-muted;
+}
+
+.history-chart__bars {
+    display: flex;
+    gap: 12px;
+    overflow-x: auto;
+    padding: 20px 4px;
+}
+
+.history-chart__col {
+    flex: 0 0 48px;
+    font-size: 12px;
+}
+
+.history-chart__bar-wrap {
+    height: 96px;
+    display: flex;
+    align-items: end;
+    margin: 8px 0;
+    background: var(--brand-soft);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.history-chart__bar {
+    width: 100%;
+    background: var(--brand-gradient);
+}
+
+.history-chart__bar--passed {
+    background: var(--success);
+}
+
+.history-list li {
+    flex-wrap: wrap;
 }

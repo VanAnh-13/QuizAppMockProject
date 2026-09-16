@@ -6,7 +6,6 @@ import {SiteHeaderComponent} from '../../../shared/ui/site-header/site-header.co
 import {quizCatalogProvider} from '../infrastructure/quiz-catalog.provider';
 import {QuizSummary} from '../domain/quiz-summary';
 import {QuizExploreStore} from './quiz-explore.store';
-import {LearningIllustrationComponent} from './learning-illustration/learning-illustration.component';
 import {QuizCardComponent} from './quiz-card/quiz-card.component';
 
 @Component({
@@ -15,7 +14,6 @@ import {QuizCardComponent} from './quiz-card/quiz-card.component';
         ReactiveFormsModule,
         SiteFooterComponent,
         SiteHeaderComponent,
-        LearningIllustrationComponent,
         QuizCardComponent,
     ],
     providers: [quizCatalogProvider, QuizExploreStore],

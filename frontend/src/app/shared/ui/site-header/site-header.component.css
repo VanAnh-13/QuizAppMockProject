@@ -1,13 +1,24 @@
 :host {
-    @apply sticky top-0 z-40 block;
+    @apply sticky top-4 z-40 block;
+    width: calc(100% - 32px);
+    max-width: var(--page-width);
+    margin: 16px auto 0;
+    border: 1px solid var(--glass-border);
+    border-radius: var(--glass-radius);
+
 }
 
 .header {
-    @apply border-b border-border bg-surface shadow-subtle;
+    border-radius: var(--glass-radius);
+    background: var(--glass-raised);
+    backdrop-filter: var(--glass-filter);
+    -webkit-backdrop-filter: var(--glass-filter);
+    border-bottom: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
 }
 
 .header__inner {
-    @apply mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-4;
+    @apply mx-auto flex h-16 w-full max-w-[1200px] items-center justify-between px-4;
 }
 
 .header__leading,
@@ -34,7 +45,7 @@
 
 .header__navigation-link:hover,
 .header__navigation-link--active {
-    @apply text-brand;
+    color: var(--ink);
 }
 
 .header__navigation-link--active {
@@ -42,7 +53,8 @@
 }
 
 .header__navigation-link--active::after {
-    @apply bg-brand;
+    background: #a855f7;
+    box-shadow: var(--glass-shadow);
 }
 
 .header__actions {
@@ -59,11 +71,23 @@
 }
 
 .header__action--text {
-    @apply bg-transparent text-muted;
+    @apply bg-transparent text-muted transition-colors;
+}
+
+.header__action--text:hover {
+    color: var(--ink);
 }
 
 .header__action--primary {
-    @apply bg-gradient-to-r from-brand to-brand-accent px-5 text-on-brand shadow-subtle;
+    background: var(--brand-gradient);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    @apply px-5 text-on-brand transition-all;
+}
+
+.header__action--primary:hover {
+    box-shadow: var(--glass-shadow);
+    transform: translateY(-1px);
 }
 
 .header__mobile-menu {
@@ -83,7 +107,17 @@
 }
 
 .header__mobile-panel {
-    @apply absolute top-[50px] right-0 w-[min(280px,calc(100vw-32px))] rounded-card border border-border bg-surface p-2 shadow-card;
+    position: absolute;
+    top: 50px;
+    right: 0;
+    width: min(280px, calc(100vw - 32px));
+    border-radius: 1rem;
+    border: 1px solid var(--glass-border);
+    background: var(--glass-raised);
+    backdrop-filter: var(--glass-filter);
+    -webkit-backdrop-filter: var(--glass-filter);
+    padding: 0.5rem;
+    box-shadow: var(--glass-shadow);
 }
 
 .header__mobile-panel nav,
@@ -92,21 +126,25 @@
 }
 
 .header__mobile-panel a,
+.header__mobile-panel nav button,
 .header__mobile-actions button {
-    @apply flex min-h-11 w-full items-center rounded-control border-0 bg-transparent px-3 text-sm font-medium text-ink no-underline;
+    @apply flex min-h-11 w-full items-center rounded-control border-0 bg-transparent px-3 text-sm font-medium text-ink no-underline transition-colors;
 }
 
 .header__mobile-panel a:hover,
 .header__mobile-link--active {
-    @apply bg-brand-soft text-brand-strong;
+    background: var(--glass-surface);
+    color: var(--ink);
 }
 
 .header__mobile-actions {
     @apply mt-2 border-t border-border-soft pt-2;
 }
 
-.header__mobile-primary {
-    @apply bg-gradient-to-r from-brand to-brand-accent text-on-brand;
+.header__mobile-actions .header__mobile-primary {
+    background: var(--brand-gradient);
+    border: 1px solid var(--glass-border);
+    @apply text-on-brand;
 }
 
 .header__navigation-link:focus-visible,
@@ -114,10 +152,10 @@
 .header__mobile-menu summary:focus-visible,
 .header__mobile-panel a:focus-visible,
 .header__mobile-actions button:focus-visible {
-    @apply outline-none ring-2 ring-brand ring-offset-2;
+    @apply outline-none ring-2 ring-brand ring-offset-2 ring-offset-canvas;
 }
 
-@media (min-width: 40rem) {
+@media (min-width: 64rem) {
     .header__inner {
         @apply px-5;
     }

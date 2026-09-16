@@ -1,49 +1,6 @@
-@if (registering) {
-    <app-site-header [returnAfterAuth]="returnUrl"/>
-}
+<app-site-header [returnAfterAuth]="returnUrl"/>
 
 <main class="auth-layout" [class.auth-layout--register]="registering">
-    @if (!registering) {
-        <section class="welcome" aria-labelledby="welcome-title">
-            <a class="welcome__brand" routerLink="/" aria-label="QuizApp — Trang chủ">
-                <span class="welcome__logo" aria-hidden="true">&gt;_</span>
-                QuizApp
-            </a>
-            <div class="welcome__content">
-                <span class="welcome__eyebrow">MỖI CÂU HỎI, MỘT BƯỚC TIẾN</span>
-                <h1 id="welcome-title">Học lập trình.<br/> Kiểm tra kiến thức.<br/> Vươn xa hơn.
-                </h1>
-                <p class="welcome__intro">
-                    Củng cố tư duy, làm chủ công nghệ và tự tin hơn mỗi ngày với những bài quiz
-                    dành cho người yêu lập trình.
-                </p>
-                <div class="code-card" aria-hidden="true">
-                    <div class="code-card__bar">
-                        <i></i><i></i><i></i><span>your-next-challenge.ts</span></div>
-                    <div class="code-card__body">
-                        <span class="code-card__line">01 <b>const</b> developer = &#123;</span>
-                        <span class="code-card__line">02 &nbsp; curiosity: <em>'không giới hạn'</em>,</span>
-                        <span class="code-card__line">03 &nbsp; progress: <em>'mỗi ngày'</em></span>
-                        <span class="code-card__line">04 &#125;;</span>
-                    </div>
-                    <div class="code-card__footer"><span>✓</span> Sẵn sàng cho thử thách tiếp theo
-                    </div>
-                </div>
-                <ul class="benefits">
-                    @for (benefit of benefits; track benefit.title) {
-                        <li>
-                            <span class="benefits__icon material-symbols-outlined"
-                                    aria-hidden="true">{{ benefit.icon }}</span>
-                            <div><h2>{{ benefit.title }}</h2>
-                                <p>{{ benefit.description }}</p></div>
-                        </li>
-                    }
-                </ul>
-            </div>
-            <p class="welcome__copyright">© {{ year }} QuizApp. Học mỗi ngày, vững từng bước.</p>
-        </section>
-    }
-
     <section class="form-panel" aria-labelledby="auth-title">
         @if (!registering) {
             <button class="support-link" type="button" (click)="information.open('contact')">
@@ -59,7 +16,7 @@
                 @if (registering) {
                     <h1 id="auth-title">Tạo tài khoản QuizApp</h1>
                 } @else {
-                    <h2 id="auth-title">Đăng nhập</h2>
+                    <h1 id="auth-title">Đăng nhập</h1>
                 }
                 <p>{{ registering ? 'Tham gia cộng đồng rèn luyện kiến thức lập trình' : 'Tiếp tục hành trình học tập của bạn' }}</p>
             </div>

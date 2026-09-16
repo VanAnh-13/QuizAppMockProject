@@ -33,6 +33,11 @@
                 <span aria-hidden="true"></span>
             </summary>
             <div class="header__mobile-panel">
+                <nav aria-label="Điều hướng di động">
+                    <a routerLink="/" fragment="quiz-list">Khám phá quiz</a>
+                    <button type="button" (click)="information.open('about')">Giới thiệu</button>
+                    <button type="button" (click)="information.open('contact')">Liên hệ</button>
+                </nav>
                 <div class="header__mobile-actions">
                     @if (session.user(); as user) {
                         <span>{{ user.fullName || user.username }}</span>

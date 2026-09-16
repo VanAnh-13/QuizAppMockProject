@@ -1,21 +1,28 @@
-﻿.attempt-sidebar {
-    @apply flex flex-col gap-5 lg:sticky lg:top-28 lg:col-span-4;
+.attempt-sidebar {
+    @apply flex flex-col gap-5 lg:sticky lg:top-28;
 }
 
 .palette-card {
-    @apply flex flex-col gap-5 rounded-card border border-[#b7cceb] bg-white p-5 shadow-subtle md:p-6;
+    border-radius: var(--glass-radius);
+    border: 1px solid var(--glass-border);
+    background: var(--glass-surface);
+    backdrop-filter: var(--glass-filter);
+    -webkit-backdrop-filter: var(--glass-filter);
+    box-shadow: var(--glass-shadow);
+    @apply flex flex-col gap-5 p-5 md:p-6;
 }
 
 .palette-card__heading {
-    @apply flex items-center justify-between border-b border-[#c2d5f0] pb-4;
+    border-bottom: 1px solid var(--glass-border);
+    @apply flex items-center justify-between pb-4;
 }
 
 .palette-card__heading h2 {
-    @apply m-0 text-sm font-bold;
+    @apply m-0 text-sm font-bold text-ink;
 }
 
 .palette-card__heading p {
-    @apply mb-0 mt-1 text-xs text-[#4e626d];
+    @apply mb-0 mt-1 text-xs text-muted;
 }
 
 .question-palette {
@@ -23,15 +30,24 @@
 }
 
 .question-palette button {
-    @apply relative flex h-11 items-center justify-center gap-1 rounded-control border border-[#94b4e0] bg-white text-xs font-medium hover:bg-[#e5eeff];
+    border: 1px solid var(--glass-border);
+    background: var(--glass-inset);
+    color: var(--ink);
+    @apply relative flex h-11 items-center justify-center gap-1 rounded-xl text-xs font-semibold transition-all duration-200 hover:border-white/30 hover:bg-[var(--glass-hover)];
 }
 
 .question-palette .question-palette__button--answered {
-    @apply border-[#4a4bd7] bg-[#4a4bd7] text-white;
+    background: var(--brand-gradient);
+    border-color: var(--on-brand);
+    color: var(--on-brand);
+    box-shadow: var(--glass-shadow);
 }
 
 .question-palette .question-palette__button--current {
-    @apply border-2 border-[#4a4bd7] bg-[#e5eeff] text-sm font-bold text-[#4a4bd7] ring-2 ring-[#4a4bd7]/20;
+    border: 2px solid var(--brand);
+    background: var(--brand-soft);
+    color: var(--ink);
+    box-shadow: var(--glass-shadow);
 }
 
 .question-palette button > .material-symbols-outlined {
@@ -39,11 +55,12 @@
 }
 
 .question-palette__bookmark {
-    @apply absolute -right-1 -top-1 rounded-full bg-amber-400 p-0.5 text-[10px] text-white;
+    @apply absolute -right-1 -top-1 rounded-full bg-amber-400 p-0.5 text-[10px] text-ink;
 }
 
 .palette-legend {
-    @apply grid grid-cols-1 gap-2 border-t border-[#c2d5f0] pt-4 text-[11px] text-[#4e626d] sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-3;
+    border-top: 1px solid var(--glass-border);
+    @apply grid grid-cols-1 gap-2 pt-4 text-[11px] text-muted sm:grid-cols-3 lg:grid-cols-1;
 }
 
 .palette-legend span {
@@ -55,35 +72,45 @@
 }
 
 .palette-legend__answered {
-    @apply bg-[#4a4bd7];
+    background: var(--brand-gradient);
 }
 
 .palette-legend__current {
-    @apply border-2 border-[#4a4bd7] bg-[#e5eeff];
+    border: 2px solid var(--brand);
+    background: var(--brand-soft);
 }
 
 .palette-legend__empty {
-    @apply border border-[#5d7da6];
+    border: 1px solid var(--glass-border);
+    background: var(--glass-inset);
 }
 
 .submission {
-    @apply border-t border-[#c2d5f0] pt-5;
+    border-top: 1px solid var(--glass-border);
+    @apply pt-5;
 }
 
 .submit-button {
-    @apply flex min-h-12 w-full items-center justify-center gap-2 rounded-control px-4 text-sm font-bold;
+    background: var(--brand-gradient);
+    border: 1px solid var(--glass-border);
+    color: var(--on-brand);
+    box-shadow: var(--glass-shadow);
+    @apply flex min-h-12 w-full items-center justify-center gap-2 rounded-xl px-4 text-sm font-bold transition-all hover:brightness-110 active:scale-[0.98];
 }
 
 .submission p {
-    @apply mb-0 mt-3 text-center text-[11px] leading-5 text-[#4e626d];
+    @apply mb-0 mt-3 text-center text-[11px] leading-5 text-muted;
 }
 
 .keyboard-tip {
-    @apply flex items-center gap-3 rounded-card border border-[#c2d5f0] bg-[#e5eeff] p-3.5 text-[#4e626d];
+    border: 1px solid var(--glass-border);
+    background: var(--glass-inset);
+    color: var(--ink);
+    @apply flex items-center gap-3 rounded-2xl p-3.5 backdrop-blur-md;
 }
 
 .keyboard-tip > span {
-    @apply text-xl text-[#4a4bd7];
+    @apply text-xl text-brand-accent;
 }
 
 .keyboard-tip p {
@@ -91,5 +118,8 @@
 }
 
 kbd {
-    @apply rounded border border-[#94b4e0] bg-white px-1.5 py-0.5 font-mono text-[10px] text-[#0d3459];
+    border: 1px solid var(--glass-border);
+    background: var(--glass-inset);
+    color: var(--ink);
+    @apply rounded px-1.5 py-0.5 font-mono text-[10px];
 }

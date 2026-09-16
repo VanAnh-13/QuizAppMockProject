@@ -13,7 +13,22 @@ describe('QuizDetailsPage', () => {
     const load = vi.fn();
     const history = vi.fn();
 
+    const originalShowModal = Object.getOwnPropertyDescriptor(HTMLDialogElement.prototype, 'showModal');
+    const originalClose = Object.getOwnPropertyDescriptor(HTMLDialogElement.prototype, 'close');
+
     beforeEach(async () => {
+        Object.defineProperty(HTMLDialogElement.prototype, 'showModal', {
+            configurable: true,
+            value: vi.fn(function (this: HTMLDialogElement) {
+                this.setAttribute('open', '');
+            }),
+        });
+        Object.defineProperty(HTMLDialogElement.prototype, 'close', {
+            configurable: true,
+            value: vi.fn(function (this: HTMLDialogElement) {
+                this.removeAttribute('open');
+            }),
+        });
         sessionStorage.clear();
         load.mockReset();
         history.mockReset();
@@ -62,8 +77,13 @@ describe('QuizDetailsPage', () => {
     }
 
     afterEach(() => {
+        TestBed.resetTestingModule();
         sessionStorage.clear();
         vi.restoreAllMocks();
+        if (originalShowModal) Object.defineProperty(HTMLDialogElement.prototype, 'showModal', originalShowModal);
+        else Reflect.deleteProperty(HTMLDialogElement.prototype, 'showModal');
+        if (originalClose) Object.defineProperty(HTMLDialogElement.prototype, 'close', originalClose);
+        else Reflect.deleteProperty(HTMLDialogElement.prototype, 'close');
     });
 
     it('shows working login and registration controls for anonymous visitors', async () => {
@@ -82,12 +102,12 @@ describe('QuizDetailsPage', () => {
         expect(history).not.toHaveBeenCalled();
     });
 
-    it('sends anonymous history visitors to the login page without requesting protected history', async () => {
+    it.each(['mobile', 'desktop'])('sends anonymous %s history visitors to login without requesting protected history', async (layout) => {
         const navigate = vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
         const fixture = await createFixture();
         const element = fixture.nativeElement as HTMLElement;
 
-        element.querySelector<HTMLButtonElement>('.history-button')!.click();
+        element.querySelector<HTMLButtonElement>(`.quiz-details__actions--${layout} .history-button`)!.click();
         await fixture.whenStable();
 
         expect(navigate).toHaveBeenCalledWith(['/login'], {queryParams: {returnUrl: `/quiz/${quizId}`}});
@@ -183,7 +203,7 @@ describe('QuizDetailsPage', () => {
         expect(element.textContent).not.toContain('Thông tin chủ đề của quiz này chưa được cung cấp.');
     });
 
-    it('loads the signed-in user history for the current quiz', async () => {
+    it.each(['mobile', 'desktop'])('loads signed-in history from the %s actions', async (layout) => {
         TestBed.inject(AuthSession).set({
             token: 'test-token',
             expiresAt: new Date(Date.now() + 60_000).toISOString(),
@@ -192,12 +212,28 @@ describe('QuizDetailsPage', () => {
         const fixture = await createFixture();
         const element = fixture.nativeElement as HTMLElement;
 
-        element.querySelector<HTMLButtonElement>('.history-button')!.click();
+        element.querySelector<HTMLButtonElement>(`.quiz-details__actions--${layout} .history-button`)!.click();
         await fixture.whenStable();
         fixture.detectChanges();
 
         expect(history).toHaveBeenCalledWith(quizId);
         expect(element.querySelector('.history-list')?.textContent).toContain('80 / 100');
+    });
+
+    it('gives responsive actions unique accessible headings and the same quiz destination', async () => {
+        const fixture = await createFixture();
+        const element = fixture.nativeElement as HTMLElement;
+        const actions = [...element.querySelectorAll<HTMLElement>('.cta-card')];
+        const headingIds = actions.map((action) => action.getAttribute('aria-labelledby'));
+
+        expect(actions).toHaveLength(2);
+        expect(new Set(headingIds).size).toBe(actions.length);
+        for (const action of actions) {
+            const headingId = action.getAttribute('aria-labelledby');
+            expect(action.querySelector('h2')?.id).toBe(headingId);
+            expect(action.querySelector('h2')?.textContent).toContain('Sẵn sàng thử thách năng lực?');
+            expect(action.querySelector('a')?.getAttribute('href')).toBe(`/quiz/${quizId}/attempt`);
+        }
     });
 
     it('links an expired history session to the full login page', async () => {
@@ -217,5 +253,47 @@ describe('QuizDetailsPage', () => {
         expect(element.querySelector('#attempt-history a')?.getAttribute('href')).toBe(
             `/login?returnUrl=${encodeURIComponent(`/quiz/${quizId}`)}`,
         );
+    });
+    it('renders the sidebar after the content column in DOM order for correct mobile stacking', async () => {
+        const fixture = await createFixture();
+        const element = fixture.nativeElement as HTMLElement;
+        const content = element.querySelector('.quiz-details__content')!;
+        const sidebar = element.querySelector('.quiz-details__sidebar')!;
+
+        expect(content).not.toBeNull();
+        expect(sidebar).not.toBeNull();
+        // sidebar must follow content in DOM so that mobile (single-column) order is:
+        // overview → CTA → topics → guidelines → format
+        const position = content.compareDocumentPosition(sidebar);
+        expect(position & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    });
+
+    it('places guidelines-card after the CTA wrapper in sidebar DOM order', async () => {
+        const fixture = await createFixture();
+        const element = fixture.nativeElement as HTMLElement;
+        const sidebar = element.querySelector('.quiz-details__sidebar')!;
+        const ctaWrapper = sidebar.querySelector('.quiz-details__actions--desktop')!;
+        const guidelines = sidebar.querySelector('.guidelines-card')!;
+        const format = sidebar.querySelector('.format-card')!;
+
+        expect(ctaWrapper).not.toBeNull();
+        expect(guidelines).not.toBeNull();
+        expect(format).not.toBeNull();
+        // guidelines must follow cta wrapper
+        expect(ctaWrapper.compareDocumentPosition(guidelines) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+        // format must follow guidelines
+        expect(guidelines.compareDocumentPosition(format) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy();
+    });
+    it('opens information as a modal and dismisses it on Escape', async () => {
+        const fixture = await createFixture();
+        const element = fixture.nativeElement as HTMLElement;
+        element.querySelector<HTMLButtonElement>('[title="Thông báo"]')!.click();
+        fixture.detectChanges();
+        const dialog = element.querySelector<HTMLDialogElement>('.details-dialog')!;
+        expect(HTMLDialogElement.prototype.showModal).toHaveBeenCalled();
+        expect(dialog.open).toBe(true);
+        dialog.dispatchEvent(new Event('cancel'));
+        fixture.detectChanges();
+        expect(element.querySelector('.details-dialog')).toBeNull();
     });
 });

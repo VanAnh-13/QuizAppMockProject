@@ -1,10 +1,11 @@
-﻿import {ChangeDetectionStrategy, Component, computed, inject, signal} from '@angular/core';
-import {DatePipe} from '@angular/common';
+import {ChangeDetectionStrategy, Component, computed, inject, signal} from '@angular/core';
+import {DatePipe, NgTemplateOutlet} from '@angular/common';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {ATTEMPT_API, AttemptResult} from '../../quiz-attempt/application/attempt-api';
 import {attemptContentProvider} from '../../quiz-attempt/infrastructure/attempt-content.provider';
 import {apiErrorMessage} from '../../../core/api/api-error';
 import {AuthSession} from '../../../core/auth/auth-session';
+import {ModalDirective} from '../../../shared/ui/dialog/modal.directive';
 import {QuizDetailsSnapshot} from '../application/quiz-details-content';
 import {QUIZ_DETAILS_CONTENT, quizDetailsContentProvider,} from '../infrastructure/quiz-details-content.provider';
 
@@ -34,7 +35,7 @@ const INFO_MESSAGES = {
 
 @Component({
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [DatePipe, RouterLink],
+    imports: [DatePipe, RouterLink, ModalDirective, NgTemplateOutlet],
     providers: [quizDetailsContentProvider, attemptContentProvider],
     selector: 'app-quiz-details-page',
     styleUrls: [
@@ -57,6 +58,7 @@ export class QuizDetailsPage {
     protected readonly quizId = signal('');
     protected readonly quizUrl = computed(() => `/quiz/${encodeURIComponent(this.quizId())}`);
     protected readonly title = signal('');
+    protected readonly imageUrl = signal<string | null>(null);
     protected readonly description = signal('');
     protected readonly categoryLabel = signal('C# / .NET');
     protected readonly metrics = signal<QuizDetailsSnapshot['metrics']>([]);
@@ -91,6 +93,7 @@ export class QuizDetailsPage {
         try {
             const snapshot = await this.content.load(quizId);
             this.title.set(snapshot.title);
+            this.imageUrl.set(snapshot.imageUrl ?? null);
             this.description.set(snapshot.description);
             this.categoryLabel.set(snapshot.categoryLabel);
             this.metrics.set(snapshot.metrics);
