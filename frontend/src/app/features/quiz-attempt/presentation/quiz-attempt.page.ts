@@ -32,6 +32,7 @@ export class QuizAttemptPage implements OnDestroy {
     private readonly submitDialog = viewChild<ElementRef<HTMLDialogElement>>('submitDialog');
     private readonly leaveDialog = viewChild<ElementRef<HTMLDialogElement>>('leaveDialog');
     private leaveResolver: ((value: boolean) => void) | null = null;
+    private destroyed = false;
     private readonly confirmation = inject(ConfirmationService);
     private readonly route = inject(ActivatedRoute);
     private readonly location = inject(Location);
@@ -51,6 +52,8 @@ export class QuizAttemptPage implements OnDestroy {
     }
 
     protected async load(): Promise<void> {
+        if (this.destroyed) return;
+
         const quizId = this.route.snapshot.paramMap.get('quizId');
 
         if (!quizId) return;
@@ -59,6 +62,8 @@ export class QuizAttemptPage implements OnDestroy {
             quizId,
             this.store.attemptId() ?? this.route.snapshot.queryParamMap.get('attemptId'),
         );
+
+        if (this.destroyed) return;
 
         if (this.store.attemptId())
             this.location.replaceState(
@@ -78,6 +83,7 @@ export class QuizAttemptPage implements OnDestroy {
             }))
         )
             return;
+        if (this.destroyed) return;
         await this.load();
     }
 
@@ -174,6 +180,8 @@ export class QuizAttemptPage implements OnDestroy {
     }
 
     ngOnDestroy(): void {
+        this.destroyed = true;
+        this.confirmation.cancel();
         clearInterval(this.timerId);
         this.subscription.unsubscribe();
         if (this.leaveResolver) {

@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute, convertToParamMap, provideRouter } from '@angular/router';
 import { of } from 'rxjs';
+import { ConfirmationService } from '../../../shared/ui/confirmation/confirmation.service';
 import { ATTEMPT_API, AttemptApi, AttemptStart } from '../application/attempt-api';
 import { QuizAttemptStore } from './quiz-attempt.store';
 import { QuizAttemptPage } from './quiz-attempt.page';
@@ -369,6 +370,30 @@ describe('QuizAttemptPage', () => {
     expect(canLeaveResult).toBe(true);
     const leaveDialog = element.querySelector<HTMLDialogElement>('#leave-confirmation');
     expect(leaveDialog?.hasAttribute('open')).toBe(false);
+  });
+
+  it('dismisses a pending reload confirmation when the page is destroyed', async () => {
+    const fixture = await createFixture();
+    const page = fixture.componentInstance as unknown as {
+      reload(): Promise<void>;
+    };
+    const store = fixture.debugElement.injector.get(QuizAttemptStore);
+    const confirmation = TestBed.inject(ConfirmationService);
+    const load = vi.spyOn(store, 'load');
+
+    store.dirty.set(true);
+    const reloadPromise = page.reload();
+    fixture.detectChanges();
+
+    expect(confirmation.request()?.title).toBe('Tải lại trạng thái?');
+
+    load.mockClear();
+    fixture.destroy();
+    confirmation.accept();
+    await reloadPromise;
+
+    expect(confirmation.request()).toBeNull();
+    expect(load).not.toHaveBeenCalled();
   });
 });
 

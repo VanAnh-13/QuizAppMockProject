@@ -3,8 +3,10 @@
     padding: 2rem;
     border: 1px solid var(--glass-border);
     border-radius: var(--glass-radius);
-    background: var(--canvas);
+    background: var(--glass-raised);
     box-shadow: var(--glass-shadow);
+    backdrop-filter: var(--glass-filter);
+    -webkit-backdrop-filter: var(--glass-filter);
     text-align: center;
 }
 
