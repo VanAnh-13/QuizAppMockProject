@@ -45,6 +45,7 @@ describe('AuthPage routes', () => {
 
     it('shows associated field errors when an empty registration is submitted', async () => {
         const {element, harness, api} = await setup('/register');
+        expect(element.querySelector('.auth-card .auth-badge')?.textContent).toContain('Nền tảng kiểm tra tri thức lập trình');
         expect(element.querySelector('h1')?.textContent).toContain('Tạo tài khoản QuizApp');
         element.querySelector<HTMLButtonElement>('button[type="submit"]')!.click();
         await harness.fixture.whenStable();

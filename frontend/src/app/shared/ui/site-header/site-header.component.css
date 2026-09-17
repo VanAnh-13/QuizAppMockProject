@@ -3,17 +3,14 @@
     width: calc(100% - 32px);
     max-width: var(--page-width);
     margin: 16px auto 0;
-    border: 1px solid var(--glass-border);
-    border-radius: var(--glass-radius);
-
 }
 
 .header {
+    border: 1px solid var(--glass-border);
     border-radius: var(--glass-radius);
     background: var(--glass-raised);
     backdrop-filter: var(--glass-filter);
     -webkit-backdrop-filter: var(--glass-filter);
-    border-bottom: 1px solid var(--glass-border);
     box-shadow: var(--glass-shadow);
 }
 

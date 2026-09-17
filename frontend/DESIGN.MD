@@ -55,17 +55,17 @@ Four tokens control surface opacity. Apply by layer depth — never repeat the s
 
 | Token             | Opacity   | Use                                                                                        |
 |-------------------|-----------|--------------------------------------------------------------------------------------------|
-| `--glass-raised`  | 30% white | sticky nav bar, modal dialogs, toast notifications                                         |
-| `--glass-surface` | 25% white | top-level page cards (overview, quiz card, CTA, auth card)                                 |
-| `--glass-inset`   | 8% white  | child elements inside a surface card (metric grid, answer option, list item, keyboard tip) |
-| `--glass-hover`   | 18% white | hover / pressed state for any inset or surface element                                     |
+| `--glass-raised`  | 20% white | sticky nav bar, modal dialogs, toast notifications                                         |
+| `--glass-surface` | 15% white | top-level page cards (overview, quiz card, CTA, auth card)                                 |
+| `--glass-inset`   | 5% white  | child elements inside a surface card (metric grid, answer option, list item, keyboard tip) |
+| `--glass-hover`   | 10% white | hover / pressed state for any inset or surface element                                     |
 
 Every glass surface must carry:
 
 ```text
 backdrop-filter: var(--glass-filter);          /* blur(20px) saturate(145%) */
 -webkit-backdrop-filter: var(--glass-filter);
-border: 1px solid var(--glass-border);         /* rgba(255,255,255,0.9) */
+border: 1px solid var(--glass-border);         /* rgba(255,255,255,0.65) */
 box-shadow: var(--glass-shadow);
 border-radius: var(--glass-radius);            /* 24px for cards; smaller for child elements */
 ```

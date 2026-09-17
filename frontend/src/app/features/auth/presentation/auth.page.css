@@ -67,7 +67,7 @@
     border: 1px solid rgba(168, 85, 247, 0.35);
     background: var(--brand-soft);
     color: var(--brand);
-    @apply mb-4 inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-[0.625rem] font-semibold backdrop-blur-sm;
+    @apply mb-4 inline-flex items-center gap-2 rounded-full px-3 py-1.5 text-[0.625rem] font-semibold;
 }
 
 fieldset {

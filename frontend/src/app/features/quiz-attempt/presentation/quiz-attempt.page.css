@@ -1,4 +1,4 @@
-﻿:host {
+:host {
     @apply relative flex min-h-dvh flex-col;
     background: transparent;
     color: var(--ink);
@@ -47,7 +47,11 @@ button {
 .exam-brand__mark {
     background: var(--brand-gradient);
     border: 1px solid var(--glass-border);
-    @apply flex size-9 items-center justify-center rounded-control text-on-brand shadow-subtle;
+    @apply flex size-9 items-center justify-center rounded-lg text-on-brand shadow-subtle;
+    font-variation-settings: 'FILL' 1,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24;
 }
 
 .exam-header__divider {

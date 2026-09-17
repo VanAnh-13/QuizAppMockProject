@@ -3,26 +3,20 @@
 }
 
 .brand {
-    @apply inline-flex min-h-11 items-center gap-2 rounded-control p-1 text-xl font-extrabold tracking-[-0.04em] text-ink no-underline;
+    @apply inline-flex min-h-11 items-center gap-2 rounded-control p-1 text-xl font-bold tracking-tight text-ink no-underline;
 }
 
 .brand__mark {
-    @apply inline-flex size-8 items-center justify-center rounded-control bg-brand text-on-brand shadow-subtle;
+    background: var(--brand-gradient);
+    border: 1px solid var(--glass-border);
+    @apply flex size-9 items-center justify-center rounded-lg text-on-brand shadow-subtle;
 }
 
-.brand__mark svg {
-    fill: none;
-    height: 27px;
-    overflow: visible;
-    stroke: currentColor;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    stroke-width: 2.2;
-    width: 27px;
-}
-
-.brand__check {
-    stroke-width: 2.5;
+.brand__mark .material-symbols-outlined {
+    font-variation-settings: 'FILL' 1,
+    'wght' 400,
+    'GRAD' 0,
+    'opsz' 24;
 }
 
 .brand:focus-visible {
