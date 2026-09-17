@@ -339,7 +339,7 @@ button {
 }
 
 .result-icon-badge {
-    border: 1px solid rgba(168, 85, 247, 0.35);
+    border: 1px solid rgba(37, 99, 235, 0.35);
     background: var(--brand-soft);
     color: var(--brand);
     @apply mb-4 flex size-16 items-center justify-center rounded-2xl shadow-inner;
@@ -384,7 +384,7 @@ button {
 }
 
 .score-status-pill {
-    border: 1px solid rgba(168, 85, 247, 0.4);
+    border: 1px solid rgba(37, 99, 235, 0.4);
     background: var(--brand-soft);
     color: var(--brand);
     @apply inline-flex items-center gap-1.5 rounded-full px-3.5 py-1 text-xs font-bold tracking-wider backdrop-blur-md;
@@ -419,7 +419,7 @@ button {
 }
 
 .breakdown-bar__fill {
-    @apply h-full rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 transition-all duration-700;
+    @apply h-full rounded-full bg-gradient-to-r from-brand to-brand-accent transition-all duration-700;
 }
 
 .breakdown-bar__fill--pass {

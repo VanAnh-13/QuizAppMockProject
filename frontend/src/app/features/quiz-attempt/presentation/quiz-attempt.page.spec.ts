@@ -204,6 +204,11 @@ describe('QuizAttemptPage', () => {
     expect(pill.classList.contains('score-status-pill--pass')).toBe(true);
     expect(element.textContent).not.toContain('CHƯA ĐẠT CHUẨN');
     expect(element.textContent).toContain('70%');
+
+    const stops = element.querySelectorAll('#scoreGaugeGradient stop');
+    expect(stops).toHaveLength(2);
+    expect(stops[0].getAttribute('stop-color')).toBe('#10b981');
+    expect(stops[1].getAttribute('stop-color')).toBe('#059669');
   });
 
   it('labels a shortfall against the quiz threshold and shows the required score', async () => {
@@ -244,5 +249,26 @@ describe('QuizAttemptPage', () => {
     expect(pill.classList.contains('score-status-pill--pass')).toBe(false);
     expect(element.querySelector('.breakdown-bar__fill--target')).toBeNull();
     expect(element.textContent).toContain('Không quy định');
+  });
+
+  it('uses the brand blue gradient for the score gauge when an attempt has not passed', async () => {
+    const fixture = await createFixture();
+    const element = fixture.nativeElement as HTMLElement;
+    const store = fixture.debugElement.injector.get(QuizAttemptStore);
+    store.result.set({
+      id: start.attemptId,
+      quizId,
+      quizTitle: start.quiz.title,
+      score: 70,
+      submittedAt: '2026-09-12T08:10:00Z',
+      passedScore: 75,
+    });
+    fixture.detectChanges();
+
+    const stops = element.querySelectorAll('#scoreGaugeGradient stop');
+    expect(stops).toHaveLength(2);
+    expect(stops[0].getAttribute('stop-color')).toBe('#1d4ed8');
+    expect(stops[1].getAttribute('stop-color')).toBe('#38bdf8');
+    expect(element.querySelector('.score-gauge__track')?.getAttribute('stroke')).toBe('#eff6ff');
   });
 });

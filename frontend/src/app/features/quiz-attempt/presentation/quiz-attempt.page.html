@@ -98,14 +98,16 @@
                         <defs>
                             <linearGradient id="scoreGaugeGradient" x1="0%" y1="0%" x2="100%"
                                     y2="100%">
+                                <!--suppress HtmlUnknownAttribute -->
                                 <stop offset="0%"
-                                        [attr.stop-color]="store.resultPassed() === true ? '#10b981' : '#6366f1'"/>
+                                        [attr.stop-color]="store.resultPassed() === true ? '#10b981' : '#1d4ed8'"/>
+                                <!--suppress HtmlUnknownAttribute -->
                                 <stop offset="100%"
-                                        [attr.stop-color]="store.resultPassed() === true ? '#059669' : '#4338ca'"/>
+                                        [attr.stop-color]="store.resultPassed() === true ? '#059669' : '#38bdf8'"/>
                             </linearGradient>
                         </defs>
                         <circle class="score-gauge__track" cx="80" cy="80" r="62" fill="none"
-                                stroke="#e0e7ff" stroke-width="12" stroke-linecap="round"/>
+                                stroke="#eff6ff" stroke-width="12" stroke-linecap="round"/>
                         <circle class="score-gauge__progress" cx="80" cy="80" r="62" fill="none"
                                 stroke="url(#scoreGaugeGradient)" stroke-width="12"
                                 stroke-linecap="round"
