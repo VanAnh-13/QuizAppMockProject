@@ -271,4 +271,14 @@ describe('QuizAttemptPage', () => {
     expect(stops[1].getAttribute('stop-color')).toBe('#38bdf8');
     expect(element.querySelector('.score-gauge__track')?.getAttribute('stroke')).toBe('#eff6ff');
   });
+
+  it('maintains identity, progress, and actions elements in order within exam header', async () => {
+    const fixture = await createFixture();
+    const element = fixture.nativeElement as HTMLElement;
+
+    const headerInner = element.querySelector('.exam-header__inner');
+    expect(headerInner).not.toBeNull();
+    const childClasses = Array.from(headerInner!.children).map(c => c.className);
+    expect(childClasses).toEqual(['exam-header__identity', 'exam-progress', 'exam-header__actions']);
+  });
 });
