@@ -11,6 +11,7 @@ import {
 } from '@angular/core';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {Location} from '@angular/common';
+import {ConfirmationService} from '../../../shared/ui/confirmation/confirmation.service';
 import {attemptContentProvider} from '../infrastructure/attempt-content.provider';
 import {ATTEMPT_CONFIG} from '../application/attempt-config';
 import {QuizAttemptStore} from './quiz-attempt.store';
@@ -31,6 +32,7 @@ export class QuizAttemptPage implements OnDestroy {
     private readonly submitDialog = viewChild<ElementRef<HTMLDialogElement>>('submitDialog');
     private readonly leaveDialog = viewChild<ElementRef<HTMLDialogElement>>('leaveDialog');
     private leaveResolver: ((value: boolean) => void) | null = null;
+    private readonly confirmation = inject(ConfirmationService);
     private readonly route = inject(ActivatedRoute);
     private readonly location = inject(Location);
     private readonly timerId = setInterval(() => this.store.tick(), inject(ATTEMPT_CONFIG).tickMs);
@@ -68,9 +70,12 @@ export class QuizAttemptPage implements OnDestroy {
     protected async reload(): Promise<void> {
         if (
             this.store.dirty() &&
-            !window.confirm(
-                'Tải lại sẽ thay đáp án chưa lưu bằng bản trên máy chủ. Bạn có muốn tiếp tục?',
-            )
+            !(await this.confirmation.confirm({
+                title: 'Tải lại trạng thái?',
+                message: 'Tải lại sẽ thay đáp án chưa lưu bằng bản trên máy chủ. Bạn có muốn tiếp tục?',
+                confirmLabel: 'Tải lại',
+                cancelLabel: 'Hủy',
+            }))
         )
             return;
         await this.load();
