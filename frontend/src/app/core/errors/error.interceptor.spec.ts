@@ -1,6 +1,7 @@
 import {HttpClient, provideHttpClient, withInterceptors} from '@angular/common/http';
 import {HttpTestingController, provideHttpClientTesting} from '@angular/common/http/testing';
 import {TestBed} from '@angular/core/testing';
+import {firstValueFrom} from 'rxjs';
 import {ErrorNotificationService} from './error-notification.service';
 import {errorInterceptor} from './error.interceptor';
 
@@ -24,11 +25,12 @@ describe('errorInterceptor', () => {
     });
 
     afterEach(() => {
+        vi.useRealTimers();
         httpMock.verify();
     });
 
     it('notifies on 500 server error', async () => {
-        const promise = http.get('/api/test').toPromise();
+        const promise = firstValueFrom(http.post('/api/test', {}));
 
         const req = httpMock.expectOne('/api/test');
         req.flush({message: 'Server Error'}, {status: 500, statusText: 'Internal Server Error'});
@@ -40,7 +42,7 @@ describe('errorInterceptor', () => {
     });
 
     it('notifies on status 0 network error', async () => {
-        const promise = http.get('/api/test').toPromise();
+        const promise = firstValueFrom(http.post('/api/test', {}));
 
         const req = httpMock.expectOne('/api/test');
         req.error(new ProgressEvent('error'), {status: 0, statusText: 'Unknown Error'});
@@ -51,8 +53,40 @@ describe('errorInterceptor', () => {
         );
     });
 
+    it('does not notify when a transient GET error succeeds on retry', async () => {
+        vi.useFakeTimers();
+        const promise = firstValueFrom(http.get('/api/test'));
+
+        httpMock
+            .expectOne('/api/test')
+            .flush({message: 'Server Error'}, {status: 500, statusText: 'Internal Server Error'});
+        await vi.advanceTimersByTimeAsync(1000);
+        httpMock.expectOne('/api/test').flush({result: 'success'});
+
+        await expect(promise).resolves.toEqual({result: 'success'});
+        expect(notificationService.show).not.toHaveBeenCalled();
+    });
+
+    it('notifies once after transient GET retries are exhausted', async () => {
+        vi.useFakeTimers();
+        const promise = firstValueFrom(http.get('/api/test'));
+        const serverError = {status: 500, statusText: 'Internal Server Error'};
+
+        httpMock.expectOne('/api/test').flush({message: 'Server Error'}, serverError);
+        await vi.advanceTimersByTimeAsync(1000);
+        httpMock.expectOne('/api/test').flush({message: 'Server Error'}, serverError);
+        await vi.advanceTimersByTimeAsync(2000);
+        httpMock.expectOne('/api/test').flush({message: 'Server Error'}, serverError);
+
+        await expect(promise).rejects.toMatchObject({status: 500});
+        expect(notificationService.show).toHaveBeenCalledTimes(1);
+        expect(notificationService.show).toHaveBeenCalledWith(
+            'Đã xảy ra lỗi phía máy chủ. Vui lòng thử lại sau.',
+        );
+    });
+
     it('does not notify on 4xx client errors', async () => {
-        const promise = http.get('/api/test').toPromise();
+        const promise = firstValueFrom(http.get('/api/test'));
 
         const req = httpMock.expectOne('/api/test');
         req.flush({message: 'Not found'}, {status: 404, statusText: 'Not Found'});

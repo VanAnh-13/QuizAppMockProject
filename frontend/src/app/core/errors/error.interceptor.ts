@@ -1,12 +1,18 @@
 import {inject} from '@angular/core';
 import {HttpErrorResponse, HttpInterceptorFn} from '@angular/common/http';
 import {catchError, throwError} from 'rxjs';
+import {retryOnTransientError} from '../api/retry';
 import {ErrorNotificationService} from './error-notification.service';
 
 export const errorInterceptor: HttpInterceptorFn = (request, next) => {
     const notifications = inject(ErrorNotificationService);
 
-    return next(request).pipe(
+    const response$ = next(request);
+    const retriedResponse$ = request.method === 'GET'
+        ? response$.pipe(retryOnTransientError())
+        : response$;
+
+    return retriedResponse$.pipe(
         catchError((error: unknown) => {
             if (error instanceof HttpErrorResponse && shouldNotify(error.status)) {
                 notifications.show(messageForStatus(error.status));
