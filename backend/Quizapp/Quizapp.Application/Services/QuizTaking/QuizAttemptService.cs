@@ -399,14 +399,19 @@ public sealed class QuizAttemptService(
 
         var page = await attempts.GetHistoryAsync(user.Id, pageNumber, pageSize, quizId, cancellationToken);
 
-        return ServiceRules.MapPage(page, attempt => new QuizAttemptDto
+        return ServiceRules.MapPage(page, attempt =>
         {
-            Id = attempt.Id,
-            QuizId = attempt.QuizId,
-            QuizTitle = AttemptQuizSnapshot.Read(attempt)
-                .Title,
-            Score = attempt.Score,
-            SubmittedAt = attempt.SubmitAt!.Value
+            var quiz = AttemptQuizSnapshot.Read(attempt);
+
+            return new QuizAttemptDto
+            {
+                Id = attempt.Id,
+                QuizId = attempt.QuizId,
+                QuizTitle = quiz.Title,
+                Score = attempt.Score,
+                SubmittedAt = attempt.SubmitAt!.Value,
+                PassedScore = quiz.PassedScore
+            };
         });
     }
 
@@ -455,6 +460,7 @@ public sealed class QuizAttemptService(
             QuizTitle = quiz.Title,
             Score = attempt.Score,
             SubmittedAt = attempt.SubmitAt!.Value,
+            PassedScore = quiz.PassedScore,
             Answers = results
         };
     }

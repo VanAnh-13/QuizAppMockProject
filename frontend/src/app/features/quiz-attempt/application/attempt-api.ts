@@ -49,6 +49,7 @@ export interface AttemptResult {
     readonly quizTitle: string;
     readonly submittedAt: string;
     readonly score: number;
+    readonly passedScore: number | null;
 }
 
 export interface AttemptApi {

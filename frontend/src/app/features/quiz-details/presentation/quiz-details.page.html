@@ -295,7 +295,7 @@
                                 <div
                                         class="history-chart__bar"
                                         [style.height.%]="attempt.score"
-                                        [class.history-chart__bar--passed]="attempt.score >= 80"
+                                        [class.history-chart__bar--passed]="attempt.passedScore !== null && attempt.score >= attempt.passedScore"
                                 ></div>
                             </div>
                             <span class="history-chart__idx">Lần {{ history().length - $index }}</span>

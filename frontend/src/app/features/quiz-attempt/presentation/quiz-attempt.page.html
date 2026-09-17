@@ -81,9 +81,9 @@
     <main class="result-view">
         <section class="api-state result-card glass-card" role="status">
             <div class="result-card__header">
-                <div class="result-icon-badge" [class.result-icon-badge--pass]="result.score >= 80">
+                <div class="result-icon-badge" [class.result-icon-badge--pass]="store.resultPassed() === true">
                     <span class="material-symbols-outlined" aria-hidden="true">
-                        {{ result.score >= 80 ? 'verified' : 'history_edu' }}
+                        {{ store.resultPassed() === null ? 'task_alt' : store.resultPassed() ? 'verified' : 'history_edu' }}
                     </span>
                 </div>
                 <h2>Đã nộp bài thành công</h2>
@@ -99,9 +99,9 @@
                             <linearGradient id="scoreGaugeGradient" x1="0%" y1="0%" x2="100%"
                                     y2="100%">
                                 <stop offset="0%"
-                                        [attr.stop-color]="result.score >= 80 ? '#10b981' : '#6366f1'"/>
+                                        [attr.stop-color]="store.resultPassed() === true ? '#10b981' : '#6366f1'"/>
                                 <stop offset="100%"
-                                        [attr.stop-color]="result.score >= 80 ? '#059669' : '#4338ca'"/>
+                                        [attr.stop-color]="store.resultPassed() === true ? '#059669' : '#4338ca'"/>
                             </linearGradient>
                         </defs>
                         <circle class="score-gauge__track" cx="80" cy="80" r="62" fill="none"
@@ -119,11 +119,11 @@
                     </div>
                 </div>
 
-                <div class="score-status-pill" [class.score-status-pill--pass]="result.score >= 80">
+                <div class="score-status-pill" [class.score-status-pill--pass]="store.resultPassed() === true">
                     <span class="material-symbols-outlined" aria-hidden="true">
-                        {{ result.score >= 80 ? 'check_circle' : 'info' }}
+                        {{ store.resultPassed() === null ? 'task_alt' : store.resultPassed() ? 'check_circle' : 'info' }}
                     </span>
-                    <span>{{ result.score >= 80 ? 'ĐẠT TIÊU CHUẨN' : 'CHƯA ĐẠT CHUẨN (CẦN ≥80%)' }}</span>
+                    <span>{{ store.resultPassed() === null ? 'KHÔNG QUY ĐỊNH ĐIỂM ĐẠT' : store.resultPassed() ? 'ĐẠT TIÊU CHUẨN' : 'CHƯA ĐẠT CHUẨN (CẦN ≥' + store.passThreshold() + '%)' }}</span>
                 </div>
             </div>
 
@@ -136,19 +136,28 @@
                     </div>
                     <div class="breakdown-bar">
                         <div class="breakdown-bar__fill" [style.width.%]="result.score"
-                                [class.breakdown-bar__fill--pass]="result.score >= 80"></div>
+                                [class.breakdown-bar__fill--pass]="store.resultPassed() === true"></div>
                     </div>
                 </div>
-                <div class="breakdown-item">
-                    <div class="breakdown-labels">
-                        <span>Mục tiêu chuẩn</span>
-                        <strong>80%</strong>
+                @if (store.passThreshold(); as threshold) {
+                    <div class="breakdown-item">
+                        <div class="breakdown-labels">
+                            <span>Mục tiêu chuẩn</span>
+                            <strong>{{ threshold }}%</strong>
+                        </div>
+                        <div class="breakdown-bar">
+                            <div class="breakdown-bar__fill breakdown-bar__fill--target"
+                                    [style.width.%]="threshold"></div>
+                        </div>
                     </div>
-                    <div class="breakdown-bar">
-                        <div class="breakdown-bar__fill breakdown-bar__fill--target"
-                                style="width: 80%;"></div>
+                } @else {
+                    <div class="breakdown-item">
+                        <div class="breakdown-labels">
+                            <span>Mục tiêu chuẩn</span>
+                            <strong>Không quy định</strong>
+                        </div>
                     </div>
-                </div>
+                }
             </div>
 
             <p class="result-score-text">

@@ -7,4 +7,5 @@ public class QuizAttemptDto
     public string QuizTitle { get; set; } = string.Empty;
     public DateTime SubmittedAt { get; set; }
     public double Score { get; set; }
+    public double? PassedScore { get; set; }
 }

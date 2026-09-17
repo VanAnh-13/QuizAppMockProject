@@ -178,9 +178,71 @@ describe('QuizAttemptPage', () => {
       quizTitle: start.quiz.title,
       score: 100,
       submittedAt: '2026-09-12T08:10:00Z',
+      passedScore: 70,
     });
     fixture.detectChanges();
 
     expect(element.querySelector<HTMLDialogElement>('#submit-confirmation')?.open).toBe(false);
+  });
+
+  it('marks a score at or above the quiz threshold as passed', async () => {
+    const fixture = await createFixture();
+    const element = fixture.nativeElement as HTMLElement;
+    const store = fixture.debugElement.injector.get(QuizAttemptStore);
+    store.result.set({
+      id: start.attemptId,
+      quizId,
+      quizTitle: start.quiz.title,
+      score: 75,
+      submittedAt: '2026-09-12T08:10:00Z',
+      passedScore: 70,
+    });
+    fixture.detectChanges();
+
+    const pill = element.querySelector('.score-status-pill')!;
+    expect(pill.textContent).toContain('ĐẠT TIÊU CHUẨN');
+    expect(pill.classList.contains('score-status-pill--pass')).toBe(true);
+    expect(element.textContent).not.toContain('CHƯA ĐẠT CHUẨN');
+    expect(element.textContent).toContain('70%');
+  });
+
+  it('labels a shortfall against the quiz threshold and shows the required score', async () => {
+    const fixture = await createFixture();
+    const element = fixture.nativeElement as HTMLElement;
+    const store = fixture.debugElement.injector.get(QuizAttemptStore);
+    store.result.set({
+      id: start.attemptId,
+      quizId,
+      quizTitle: start.quiz.title,
+      score: 70,
+      submittedAt: '2026-09-12T08:10:00Z',
+      passedScore: 75,
+    });
+    fixture.detectChanges();
+
+    const pill = element.querySelector('.score-status-pill')!;
+    expect(pill.textContent).toContain('CHƯA ĐẠT CHUẨN (CẦN ≥75%)');
+    expect(pill.classList.contains('score-status-pill--pass')).toBe(false);
+  });
+
+  it('renders a neutral result without a pass verdict when no threshold is configured', async () => {
+    const fixture = await createFixture();
+    const element = fixture.nativeElement as HTMLElement;
+    const store = fixture.debugElement.injector.get(QuizAttemptStore);
+    store.result.set({
+      id: start.attemptId,
+      quizId,
+      quizTitle: start.quiz.title,
+      score: 75,
+      submittedAt: '2026-09-12T08:10:00Z',
+      passedScore: null,
+    });
+    fixture.detectChanges();
+
+    const pill = element.querySelector('.score-status-pill')!;
+    expect(pill.textContent).toContain('KHÔNG QUY ĐỊNH ĐIỂM ĐẠT');
+    expect(pill.classList.contains('score-status-pill--pass')).toBe(false);
+    expect(element.querySelector('.breakdown-bar__fill--target')).toBeNull();
+    expect(element.textContent).toContain('Không quy định');
   });
 });

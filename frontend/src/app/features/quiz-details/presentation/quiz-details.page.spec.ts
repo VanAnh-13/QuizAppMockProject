@@ -48,6 +48,7 @@ describe('QuizDetailsPage', () => {
                 quizTitle: 'C# fundamentals',
                 submittedAt: '2026-09-12T08:00:00Z',
                 score: 80,
+                passedScore: 70,
             },
         ]);
         await TestBed.configureTestingModule({

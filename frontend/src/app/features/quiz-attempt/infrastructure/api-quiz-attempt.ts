@@ -67,5 +67,5 @@ function validateAttemptResult(result: AttemptResult): AttemptResult {
     ) {
         throw new Error('Kết quả làm bài không hợp lệ.');
     }
-    return result;
+    return {...result, passedScore: Number.isFinite(result.passedScore) ? result.passedScore : null};
 }

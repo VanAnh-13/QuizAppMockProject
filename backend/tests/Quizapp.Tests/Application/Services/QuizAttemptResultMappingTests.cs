@@ -73,6 +73,7 @@ public class QuizAttemptResultMappingTests
 
         Assert.Equal(JsonSerializer.Serialize(submitted), JsonSerializer.Serialize(reloaded));
         Assert.Equal(answered ? 100 : 0, submitted.Score);
+        Assert.Equal(quiz.PassedScore, submitted.PassedScore);
         var response = Assert.Single(submitted.Answers);
         Assert.Equal(question.Id, response.QuestionId);
         Assert.Equal("Test question", response.QuestionContent);
@@ -86,5 +87,35 @@ public class QuizAttemptResultMappingTests
         else if (answered && usesOptions)
             expectedSelections = ["First answer"];
         Assert.Equal(expectedSelections, response.SelectedAnswers.Select(answer => answer.Text));
+    }
+
+    [Fact]
+    public async Task Result_includes_the_snapshotted_passed_score()
+    {
+        using var context = new ServiceTestContext();
+        var quiz = TestEntities.Quiz();
+        quiz.IsActive = true;
+        quiz.PassedScore = 70;
+        var question = TestEntities.Question(QuestionType.SingleChoice);
+        question.IsActive = true;
+        question.Answers.Add(new Answer
+        {
+            Id = Guid.NewGuid(), QuestionId = question.Id, QuestionNavigation = question,
+            Text = "Answer", IsCorrect = true, IsActive = true
+        });
+        quiz.QuizQuestions.Add(new QuizQuestion
+        {
+            Id = Guid.NewGuid(), QuizId = quiz.Id, QuestionId = question.Id,
+            QuizNavigation = quiz, QuestionNavigation = question
+        });
+        context.Quizzes.Add(quiz);
+        var service = context.Get<IQuizAttemptService>();
+        var start = await service.StartAsync(quiz.Id);
+
+        var submitted = await service.SubmitAsync(quiz.Id, new SubmitQuizDto {AttemptId = start.AttemptId});
+        var reloaded = await service.GetResultAsync(start.AttemptId);
+
+        Assert.Equal(70, submitted.PassedScore);
+        Assert.Equal(70, reloaded.PassedScore);
     }
 }

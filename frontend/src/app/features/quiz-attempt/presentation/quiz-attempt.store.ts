@@ -58,6 +58,16 @@ export class QuizAttemptStore implements OnDestroy {
         const questionCount = this.questions().length;
         return questionCount ? (this.answeredCount() / questionCount) * 100 : 0;
     });
+    readonly passThreshold = computed(() => {
+        const threshold = this.result()?.passedScore;
+        return typeof threshold === 'number' && Number.isFinite(threshold) ? threshold : null;
+    });
+    readonly resultPassed = computed(() => {
+        const result = this.result();
+        const threshold = this.passThreshold();
+        if (!result || threshold === null) return null;
+        return result.score >= threshold;
+    });
     readonly canGoPrevious = computed(() => this.currentQuestionNumber() > 1);
     readonly canGoNext = computed(() => this.currentQuestionNumber() < this.questions().length);
     readonly canEdit = computed(() => {
