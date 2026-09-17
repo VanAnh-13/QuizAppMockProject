@@ -1,6 +1,7 @@
-﻿<app-site-header/>
+<app-site-header/>
 
 <main class="explore" id="main-content" tabindex="-1">
+
     <section class="hero" aria-labelledby="hero-title">
         <div class="hero__content">
             <p class="hero__eyebrow">
@@ -35,20 +36,39 @@
                         viewBox="0 0 24 24"
                         fill="none"
                         stroke="currentColor"
-                        stroke-width="1.8"
+                        stroke-width="2"
                         aria-hidden="true"
                 >
-                    <circle cx="10.5" cy="10.5" r="6.5"/>
-                    <path d="m16 16 5 5"/>
+                    <circle cx="11" cy="11" r="7"/>
+                    <path d="m20 20-3.5-3.5"/>
                 </svg>
                 <input
                         id="quiz-search"
                         type="search"
                         autocomplete="off"
-                        placeholder="Tìm theo chủ đề hoặc từ khóa..."
+                        placeholder="Tìm theo chủ đề, từ khóa hoặc tên bài quiz..."
                         [formControl]="searchControl"
                 />
-                <button type="submit">Tìm kiếm</button>
+                @if (searchControl.value) {
+                    <button
+                            class="search__clear"
+                            type="button"
+                            aria-label="Xóa từ khóa tìm kiếm"
+                            (click)="clearSearch()"
+                    >
+                        <svg
+                                width="18"
+                                height="18"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                aria-hidden="true"
+                        >
+                            <path d="M18 6 6 18M6 6l12 12"/>
+                        </svg>
+                    </button>
+                }
             </form>
             <p class="hero__catalog-note">
                 <svg
@@ -62,10 +82,10 @@
                 >
                     <path d="M3 5h7l2 2 2-2h7v15h-7l-2 2-2-2H3zM12 7v15"/>
                 </svg>
-                {{ store.totalCatalogCount() }} bài quiz mẫu · {{ store.categoryCount() }} chủ đề
+                {{ store.totalCatalogCount() }} bài quiz · {{ store.categoryCount() }} chủ đề
             </p>
         </div>
-        <app-learning-illustration class="hero__illustration"/>
+
     </section>
 
     <section class="filters" aria-labelledby="filter-title">
@@ -168,7 +188,7 @@
             <div class="pagination">
                 <p>
                     Hiển thị <strong>{{ store.rangeStart() }}–{{ store.rangeEnd() }}</strong> trong
-                    <strong>{{ store.totalCount() }}</strong> bài quiz mẫu
+                    <strong>{{ store.totalCount() }}</strong> bài quiz
                 </p>
                 <nav aria-label="Phân trang danh sách quiz">
                     <button

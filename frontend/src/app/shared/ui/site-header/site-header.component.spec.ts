@@ -47,6 +47,26 @@ describe('SiteHeaderComponent', () => {
         expect(clear).toHaveBeenCalledTimes(1);
         expect(emitted).toHaveBeenCalledTimes(1);
     });
+
+    it('renders user avatar menu and handles logout for signed in user', () => {
+        const {clear} = configure({id: '1', username: 'learner', fullName: 'Quiz Learner'});
+        const fixture = TestBed.createComponent(SiteHeaderComponent);
+        fixture.detectChanges();
+        const emitted = vi.fn();
+        fixture.componentInstance.sessionChanged.subscribe(emitted);
+
+        const avatar = (fixture.nativeElement as HTMLElement).querySelector('.header__avatar');
+        expect(avatar).toBeTruthy();
+
+        const logoutBtn = (fixture.nativeElement as HTMLElement).querySelector<HTMLButtonElement>(
+            '[data-testid="header-logout"]',
+        );
+        expect(logoutBtn).toBeTruthy();
+        logoutBtn!.click();
+
+        expect(clear).toHaveBeenCalledTimes(1);
+        expect(emitted).toHaveBeenCalledTimes(1);
+    });
 });
 
 function configure(user: AuthResponse['userDto'] | null) {

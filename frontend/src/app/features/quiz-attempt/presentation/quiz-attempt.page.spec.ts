@@ -178,9 +178,197 @@ describe('QuizAttemptPage', () => {
       quizTitle: start.quiz.title,
       score: 100,
       submittedAt: '2026-09-12T08:10:00Z',
+      passedScore: 70,
     });
     fixture.detectChanges();
 
     expect(element.querySelector<HTMLDialogElement>('#submit-confirmation')?.open).toBe(false);
   });
+
+  it('marks a score at or above the quiz threshold as passed', async () => {
+    const fixture = await createFixture();
+    const element = fixture.nativeElement as HTMLElement;
+    const store = fixture.debugElement.injector.get(QuizAttemptStore);
+    store.result.set({
+      id: start.attemptId,
+      quizId,
+      quizTitle: start.quiz.title,
+      score: 75,
+      submittedAt: '2026-09-12T08:10:00Z',
+      passedScore: 70,
+    });
+    fixture.detectChanges();
+
+    const pill = element.querySelector('.score-status-pill')!;
+    expect(pill.textContent).toContain('ĐẠT TIÊU CHUẨN');
+    expect(pill.classList.contains('score-status-pill--pass')).toBe(true);
+    expect(element.textContent).not.toContain('CHƯA ĐẠT CHUẨN');
+    expect(element.textContent).toContain('70%');
+
+    const stops = element.querySelectorAll('#scoreGaugeGradient stop');
+    expect(stops).toHaveLength(2);
+    expect(stops[0].getAttribute('stop-color')).toBe('#10b981');
+    expect(stops[1].getAttribute('stop-color')).toBe('#059669');
+  });
+
+  it('labels a shortfall against the quiz threshold and shows the required score', async () => {
+    const fixture = await createFixture();
+    const element = fixture.nativeElement as HTMLElement;
+    const store = fixture.debugElement.injector.get(QuizAttemptStore);
+    store.result.set({
+      id: start.attemptId,
+      quizId,
+      quizTitle: start.quiz.title,
+      score: 70,
+      submittedAt: '2026-09-12T08:10:00Z',
+      passedScore: 75,
+    });
+    fixture.detectChanges();
+
+    const pill = element.querySelector('.score-status-pill')!;
+    expect(pill.textContent).toContain('CHƯA ĐẠT CHUẨN (CẦN ≥75%)');
+    expect(pill.classList.contains('score-status-pill--pass')).toBe(false);
+  });
+
+  it('renders a neutral result without a pass verdict when no threshold is configured', async () => {
+    const fixture = await createFixture();
+    const element = fixture.nativeElement as HTMLElement;
+    const store = fixture.debugElement.injector.get(QuizAttemptStore);
+    store.result.set({
+      id: start.attemptId,
+      quizId,
+      quizTitle: start.quiz.title,
+      score: 75,
+      submittedAt: '2026-09-12T08:10:00Z',
+      passedScore: null,
+    });
+    fixture.detectChanges();
+
+    const pill = element.querySelector('.score-status-pill')!;
+    expect(pill.textContent).toContain('KHÔNG QUY ĐỊNH ĐIỂM ĐẠT');
+    expect(pill.classList.contains('score-status-pill--pass')).toBe(false);
+    expect(element.querySelector('.breakdown-bar__fill--target')).toBeNull();
+    expect(element.textContent).toContain('Không quy định');
+  });
+
+  it('uses the brand blue gradient for the score gauge when an attempt has not passed', async () => {
+    const fixture = await createFixture();
+    const element = fixture.nativeElement as HTMLElement;
+    const store = fixture.debugElement.injector.get(QuizAttemptStore);
+    store.result.set({
+      id: start.attemptId,
+      quizId,
+      quizTitle: start.quiz.title,
+      score: 70,
+      submittedAt: '2026-09-12T08:10:00Z',
+      passedScore: 75,
+    });
+    fixture.detectChanges();
+
+    const stops = element.querySelectorAll('#scoreGaugeGradient stop');
+    expect(stops).toHaveLength(2);
+    expect(stops[0].getAttribute('stop-color')).toBe('#1d4ed8');
+    expect(stops[1].getAttribute('stop-color')).toBe('#38bdf8');
+    expect(element.querySelector('.score-gauge__track')?.getAttribute('stroke')).toBe('#eff6ff');
+  });
+
+  it('maintains identity, progress, and actions elements in order within exam header', async () => {
+    const fixture = await createFixture();
+    const element = fixture.nativeElement as HTMLElement;
+
+    const headerInner = element.querySelector('.exam-header__inner');
+    expect(headerInner).not.toBeNull();
+    const childClasses = Array.from(headerInner!.children).map(c => c.className);
+    expect(childClasses).toEqual(['exam-header__identity', 'exam-progress', 'exam-header__actions']);
+  });
+
+  it('replaces next button with submit button on the last question', async () => {
+    const fixture = await createFixture();
+    const store = fixture.debugElement.injector.get(QuizAttemptStore);
+    const element = fixture.nativeElement as HTMLElement;
+
+    const question1 = store.questions()[0];
+    const question2 = { ...question1, id: '20000000-0000-0000-0000-000000000002', number: 2 };
+    store.questions.set([question1, question2]);
+    store.currentQuestionNumber.set(1);
+    fixture.detectChanges();
+
+    expect(element.querySelector('.next-button')).not.toBeNull();
+    expect(element.querySelector('.submit-button--nav')).toBeNull();
+
+    store.currentQuestionNumber.set(2);
+    fixture.detectChanges();
+
+    expect(element.querySelector('.next-button')).toBeNull();
+    const submitNavBtn = element.querySelector<HTMLButtonElement>('.submit-button--nav');
+    expect(submitNavBtn).not.toBeNull();
+    expect(submitNavBtn?.textContent).toContain('Nộp bài');
+  });
+
+  it('opens liquid glass leave dialog when canLeave() is called during an active attempt and resolves false on cancel', async () => {
+    const fixture = await createFixture();
+    const component = fixture.componentInstance;
+    const element = fixture.nativeElement as HTMLElement;
+
+    const confirmSpy = vi.spyOn(window, 'confirm');
+
+    const canLeavePromise = component.canLeave();
+    fixture.detectChanges();
+
+    const leaveDialog = element.querySelector<HTMLDialogElement>('#leave-confirmation');
+    expect(leaveDialog).not.toBeNull();
+    expect(leaveDialog?.hasAttribute('open')).toBe(true);
+    expect(confirmSpy).not.toHaveBeenCalled();
+
+    const stayButton = leaveDialog?.querySelector<HTMLButtonElement>('.btn-stay');
+    expect(stayButton).not.toBeNull();
+    stayButton?.click();
+    fixture.detectChanges();
+
+    const canLeaveResult = await canLeavePromise;
+    expect(canLeaveResult).toBe(false);
+  });
+
+  it('resolves true when user confirms leave from the liquid glass dialog', async () => {
+    const fixture = await createFixture();
+    const component = fixture.componentInstance;
+    const element = fixture.nativeElement as HTMLElement;
+
+    const canLeavePromise = component.canLeave();
+    fixture.detectChanges();
+
+    const leaveDialog = element.querySelector<HTMLDialogElement>('#leave-confirmation');
+    expect(leaveDialog?.hasAttribute('open')).toBe(true);
+
+    const leaveButton = leaveDialog?.querySelector<HTMLButtonElement>('.btn-leave');
+    expect(leaveButton).not.toBeNull();
+    leaveButton?.click();
+    fixture.detectChanges();
+
+    const canLeaveResult = await canLeavePromise;
+    expect(canLeaveResult).toBe(true);
+  });
+
+  it('allows leaving immediately without dialog when attempt is already submitted or empty', async () => {
+    const fixture = await createFixture();
+    const component = fixture.componentInstance;
+    const store = fixture.debugElement.injector.get(QuizAttemptStore);
+    const element = fixture.nativeElement as HTMLElement;
+
+    store.result.set({
+      id: start.attemptId,
+      quizId,
+      quizTitle: start.quiz.title,
+      score: 80,
+      submittedAt: '2026-09-12T08:10:00Z',
+      passedScore: 75,
+    });
+    fixture.detectChanges();
+
+    const canLeaveResult = await component.canLeave();
+    expect(canLeaveResult).toBe(true);
+    const leaveDialog = element.querySelector<HTMLDialogElement>('#leave-confirmation');
+    expect(leaveDialog?.hasAttribute('open')).toBe(false);
+  });
 });
+

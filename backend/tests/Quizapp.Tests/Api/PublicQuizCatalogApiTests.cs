@@ -19,6 +19,7 @@ public class PublicQuizCatalogApiTests
         await using var factory = new QuizappApiFactory();
         var activeQuiz = TestEntities.Quiz();
         activeQuiz.IsActive = true;
+        activeQuiz.Image = "https://images.example.com/quiz-cover.webp";
         var inactiveQuiz = TestEntities.Quiz();
         inactiveQuiz.Title = "Inactive quiz";
         inactiveQuiz.IsActive = false;
@@ -53,6 +54,7 @@ public class PublicQuizCatalogApiTests
         var item = Assert.Single(document.RootElement.GetProperty("items").EnumerateArray());
         Assert.Equal(activeQuiz.Id, item.GetProperty("id").GetGuid());
         Assert.Equal(activeQuiz.Title, item.GetProperty("title").GetString());
+        Assert.Equal(activeQuiz.Image, item.GetProperty("imageUrl").GetString());
         Assert.Equal(expectedQuestionCount, item.GetProperty("questionCount").GetInt32());
         Assert.DoesNotContain("isCorrect", payload, StringComparison.OrdinalIgnoreCase);
         Assert.DoesNotContain("password", payload, StringComparison.OrdinalIgnoreCase);

@@ -81,4 +81,21 @@ public class DtoContractTests
         Assert.DoesNotContain("Score", JsonSerializer.Serialize(new SubmitQuizDto()));
         Assert.DoesNotContain("UserId", JsonSerializer.Serialize(new SubmitQuizDto()));
     }
+
+    [Fact]
+    public void Public_quiz_summary_exposes_image_url_in_camel_case_json()
+    {
+        var summary = new PublicQuizSummaryDto
+        {
+            Id = Guid.NewGuid(),
+            Title = "Database quiz",
+            ImageUrl = "https://example.com/database-quiz.png"
+        };
+
+        var json = JsonSerializer.Serialize(summary, new JsonSerializerOptions { PropertyNamingPolicy = JsonNamingPolicy.CamelCase });
+        using var doc = JsonDocument.Parse(json);
+
+        Assert.True(doc.RootElement.TryGetProperty("imageUrl", out var property));
+        Assert.Equal("https://example.com/database-quiz.png", property.GetString());
+    }
 }

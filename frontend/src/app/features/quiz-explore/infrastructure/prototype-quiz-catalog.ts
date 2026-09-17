@@ -1,4 +1,4 @@
-﻿import {Injectable} from '@angular/core';
+import {Injectable} from '@angular/core';
 import {QuizCatalog} from '../application/quiz-catalog';
 import {QuizSummary} from '../domain/quiz-summary';
 
@@ -69,9 +69,14 @@ const quizzes: readonly QuizSummary[] = [
     },
 ];
 
+import {resolveQuizImageUrl} from '../../../core/utils/quiz-image';
+
 @Injectable()
 export class PrototypeQuizCatalog implements QuizCatalog {
     async listQuizzes(): Promise<readonly QuizSummary[]> {
-        return quizzes;
+        return quizzes.map((quiz) => ({
+            ...quiz,
+            imageUrl: resolveQuizImageUrl(quiz.title),
+        }));
     }
 }

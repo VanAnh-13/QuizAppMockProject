@@ -26,7 +26,11 @@ import {QuizAttemptStore} from './quiz-attempt.store';
 export class QuizAttemptPage implements OnDestroy {
     protected readonly store = inject(QuizAttemptStore);
     protected readonly submitDialogOpen = signal(false);
+    protected readonly leaveDialogOpen = signal(false);
+    protected readonly leaveMessage = signal('Bạn đang làm bài. Bạn có chắc muốn rời trang?');
     private readonly submitDialog = viewChild<ElementRef<HTMLDialogElement>>('submitDialog');
+    private readonly leaveDialog = viewChild<ElementRef<HTMLDialogElement>>('leaveDialog');
+    private leaveResolver: ((value: boolean) => void) | null = null;
     private readonly route = inject(ActivatedRoute);
     private readonly location = inject(Location);
     private readonly timerId = setInterval(() => this.store.tick(), inject(ATTEMPT_CONFIG).tickMs);
@@ -39,6 +43,7 @@ export class QuizAttemptPage implements OnDestroy {
             if (this.store.result()) {
                 this.submitDialog()?.nativeElement.close();
                 this.submitDialogOpen.set(false);
+                this.closeLeaveConfirmation();
             }
         });
     }
@@ -77,14 +82,100 @@ export class QuizAttemptPage implements OnDestroy {
 
     async canLeave(): Promise<boolean> {
         if (this.store.isBusy()) return false;
-        if (!this.store.dirty() && !this.store.isSaving()) return true;
-        if (await this.store.save()) return true;
-        return window.confirm('Có đáp án chưa lưu thành công. Bạn vẫn muốn rời trang?');
+
+        if (this.store.result() || !this.store.attemptId()) return true;
+
+        if (this.store.dirty() || this.store.isSaving()) {
+            if (await this.store.save()) {
+                return this.promptLeaveConfirmation('Bạn đang làm bài. Bạn có chắc muốn rời trang?');
+            }
+            return this.promptLeaveConfirmation('Có đáp án chưa lưu thành công. Bạn vẫn muốn rời trang?');
+        }
+
+        return this.promptLeaveConfirmation('Bạn đang làm bài. Bạn có chắc muốn rời trang?');
+    }
+
+    private promptLeaveConfirmation(message: string): Promise<boolean> {
+        if (this.leaveResolver) {
+            this.leaveResolver(false);
+            this.leaveResolver = null;
+        }
+
+        const dialog = this.leaveDialog()?.nativeElement;
+        if (!dialog) {
+            return Promise.resolve(false);
+        }
+
+        this.leaveMessage.set(message);
+        if (!dialog.open) {
+            dialog.showModal();
+        }
+        this.leaveDialogOpen.set(true);
+
+        return new Promise<boolean>((resolve) => {
+            this.leaveResolver = resolve;
+        });
+    }
+
+    protected confirmLeave(): void {
+        const resolver = this.leaveResolver;
+        this.leaveResolver = null;
+        this.closeLeaveConfirmation();
+        resolver?.(true);
+    }
+
+    protected cancelLeave(): void {
+        const resolver = this.leaveResolver;
+        this.leaveResolver = null;
+        this.closeLeaveConfirmation();
+        resolver?.(false);
+    }
+
+    protected cancelLeaveConfirmation(event: Event): void {
+        event.preventDefault();
+        this.cancelLeave();
+    }
+
+    protected onLeaveDialogClose(): void {
+        this.leaveDialogOpen.set(false);
+        if (this.leaveResolver) {
+            const resolver = this.leaveResolver;
+            this.leaveResolver = null;
+            resolver(false);
+        }
+    }
+
+    protected dismissLeaveBackdrop(event: MouseEvent): void {
+        const dialog = this.leaveDialog()?.nativeElement;
+        if (!dialog || event.target !== dialog) return;
+
+        const bounds = dialog.getBoundingClientRect();
+        if (
+            event.clientX < bounds.left ||
+            event.clientX > bounds.right ||
+            event.clientY < bounds.top ||
+            event.clientY > bounds.bottom
+        ) {
+            this.cancelLeave();
+        }
+    }
+
+    private closeLeaveConfirmation(): void {
+        const dialog = this.leaveDialog()?.nativeElement;
+        if (dialog?.open) {
+            dialog.close();
+        }
+        this.leaveDialogOpen.set(false);
     }
 
     ngOnDestroy(): void {
         clearInterval(this.timerId);
         this.subscription.unsubscribe();
+        if (this.leaveResolver) {
+            const resolver = this.leaveResolver;
+            this.leaveResolver = null;
+            resolver(false);
+        }
     }
 
     protected toggleOption(id: string): void {
@@ -134,7 +225,7 @@ export class QuizAttemptPage implements OnDestroy {
 
     @HostListener('window:beforeunload', ['$event'])
     protected beforeUnload(event: BeforeUnloadEvent): void {
-        if (this.store.dirty() || this.store.isSaving() || this.store.isBusy()) event.preventDefault();
+        if (this.store.attemptId() && !this.store.result()) event.preventDefault();
     }
 
     @HostListener('window:keydown', ['$event'])
@@ -143,6 +234,7 @@ export class QuizAttemptPage implements OnDestroy {
 
         if (
             this.submitDialogOpen() ||
+            this.leaveDialogOpen() ||
             event.altKey ||
             event.ctrlKey ||
             event.metaKey ||

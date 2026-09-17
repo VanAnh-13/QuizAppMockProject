@@ -1,4 +1,5 @@
-﻿import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
+import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
+import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
 import {Router} from '@angular/router';
 import {FormControl, ReactiveFormsModule} from '@angular/forms';
 import {SiteFooterComponent} from '../../../shared/ui/site-footer/site-footer.component';
@@ -6,7 +7,6 @@ import {SiteHeaderComponent} from '../../../shared/ui/site-header/site-header.co
 import {quizCatalogProvider} from '../infrastructure/quiz-catalog.provider';
 import {QuizSummary} from '../domain/quiz-summary';
 import {QuizExploreStore} from './quiz-explore.store';
-import {LearningIllustrationComponent} from './learning-illustration/learning-illustration.component';
 import {QuizCardComponent} from './quiz-card/quiz-card.component';
 
 @Component({
@@ -15,7 +15,6 @@ import {QuizCardComponent} from './quiz-card/quiz-card.component';
         ReactiveFormsModule,
         SiteFooterComponent,
         SiteHeaderComponent,
-        LearningIllustrationComponent,
         QuizCardComponent,
     ],
     providers: [quizCatalogProvider, QuizExploreStore],
@@ -28,9 +27,21 @@ export class QuizExplorePage {
     protected readonly store = inject(QuizExploreStore);
     private readonly router = inject(Router);
 
-    protected applySearch(event: Event): void {
-        event.preventDefault();
+    constructor() {
+        this.searchControl.valueChanges
+            .pipe(takeUntilDestroyed())
+            .subscribe((value) => {
+                this.store.applySearch(value);
+            });
+    }
+
+    protected applySearch(event?: Event): void {
+        event?.preventDefault();
         this.store.applySearch(this.searchControl.value);
+    }
+
+    protected clearSearch(): void {
+        this.searchControl.setValue('');
     }
 
     protected resetFilters(): void {
@@ -42,3 +53,4 @@ export class QuizExplorePage {
         void this.router.navigate(['/quiz', quiz.id]);
     }
 }
+

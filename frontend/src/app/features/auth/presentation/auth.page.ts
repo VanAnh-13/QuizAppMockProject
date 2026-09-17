@@ -15,7 +15,7 @@ import {SiteHeaderComponent} from '../../../shared/ui/site-header/site-header.co
 import {SiteInfoDialogComponent} from '../../../shared/ui/site-info-dialog/site-info-dialog.component';
 import {authReturnUrl} from '../domain/auth-contracts';
 import {AuthFormStore} from './auth-form.store';
-import {AUTH_BENEFITS, LOGIN_FIELDS, REGISTER_FIELDS} from './auth-page.config';
+import {LOGIN_FIELDS, REGISTER_FIELDS} from './auth-page.config';
 
 @Component({
     selector: 'app-auth-page',
@@ -23,7 +23,7 @@ import {AUTH_BENEFITS, LOGIN_FIELDS, REGISTER_FIELDS} from './auth-page.config';
     providers: [AuthFormStore],
     changeDetection: ChangeDetectionStrategy.OnPush,
     templateUrl: './auth.page.html',
-    styleUrls: ['./auth.welcome.css', './auth.page.css'],
+    styleUrl: './auth.page.css',
 })
 export class AuthPage {
     protected readonly store = inject(AuthFormStore);
@@ -36,7 +36,6 @@ export class AuthPage {
     protected readonly returnUrl = authReturnUrl(this.route.snapshot.queryParamMap.get('returnUrl'));
     protected readonly registered = !this.registering && this.router.currentNavigation()?.extras.state?.['registered'] === true;
     protected readonly fields = this.registering ? REGISTER_FIELDS : LOGIN_FIELDS;
-    protected readonly benefits = AUTH_BENEFITS;
     protected readonly year = new Date().getFullYear();
     protected readonly visiblePasswords = signal<ReadonlySet<string>>(new Set());
     private destroyed = false;

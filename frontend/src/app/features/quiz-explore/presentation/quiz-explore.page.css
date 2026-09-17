@@ -1,29 +1,30 @@
-﻿:host {
-    @apply flex min-h-dvh flex-col bg-canvas;
+:host {
+    @apply flex min-h-dvh flex-col;
+    background: transparent;
 }
 
 .explore {
-    @apply mx-auto w-full max-w-7xl flex-1 px-4 pb-16 pt-6;
+    @apply mx-auto w-full max-w-[1200px] flex-1 px-4 pb-16 pt-6;
 }
 
 .hero {
-    @apply mb-8 grid items-center gap-8 overflow-hidden rounded-card bg-gradient-to-br from-brand-strong to-brand-accent p-6 text-on-brand;
+    @apply mx-auto flex max-w-3xl flex-col items-center px-0 py-12 text-center sm:py-16;
 }
 
 .hero__content {
-    @apply min-w-0;
+    @apply w-full min-w-0;
 }
 
 .hero__eyebrow {
-    @apply mb-4 flex items-center gap-2 text-xs font-medium leading-5;
+    @apply mb-4 flex justify-center items-center gap-2 text-xs font-medium leading-5 text-brand;
 }
 
 .hero__eyebrow svg {
-    @apply shrink-0;
+    @apply shrink-0 text-brand-accent;
 }
 
 .hero h1 {
-    @apply m-0 text-3xl font-bold leading-tight tracking-tight;
+    @apply m-0 text-3xl font-bold leading-tight tracking-tight text-ink;
 }
 
 .hero__line-break {
@@ -31,35 +32,71 @@
 }
 
 .hero__description {
-    @apply mb-0 mt-4 max-w-xl text-sm leading-7;
+    @apply mx-auto mb-0 mt-4 max-w-xl text-sm leading-7 text-muted;
 }
 
-.hero__illustration {
-    @apply hidden;
-}
 
 .search {
-    @apply mt-6 flex w-full max-w-xl flex-col gap-2 rounded-control bg-surface p-2;
+    border-radius: 9999px;
+    border: 1px solid var(--glass-border);
+    background: var(--glass-surface);
+    backdrop-filter: var(--glass-filter);
+    -webkit-backdrop-filter: var(--glass-filter);
+    box-shadow: 0 2px 8px -2px rgba(0, 0, 0, 0.05), var(--glass-shadow);
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    @apply mx-auto mt-8 flex min-h-[52px] w-full max-w-2xl flex-row items-center gap-3 px-4 py-1.5;
+}
+
+.search:hover {
+    border-color: rgba(59, 130, 246, 0.35);
+    box-shadow: 0 4px 16px -2px rgba(0, 0, 0, 0.08), 0 2px 6px -1px rgba(0, 0, 0, 0.04), var(--glass-shadow);
+}
+
+.search:focus-within {
+    background: var(--glass-raised);
+    border-color: var(--brand);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15), 0 8px 24px -4px rgba(37, 99, 235, 0.12), var(--glass-shadow);
 }
 
 .search__icon {
-    @apply hidden shrink-0 text-muted;
+    @apply shrink-0 text-muted transition-colors;
+}
+
+.search:focus-within .search__icon {
+    color: var(--brand);
 }
 
 .search input {
-    @apply min-h-11 min-w-0 flex-1 rounded-control border border-border bg-transparent px-3 py-2 text-sm text-ink placeholder:text-muted;
+    background: transparent;
+    border: none;
+    outline: none;
+    box-shadow: none;
+    @apply min-h-[44px] min-w-0 flex-1 py-1 text-sm sm:text-base text-ink placeholder:text-muted;
 }
 
+.search input:focus,
 .search input:focus-visible {
-    @apply outline-offset-0;
+    outline: none;
+    box-shadow: none;
 }
 
-.search button {
-    @apply min-h-11 rounded-control bg-brand-strong px-5 text-sm font-semibold text-on-brand hover:bg-brand;
+.search input::-webkit-search-decoration,
+.search input::-webkit-search-cancel-button,
+.search input::-webkit-search-results-button,
+.search input::-webkit-search-results-decoration {
+    -webkit-appearance: none;
+    appearance: none;
+}
+
+.search__clear {
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    @apply flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-full p-0 transition-all hover:bg-slate-200/60 hover:text-ink dark:hover:bg-white/10;
 }
 
 .hero__catalog-note {
-    @apply mb-0 mt-4 flex items-center gap-2 text-xs leading-5;
+    @apply mb-0 mt-5 flex justify-center items-center gap-2 text-xs leading-5 text-muted;
 }
 
 .filters {
@@ -67,15 +104,26 @@
 }
 
 .filters__list {
-    @apply flex flex-wrap gap-2;
+    @apply flex flex-wrap justify-center gap-2;
 }
 
 .filters button {
-    @apply min-h-11 rounded-control border border-border bg-surface px-4 py-2 text-sm font-medium text-muted transition-colors hover:bg-brand-soft hover:text-brand-strong;
+    border-radius: 9999px;
+    border: 1px solid var(--glass-border);
+    background: var(--glass-surface);
+    backdrop-filter: var(--glass-filter);
+    -webkit-backdrop-filter: var(--glass-filter);
+    color: var(--ink);
+    box-shadow: var(--glass-shadow);
+    @apply min-h-11 px-4 py-2 text-sm font-medium transition-all hover:border-white/30 hover:bg-[var(--glass-hover)] hover:text-ink;
 }
 
 .filters .filters__button--active {
-    @apply border-brand-strong bg-brand-strong text-on-brand;
+    background: var(--brand-gradient);
+    color: var(--on-brand);
+    border-color: var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    @apply font-semibold;
 }
 
 .catalog {
@@ -107,19 +155,24 @@
 }
 
 .catalog__skeleton-card {
-    @apply min-h-72 animate-pulse rounded-card border border-border-soft bg-surface p-6 shadow-subtle;
+    border-radius: 1rem;
+    border: 1px solid var(--glass-border);
+    background: var(--glass-surface);
+    backdrop-filter: var(--glass-filter);
+    -webkit-backdrop-filter: var(--glass-filter);
+    @apply min-h-72 animate-pulse p-6 shadow-card;
 }
 
 .catalog__skeleton-heading {
-    @apply mb-6 h-5 w-24 rounded bg-border-soft;
+    @apply mb-6 h-5 w-24 rounded bg-slate-100/70;
 }
 
 .catalog__skeleton-title {
-    @apply mb-4 h-6 w-3/4 rounded bg-border;
+    @apply mb-4 h-6 w-3/4 rounded bg-slate-100/70;
 }
 
 .catalog__skeleton-line {
-    @apply mb-3 h-4 w-full rounded bg-border-soft;
+    @apply mb-3 h-4 w-full rounded bg-slate-100/70;
 }
 
 .catalog__skeleton-line--short {
@@ -127,7 +180,7 @@
 }
 
 .catalog__skeleton-footer {
-    @apply mt-10 h-11 w-full rounded-control bg-border-soft;
+    @apply mt-10 h-11 w-full rounded-control bg-slate-100/70;
 }
 
 .catalog__active-filters {
@@ -140,19 +193,24 @@
 }
 
 .catalog__active-filters button {
-    @apply flex min-h-11 items-center gap-2 rounded-control px-2 font-medium text-brand-strong hover:bg-brand-soft;
+    @apply flex min-h-11 items-center gap-2 rounded-control px-2 font-medium text-brand hover:bg-[var(--glass-hover)];
 }
 
 .catalog__empty {
-    @apply flex min-h-64 flex-col items-center justify-center rounded-card border border-dashed border-border bg-surface p-6 text-center;
+    border-radius: 1rem;
+    border: 1px dashed var(--glass-border);
+    background: var(--glass-surface);
+    backdrop-filter: var(--glass-filter);
+    -webkit-backdrop-filter: var(--glass-filter);
+    @apply flex min-h-64 flex-col items-center justify-center p-6 text-center text-ink;
 }
 
 .catalog__empty svg {
-    @apply text-brand-strong;
+    @apply text-brand-accent;
 }
 
 .catalog__empty h3 {
-    @apply mb-0 mt-4 text-lg font-semibold;
+    @apply mb-0 mt-4 text-lg font-semibold text-ink;
 }
 
 .catalog__empty p {
@@ -160,11 +218,14 @@
 }
 
 .catalog__empty button {
-    @apply mt-4 min-h-11 rounded-control border border-brand px-4 text-sm font-medium text-brand-strong hover:bg-brand-soft;
+    border: 1px solid var(--glass-border);
+    background: var(--glass-surface);
+    @apply mt-4 min-h-11 rounded-control px-4 text-sm font-medium text-ink transition-colors hover:bg-[var(--glass-hover)];
 }
 
 .pagination {
-    @apply flex flex-wrap items-center justify-between gap-4 border-t border-border pt-6;
+    border-top: 1px solid var(--glass-border);
+    @apply flex flex-wrap items-center justify-between gap-4 pt-6;
 }
 
 .pagination p {
@@ -180,40 +241,34 @@
 }
 
 .pagination button {
-    @apply flex size-11 items-center justify-center rounded-control border border-border bg-surface text-sm font-semibold text-ink;
+    border-radius: 0.5rem;
+    border: 1px solid var(--glass-border);
+    background: var(--glass-surface);
+    backdrop-filter: var(--glass-filter);
+    -webkit-backdrop-filter: var(--glass-filter);
+    color: var(--ink);
+    @apply flex size-11 items-center justify-center text-sm font-semibold transition-all;
 }
 
 .pagination button:hover:not(:disabled) {
-    @apply border-brand bg-brand-soft text-brand-strong;
+    background: var(--glass-surface);
+    border-color: var(--glass-border);
 }
 
 .pagination button:disabled {
-    @apply cursor-not-allowed text-muted opacity-50;
+    @apply cursor-not-allowed opacity-30;
 }
 
 .pagination .pagination__page--active {
-    @apply border-brand-strong bg-brand-strong text-on-brand;
-}
-
-.quiz-details__category {
-    @apply mb-3 font-semibold text-brand-strong;
-}
-
-.quiz-details__metadata {
-    @apply my-6 flex flex-wrap gap-x-10 gap-y-4 border-y border-border py-4;
-}
-
-.quiz-details__metadata dd {
-    @apply m-0 font-semibold text-ink;
-}
-
-.quiz-details__note {
-    @apply rounded-control bg-brand-soft p-4 text-ink;
+    background: var(--brand-gradient);
+    border-color: var(--on-brand);
+    color: var(--on-brand);
+    box-shadow: var(--glass-shadow);
 }
 
 @media (min-width: 24rem) {
     .explore {
-        @apply px-5;
+        @apply px-4;
     }
 }
 
@@ -222,9 +277,6 @@
         @apply pt-8;
     }
 
-    .hero {
-        @apply p-10;
-    }
 
     .hero h1 {
         @apply text-4xl;
@@ -232,18 +284,6 @@
 
     .hero__line-break {
         @apply block;
-    }
-
-    .search {
-        @apply flex-row items-center gap-2 p-1.5 pl-4;
-    }
-
-    .search__icon {
-        @apply block;
-    }
-
-    .search input {
-        @apply border-0 px-1;
     }
 }
 
@@ -258,21 +298,15 @@
         @apply px-6;
     }
 
-    .hero {
-        @apply grid-cols-[1.65fr_1fr] gap-6 p-12;
-    }
 
     .hero h1 {
-        @apply text-5xl;
+        @apply text-6xl;
     }
 
     .hero__description {
         @apply text-base;
     }
 
-    .hero__illustration {
-        @apply block;
-    }
 
     .catalog__grid {
         @apply grid-cols-3;

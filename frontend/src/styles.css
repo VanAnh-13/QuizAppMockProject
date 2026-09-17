@@ -5,14 +5,41 @@
 @layer base {
     :root {
         color-scheme: light;
+        --canvas: #f4f7fc;
+        --ink: #172033;
+        --muted: #536078;
+        --brand: #2563eb;
+        --brand-soft: #eff6ff;
+        --on-brand: #ffffff;
+        --success: #047857;
+        --warning: #92400e;
+        --error: #be123c;
+        --brand-gradient: linear-gradient(135deg, #1d4ed8, #38bdf8);
+        --glass-surface: rgba(255, 255, 255, 0.15);
+        --glass-raised: rgba(255, 255, 255, 0.20);
+        --glass-inset: rgba(255, 255, 255, 0.05);
+        --glass-hover: rgba(255, 255, 255, 0.10);
+        --glass-border: rgba(255, 255, 255, 0.65);
+        --control-border: #8794ab;
+        --glass-shadow: 0 12px 36px rgba(30, 64, 175, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.65);
+        --glass-filter: blur(20px) saturate(145%);
+        --glass-radius: 24px;
+        --page-width: 1200px;
     }
 
     html {
-        @apply scroll-smooth bg-canvas;
+        @apply scroll-smooth;
+        background: var(--canvas);
     }
 
     body {
-        @apply m-0 min-h-screen bg-canvas font-sans text-ink antialiased;
+        @apply m-0 min-h-screen font-sans antialiased;
+        background: radial-gradient(ellipse at 10% 5%, #bfdbfe 0, transparent 50%),
+        radial-gradient(ellipse at 95% 25%, #bae6fd 0, transparent 45%),
+        radial-gradient(ellipse at 50% 85%, #dbeafe 0, transparent 50%),
+        var(--canvas);
+        background-attachment: fixed;
+        color: var(--ink);
     }
 
     button,
@@ -27,7 +54,7 @@
     }
 
     ::selection {
-        @apply bg-brand-soft text-brand-strong;
+        @apply bg-brand text-white;
     }
 }
 
@@ -62,5 +89,44 @@
         animation-iteration-count: 1 !important;
         scroll-behavior: auto !important;
         transition-duration: 0.01ms !important;
+    }
+}
+
+
+.glass-card,
+.glass-pill {
+    background: var(--glass-surface);
+    border: 1px solid var(--glass-border);
+    box-shadow: var(--glass-shadow);
+    backdrop-filter: var(--glass-filter);
+    -webkit-backdrop-filter: var(--glass-filter);
+    border-radius: var(--glass-radius);
+}
+
+:where(button, a, input, textarea, summary):focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 4px;
+}
+
+:where(main, section, article, aside, form) {
+    min-width: 0;
+}
+
+:where(h1, h2, h3, p, dd) {
+    overflow-wrap: anywhere;
+}
+
+:where(dialog) {
+    max-height: calc(100dvh - 32px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    :root {
+        --glass-surface: #f0f4fc;
+        --glass-raised: #f5f8ff;
+        --glass-inset: #e8edf8;
+        --glass-hover: #dce3f2;
     }
 }

@@ -1,13 +1,3 @@
-export const AUTH_BENEFITS = [
-    {
-        icon: 'category',
-        title: 'Đa dạng chủ đề',
-        description: 'C#, .NET, SQL và Web — củng cố kiến thức theo từng chủ đề.'
-    },
-    {icon: 'speed', title: 'Kết quả tức thì', description: 'Xem điểm số và đáp án sau mỗi lần nộp bài.'},
-    {icon: 'history_edu', title: 'Lưu lịch sử', description: 'Theo dõi kết quả và tiếp tục những bài đang làm dở.'},
-] as const;
-
 export interface AuthField {
     readonly name: 'familyName' | 'givenName' | 'email' | 'username' | 'phoneNumber' | 'dateOfBirth' | 'password' | 'confirmPassword';
     readonly label: string;

@@ -28,6 +28,8 @@ describe('AuthPage routes', () => {
     it('renders an initially clean login form and toggles password visibility accessibly', async () => {
         const {element, harness, scrollToPosition} = await setup('/login');
         expect(scrollToPosition).toHaveBeenCalledWith([0, 0]);
+        expect(element.querySelectorAll('h1')).toHaveLength(1);
+        expect(element.querySelector('h1')?.textContent).toBe('Đăng nhập');
         expect(element.querySelector('[aria-invalid="true"]')).toBeNull();
         expect(element.querySelector('input[type="email"]')).toBeNull();
         const toggle = element.querySelector<HTMLButtonElement>('[aria-controls="password"]')!;
@@ -43,6 +45,7 @@ describe('AuthPage routes', () => {
 
     it('shows associated field errors when an empty registration is submitted', async () => {
         const {element, harness, api} = await setup('/register');
+        expect(element.querySelector('.auth-card .auth-badge')?.textContent).toContain('Nền tảng kiểm tra tri thức lập trình');
         expect(element.querySelector('h1')?.textContent).toContain('Tạo tài khoản QuizApp');
         element.querySelector<HTMLButtonElement>('button[type="submit"]')!.click();
         await harness.fixture.whenStable();

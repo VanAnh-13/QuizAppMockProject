@@ -3,6 +3,12 @@
 These instructions apply to everything under `frontend/`. They extend the repository-level
 `AGENTS.md`; follow both files. If the rules conflict, this file controls frontend work.
 
+## Design system
+
+Before touching any CSS, HTML, or visual component, read `frontend/DESIGN.MD`.
+It defines the **LyQuiz Glass** style and the **Blue Gradient** brand palette — the single source
+of truth for colours, glass tokens, component layers, and prohibited patterns.
+
 ## Required workflow
 
 1. Inspect the working tree and read the affected implementation and tests before editing.

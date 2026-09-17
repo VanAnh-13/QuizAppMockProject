@@ -12,43 +12,77 @@
             </button>
         </nav>
 
-        <div class="header__actions">
-            @if (session.user(); as user) {
-                <span>{{ user.fullName || user.username }}</span>
-                <button type="button" (click)="logout()">Đăng xuất</button>
-            } @else {
-                <a class="header__action header__action--text" routerLink="/login"
-                        [queryParams]="{ returnUrl: returnAfterAuth() ?? router.url }">Đăng nhập</a>
-                <a class="header__action header__action--primary" routerLink="/register"
-                        [queryParams]="{ returnUrl: returnAfterAuth() ?? router.url }">
-                    Đăng ký
-                </a>
-            }
-        </div>
-
-        <details class="header__mobile-menu">
-            <summary aria-label="Mở trình đơn tài khoản">
-                <span aria-hidden="true"></span>
-                <span aria-hidden="true"></span>
-                <span aria-hidden="true"></span>
-            </summary>
-            <div class="header__mobile-panel">
-                <div class="header__mobile-actions">
-                    @if (session.user(); as user) {
-                        <span>{{ user.fullName || user.username }}</span>
-                        <button type="button" (click)="logout()">Đăng xuất</button>
-                    } @else {
-                        <a routerLink="/login"
-                                [queryParams]="{ returnUrl: returnAfterAuth() ?? router.url }">Đăng
-                            nhập</a>
-                        <a class="header__mobile-primary" routerLink="/register"
-                                [queryParams]="{ returnUrl: returnAfterAuth() ?? router.url }">
-                            Đăng ký
-                        </a>
-                    }
-                </div>
+        <div class="header__trailing">
+            <div class="header__actions">
+                @if (session.user(); as user) {
+                    <details #userMenu class="header__profile header__user-menu">
+                        <summary
+                                class="header__avatar material-symbols-outlined"
+                                aria-label="Tài khoản: {{ user.fullName || user.username }}"
+                        >
+                            person
+                        </summary>
+                        <div class="header__user-panel">
+                            <div class="header__user-info">
+                                <strong>{{ user.fullName || user.username }}</strong>
+                                <span>Đã đăng nhập</span>
+                            </div>
+                            <button
+                                    class="header__logout-button"
+                                    type="button"
+                                    data-testid="header-logout"
+                                    (click)="logout()"
+                            >
+                                <span class="material-symbols-outlined" aria-hidden="true">logout</span>
+                                Đăng xuất
+                            </button>
+                        </div>
+                    </details>
+                } @else {
+                    <a class="header__action header__action--text" routerLink="/login"
+                            [queryParams]="{ returnUrl: returnAfterAuth() ?? router.url }">Đăng nhập</a>
+                    <a class="header__action header__action--primary" routerLink="/register"
+                            [queryParams]="{ returnUrl: returnAfterAuth() ?? router.url }">
+                        Đăng ký
+                    </a>
+                }
             </div>
-        </details>
+
+            <details class="header__mobile-menu">
+                <summary aria-label="Mở trình đơn tài khoản">
+                    <span aria-hidden="true"></span>
+                    <span aria-hidden="true"></span>
+                    <span aria-hidden="true"></span>
+                </summary>
+                <div class="header__mobile-panel">
+                    <nav aria-label="Điều hướng di động">
+                        <a routerLink="/" fragment="quiz-list">Khám phá quiz</a>
+                        <button type="button" (click)="information.open('about')">Giới thiệu</button>
+                        <button type="button" (click)="information.open('contact')">Liên hệ</button>
+                    </nav>
+                    <div class="header__mobile-actions">
+                        @if (session.user(); as user) {
+                            <div class="header__mobile-user">
+                                <span class="header__avatar material-symbols-outlined" aria-hidden="true">person</span>
+                                <div class="header__user-info">
+                                    <strong>{{ user.fullName || user.username }}</strong>
+                                    <span>Đã đăng nhập</span>
+                                </div>
+                            </div>
+                            <button type="button" (click)="logout()">Đăng xuất</button>
+                        } @else {
+                            <a routerLink="/login"
+                                    [queryParams]="{ returnUrl: returnAfterAuth() ?? router.url }">Đăng
+                                nhập</a>
+                            <a class="header__mobile-primary" routerLink="/register"
+                                    [queryParams]="{ returnUrl: returnAfterAuth() ?? router.url }">
+                                Đăng ký
+                            </a>
+                        }
+                    </div>
+                </div>
+            </details>
+        </div>
     </div>
 </header>
 

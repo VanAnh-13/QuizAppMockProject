@@ -1,7 +1,8 @@
-﻿import {QuizFormatFact, QuizGuideline, QuizMetric, QuizTopic} from '../domain/quiz-details';
+import {QuizFormatFact, QuizGuideline, QuizMetric, QuizTopic} from '../domain/quiz-details';
 
 export interface QuizDetailsSnapshot {
     readonly isActive?: boolean;
+    readonly imageUrl?: string | null;
     readonly title: string;
     readonly description: string;
     readonly categoryLabel: string;

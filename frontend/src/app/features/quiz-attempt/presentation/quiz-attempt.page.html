@@ -6,7 +6,7 @@
         <div class="exam-header__identity">
             <a class="exam-brand" routerLink="/" aria-label="QuizApp — Trở về trang khám phá">
                 <span class="exam-brand__mark material-symbols-outlined"
-                        aria-hidden="true">task_alt</span>
+                        aria-hidden="true">quiz</span>
                 <span>QuizApp</span>
             </a>
             <span class="exam-header__divider" aria-hidden="true"></span>
@@ -35,16 +35,10 @@
         </div>
 
         <div class="exam-header__actions">
-            <div class="timer" [class.timer--paused]="store.isPaused()">
-                <span class="material-symbols-outlined" aria-hidden="true">timer</span>
-                <span class="timer__label">{{
-                        store.isPaused() ? 'Đã tạm dừng:' : 'Thời gian còn lại:'
-                    }}</span>
-                <strong aria-live="off">{{ store.formattedTime() }}</strong>
-            </div>
             <button
                     class="pause-button"
                     type="button"
+                    [attr.aria-label]="store.isPaused() ? 'Tiếp tục làm bài' : 'Tạm dừng bài thi'"
                     [attr.aria-pressed]="store.isPaused()"
                     [disabled]="
           store.isLoading() ||
@@ -58,9 +52,18 @@
         <span class="material-symbols-outlined" aria-hidden="true">{{
                 store.isPaused() ? 'play_circle' : 'pause_circle'
             }}</span>
-                <span>{{ store.isPaused() ? 'Tiếp tục làm bài' : 'Tạm dừng bài thi' }}</span>
             </button>
         </div>
+    </div>
+
+    <div class="timer-bar" [class.timer-bar--paused]="store.isPaused()">
+        <div class="timer-bar__track">
+            <span class="timer-bar__fill" [style.width.%]="store.timePercent()"></span>
+        </div>
+        <span class="timer-bar__time" aria-live="off">
+            <span class="material-symbols-outlined" aria-hidden="true">timer</span>
+            {{ store.formattedTime() }}
+        </span>
     </div>
 </header>
 
@@ -77,17 +80,114 @@
     </section>
 }
 @if (store.result(); as result) {
-    <section class="api-state" role="status">
-        <h2>Đã nộp bài thành công</h2>
-        <p>
-            Điểm: <strong>{{ result.score }} / 100</strong>
-        </p>
-        <a [routerLink]="['/quiz', result.quizId]">Về chi tiết và lịch sử bài thi</a>
-    </section>
+    <main class="result-view">
+        <section class="api-state result-card glass-card" role="status">
+            <div class="result-card__header">
+                <div class="result-icon-badge" [class.result-icon-badge--pass]="store.resultPassed() === true">
+                    <span class="material-symbols-outlined" aria-hidden="true">
+                        {{ store.resultPassed() === null ? 'task_alt' : store.resultPassed() ? 'verified' : 'history_edu' }}
+                    </span>
+                </div>
+                <h2>Đã nộp bài thành công</h2>
+                <p class="result-quiz-title">{{ result.quizTitle }}</p>
+            </div>
+
+            <!-- Radial Score Donut Chart -->
+            <div class="score-chart-wrapper">
+                <div class="score-gauge">
+                    <svg class="score-gauge__svg" width="160" height="160" viewBox="0 0 160 160"
+                            aria-hidden="true">
+                        <defs>
+                            <linearGradient id="scoreGaugeGradient" x1="0%" y1="0%" x2="100%"
+                                    y2="100%">
+                                <!--suppress HtmlUnknownAttribute -->
+                                <stop offset="0%"
+                                        [attr.stop-color]="store.resultPassed() === true ? '#10b981' : '#1d4ed8'"/>
+                                <!--suppress HtmlUnknownAttribute -->
+                                <stop offset="100%"
+                                        [attr.stop-color]="store.resultPassed() === true ? '#059669' : '#38bdf8'"/>
+                            </linearGradient>
+                        </defs>
+                        <circle class="score-gauge__track" cx="80" cy="80" r="62" fill="none"
+                                stroke="#eff6ff" stroke-width="12" stroke-linecap="round"/>
+                        <circle class="score-gauge__progress" cx="80" cy="80" r="62" fill="none"
+                                stroke="url(#scoreGaugeGradient)" stroke-width="12"
+                                stroke-linecap="round"
+                                stroke-dasharray="389.56"
+                                [attr.stroke-dashoffset]="389.56 - (389.56 * (result.score / 100))"
+                                transform="rotate(-90 80 80)"/>
+                    </svg>
+                    <div class="score-gauge__content">
+                        <span class="score-gauge__number">{{ result.score }}</span>
+                        <span class="score-gauge__max">/ 100</span>
+                    </div>
+                </div>
+
+                <div class="score-status-pill" [class.score-status-pill--pass]="store.resultPassed() === true">
+                    <span class="material-symbols-outlined" aria-hidden="true">
+                        {{ store.resultPassed() === null ? 'task_alt' : store.resultPassed() ? 'check_circle' : 'info' }}
+                    </span>
+                    <span>{{ store.resultPassed() === null ? 'KHÔNG QUY ĐỊNH ĐIỂM ĐẠT' : store.resultPassed() ? 'ĐẠT TIÊU CHUẨN' : 'CHƯA ĐẠT CHUẨN (CẦN ≥' + store.passThreshold() + '%)' }}</span>
+                </div>
+            </div>
+
+            <!-- Visual Performance Comparison Bar Chart -->
+            <div class="result-breakdown">
+                <div class="breakdown-item">
+                    <div class="breakdown-labels">
+                        <span>Điểm của bạn</span>
+                        <strong>{{ result.score }}%</strong>
+                    </div>
+                    <div class="breakdown-bar">
+                        <div class="breakdown-bar__fill" [style.width.%]="result.score"
+                                [class.breakdown-bar__fill--pass]="store.resultPassed() === true"></div>
+                    </div>
+                </div>
+                @if (store.passThreshold(); as threshold) {
+                    <div class="breakdown-item">
+                        <div class="breakdown-labels">
+                            <span>Mục tiêu chuẩn</span>
+                            <strong>{{ threshold }}%</strong>
+                        </div>
+                        <div class="breakdown-bar">
+                            <div class="breakdown-bar__fill breakdown-bar__fill--target"
+                                    [style.width.%]="threshold"></div>
+                        </div>
+                    </div>
+                } @else {
+                    <div class="breakdown-item">
+                        <div class="breakdown-labels">
+                            <span>Mục tiêu chuẩn</span>
+                            <strong>Không quy định</strong>
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <p class="result-score-text">
+                Điểm: <strong>{{ result.score }} / 100</strong>
+            </p>
+
+            <!-- Centered Action Buttons with Clean Whitespace -->
+            <div class="result-card__actions">
+                <a class="result-button result-button--primary"
+                        [routerLink]="['/quiz', result.quizId]">
+                    <span class="material-symbols-outlined" aria-hidden="true">assessment</span>
+                    Về chi tiết và lịch sử bài thi
+                </a>
+                <a class="result-button result-button--secondary" routerLink="/">
+                    <span class="material-symbols-outlined" aria-hidden="true">explore</span>
+                    Khám phá thêm quiz
+                </a>
+            </div>
+        </section>
+    </main>
 } @else if (!store.isLoading() && store.currentQuestion(); as question) {
-    <p class="api-state" role="status">{{ store.saveStatus() }}</p>
+    @if (store.saveStatus(); as status) {
+        <p class="attempt-status" role="status">{{ status }}</p>
+    }
     @if (store.isPaused()) {
-        <p class="api-state" role="status">
+        <p class="attempt-status attempt-status--paused" role="status">
             Bài thi đang tạm dừng. Nhấn “Tiếp tục làm bài” để trả lời.
         </p>
     }
@@ -206,16 +306,27 @@
                                     : 'Đánh dấu xem lại'
                         }}
                     </button>
-                    <button
-                            type="button"
-                            class="next-button"
-                            [disabled]="!store.canGoNext()"
-                            (click)="store.nextQuestion()"
-                    >
-                        Câu tiếp theo
-                        <span class="material-symbols-outlined"
-                                aria-hidden="true">arrow_forward</span>
-                    </button>
+                    @if (store.canGoNext()) {
+                        <button
+                                type="button"
+                                class="next-button"
+                                (click)="store.nextQuestion()"
+                        >
+                            Câu tiếp theo
+                            <span class="material-symbols-outlined"
+                                    aria-hidden="true">arrow_forward</span>
+                        </button>
+                    } @else {
+                        <button
+                                type="button"
+                                class="submit-button submit-button--nav"
+                                [disabled]="store.isBusy() || store.isPaused() || store.requiresReload()"
+                                (click)="openSubmitConfirmation()"
+                        >
+                            <span class="material-symbols-outlined" aria-hidden="true">send</span>
+                            Nộp bài
+                        </button>
+                    }
                 </div>
             </div>
         </section>
@@ -337,6 +448,42 @@
                 (click)="confirmSubmission()"
         >
             {{ store.isBusy() ? 'Đang nộp…' : 'Xác nhận nộp' }}
+        </button>
+    </div>
+</dialog>
+
+<dialog
+        #leaveDialog
+        id="leave-confirmation"
+        class="leave-dialog"
+        aria-labelledby="leave-title"
+        aria-describedby="leave-description"
+        (cancel)="cancelLeaveConfirmation($event)"
+        (close)="onLeaveDialogClose()"
+        (click)="dismissLeaveBackdrop($event)"
+>
+    <div class="leave-dialog__icon material-symbols-outlined" aria-hidden="true">
+        warning
+    </div>
+    <h2 id="leave-title">Rời khỏi bài thi?</h2>
+    <p id="leave-description">
+        {{ leaveMessage() }}
+    </p>
+    <div class="leave-dialog__actions">
+        <button
+                type="button"
+                class="btn-leave"
+                (click)="confirmLeave()"
+        >
+            Rời trang
+        </button>
+        <button
+                type="button"
+                class="btn-stay"
+                autofocus
+                (click)="cancelLeave()"
+        >
+            Ở lại làm tiếp
         </button>
     </div>
 </dialog>

@@ -24,6 +24,7 @@ public sealed class PublicQuizCatalogService(IQuizRepository quizzes) : IPublicQ
         Title = quiz.Title,
         Description = quiz.Description,
         Duration = quiz.Duration,
+        ImageUrl = quiz.Image,
         PassedScore = quiz.PassedScore,
         QuestionCount = quiz.QuizQuestions.Count(qq => qq.QuestionNavigation.IsActive),
         UpdatedAt = quiz.UpdateAt
