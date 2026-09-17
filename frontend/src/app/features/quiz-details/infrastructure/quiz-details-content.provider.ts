@@ -12,4 +12,3 @@ export const quizDetailsContentProvider: Provider[] = [
 export function provideQuizDetails(): Provider[] {
     return [...quizDetailsContentProvider, attemptContentProvider];
 }
-
