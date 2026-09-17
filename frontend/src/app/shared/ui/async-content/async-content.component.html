@@ -1,0 +1,18 @@
+@switch (state().status) {
+    @case ('loading') {
+        <div class="async-content async-content--loading" role="status">
+            <span class="async-content__spinner" aria-hidden="true"></span>
+            <p>{{ loadingMessage() }}</p>
+        </div>
+    }
+    @case ('error') {
+        <div class="async-content async-content--error" role="alert">
+            <span class="async-content__icon material-symbols-outlined" aria-hidden="true">error</span>
+            <p>{{ errorMessage() }}</p>
+            <button type="button" (click)="retryRequested.emit()">Thử lại</button>
+        </div>
+    }
+    @case ('success') {
+        <ng-content/>
+    }
+}

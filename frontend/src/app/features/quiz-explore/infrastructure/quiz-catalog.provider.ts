@@ -1,4 +1,4 @@
-﻿import {InjectionToken, Provider} from '@angular/core';
+import {InjectionToken, Provider} from '@angular/core';
 import {QuizCatalog} from '../application/quiz-catalog';
 import {ApiQuizCatalog} from './api-quiz-catalog';
 
@@ -8,3 +8,7 @@ export const quizCatalogProvider: Provider = {
     provide: QUIZ_CATALOG,
     useClass: ApiQuizCatalog,
 };
+
+export function provideQuizCatalog(): Provider[] {
+    return [quizCatalogProvider];
+}

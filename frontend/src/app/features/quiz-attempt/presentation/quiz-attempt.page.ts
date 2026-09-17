@@ -11,14 +11,15 @@ import {
 } from '@angular/core';
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {Location} from '@angular/common';
-import {attemptContentProvider} from '../infrastructure/attempt-content.provider';
+import {ConfirmationService} from '../../../shared/ui/confirmation/confirmation.service';
+import {provideQuizAttempt} from '../infrastructure/attempt-content.provider';
 import {ATTEMPT_CONFIG} from '../application/attempt-config';
 import {QuizAttemptStore} from './quiz-attempt.store';
 
 @Component({
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [RouterLink],
-    providers: [attemptContentProvider, QuizAttemptStore],
+    providers: [provideQuizAttempt(), QuizAttemptStore],
     selector: 'app-quiz-attempt-page',
     styleUrls: ['./quiz-attempt.page.css', './quiz-attempt.sidebar.css', './quiz-attempt.dialog.css'],
     templateUrl: './quiz-attempt.page.html',
@@ -31,6 +32,8 @@ export class QuizAttemptPage implements OnDestroy {
     private readonly submitDialog = viewChild<ElementRef<HTMLDialogElement>>('submitDialog');
     private readonly leaveDialog = viewChild<ElementRef<HTMLDialogElement>>('leaveDialog');
     private leaveResolver: ((value: boolean) => void) | null = null;
+    private destroyed = false;
+    private readonly confirmation = inject(ConfirmationService);
     private readonly route = inject(ActivatedRoute);
     private readonly location = inject(Location);
     private readonly timerId = setInterval(() => this.store.tick(), inject(ATTEMPT_CONFIG).tickMs);
@@ -49,6 +52,8 @@ export class QuizAttemptPage implements OnDestroy {
     }
 
     protected async load(): Promise<void> {
+        if (this.destroyed) return;
+
         const quizId = this.route.snapshot.paramMap.get('quizId');
 
         if (!quizId) return;
@@ -57,6 +62,8 @@ export class QuizAttemptPage implements OnDestroy {
             quizId,
             this.store.attemptId() ?? this.route.snapshot.queryParamMap.get('attemptId'),
         );
+
+        if (this.destroyed) return;
 
         if (this.store.attemptId())
             this.location.replaceState(
@@ -68,11 +75,15 @@ export class QuizAttemptPage implements OnDestroy {
     protected async reload(): Promise<void> {
         if (
             this.store.dirty() &&
-            !window.confirm(
-                'Tải lại sẽ thay đáp án chưa lưu bằng bản trên máy chủ. Bạn có muốn tiếp tục?',
-            )
+            !(await this.confirmation.confirm({
+                title: 'Tải lại trạng thái?',
+                message: 'Tải lại sẽ thay đáp án chưa lưu bằng bản trên máy chủ. Bạn có muốn tiếp tục?',
+                confirmLabel: 'Tải lại',
+                cancelLabel: 'Hủy',
+            }))
         )
             return;
+        if (this.destroyed) return;
         await this.load();
     }
 
@@ -169,6 +180,8 @@ export class QuizAttemptPage implements OnDestroy {
     }
 
     ngOnDestroy(): void {
+        this.destroyed = true;
+        this.confirmation.cancel();
         clearInterval(this.timerId);
         this.subscription.unsubscribe();
         if (this.leaveResolver) {

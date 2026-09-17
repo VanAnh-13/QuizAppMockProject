@@ -4,7 +4,7 @@ import {Router} from '@angular/router';
 import {FormControl, ReactiveFormsModule} from '@angular/forms';
 import {SiteFooterComponent} from '../../../shared/ui/site-footer/site-footer.component';
 import {SiteHeaderComponent} from '../../../shared/ui/site-header/site-header.component';
-import {quizCatalogProvider} from '../infrastructure/quiz-catalog.provider';
+import {provideQuizCatalog} from '../infrastructure/quiz-catalog.provider';
 import {QuizSummary} from '../domain/quiz-summary';
 import {QuizExploreStore} from './quiz-explore.store';
 import {QuizCardComponent} from './quiz-card/quiz-card.component';
@@ -17,7 +17,7 @@ import {QuizCardComponent} from './quiz-card/quiz-card.component';
         SiteHeaderComponent,
         QuizCardComponent,
     ],
-    providers: [quizCatalogProvider, QuizExploreStore],
+    providers: [provideQuizCatalog(), QuizExploreStore],
     selector: 'app-quiz-explore-page',
     styleUrl: './quiz-explore.page.css',
     templateUrl: './quiz-explore.page.html',

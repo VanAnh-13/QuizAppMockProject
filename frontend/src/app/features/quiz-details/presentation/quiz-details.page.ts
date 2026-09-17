@@ -11,12 +11,12 @@ import {
 import {DatePipe, NgTemplateOutlet} from '@angular/common';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {ATTEMPT_API, AttemptResult} from '../../quiz-attempt/application/attempt-api';
-import {attemptContentProvider} from '../../quiz-attempt/infrastructure/attempt-content.provider';
 import {apiErrorMessage} from '../../../core/api/api-error';
 import {AuthSession} from '../../../core/auth/auth-session';
 import {ModalDirective} from '../../../shared/ui/dialog/modal.directive';
 import {QuizDetailsSnapshot} from '../application/quiz-details-content';
-import {QUIZ_DETAILS_CONTENT, quizDetailsContentProvider,} from '../infrastructure/quiz-details-content.provider';
+import {QUIZ_DETAILS_CONTENT, provideQuizDetails} from '../infrastructure/quiz-details-content.provider';
+import {QuizDetailsResolution} from './quiz-details.resolver';
 
 interface InfoMessage {
     readonly title: string;
@@ -45,7 +45,7 @@ const INFO_MESSAGES = {
 @Component({
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [DatePipe, RouterLink, ModalDirective, NgTemplateOutlet],
-    providers: [quizDetailsContentProvider, attemptContentProvider],
+    providers: [provideQuizDetails()],
     selector: 'app-quiz-details-page',
     styleUrls: [
         './quiz-details.page.css',
@@ -86,8 +86,43 @@ export class QuizDetailsPage {
     constructor() {
         this.route.paramMap.subscribe((params) => {
             this.quizId.set(params.get('quizId') ?? '');
-            void this.load();
+            const resolved = this.route.snapshot?.data?.['snapshot'] as QuizDetailsResolution | undefined;
+            if (resolved) {
+                this.applyResolution(resolved);
+            } else {
+                void this.load();
+            }
         });
+        if (this.route.data) {
+            this.route.data.subscribe((data) => {
+                const resolved = data['snapshot'] as QuizDetailsResolution | undefined;
+                if (resolved) {
+                    this.applyResolution(resolved);
+                }
+            });
+        }
+    }
+
+    private applyResolution(resolved: QuizDetailsResolution): void {
+        if ('errorMessage' in resolved) {
+            this.errorMessage.set(resolved.errorMessage);
+            this.isLoading.set(false);
+            return;
+        }
+        this.applySnapshot(resolved);
+    }
+
+    private applySnapshot(snapshot: QuizDetailsSnapshot): void {
+        this.title.set(snapshot.title);
+        this.imageUrl.set(snapshot.imageUrl ?? null);
+        this.description.set(snapshot.description);
+        this.categoryLabel.set(snapshot.categoryLabel);
+        this.metrics.set(snapshot.metrics);
+        this.topics.set(snapshot.topics);
+        this.guidelines.set(snapshot.guidelines);
+        this.formatFacts.set(snapshot.formatFacts);
+        this.errorMessage.set(null);
+        this.isLoading.set(false);
     }
 
     protected async load(): Promise<void> {
@@ -102,14 +137,7 @@ export class QuizDetailsPage {
 
         try {
             const snapshot = await this.content.load(quizId);
-            this.title.set(snapshot.title);
-            this.imageUrl.set(snapshot.imageUrl ?? null);
-            this.description.set(snapshot.description);
-            this.categoryLabel.set(snapshot.categoryLabel);
-            this.metrics.set(snapshot.metrics);
-            this.topics.set(snapshot.topics);
-            this.guidelines.set(snapshot.guidelines);
-            this.formatFacts.set(snapshot.formatFacts);
+            this.applySnapshot(snapshot);
         } catch {
             this.errorMessage.set('Không thể tải chi tiết quiz từ máy chủ. Vui lòng thử lại.');
         } finally {
