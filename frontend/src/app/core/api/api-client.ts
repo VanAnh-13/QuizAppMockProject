@@ -2,6 +2,7 @@ import {inject, Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {firstValueFrom} from 'rxjs';
 import {API_CONFIG} from '../config/api.config';
+import {retryOnTransientError} from './retry';
 
 export interface PagedResult<T> {
     readonly items: readonly T[];
@@ -16,7 +17,7 @@ export class ApiClient {
     private readonly config = inject(API_CONFIG);
 
     get<T>(path: string, params: Record<string, string | number> = {}): Promise<T> {
-        return firstValueFrom(this.http.get<T>(this.url(path), {params}));
+        return firstValueFrom(this.http.get<T>(this.url(path), {params}).pipe(retryOnTransientError()));
     }
 
     post<T>(path: string, body: unknown = {}): Promise<T> {
