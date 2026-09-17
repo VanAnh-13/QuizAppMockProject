@@ -40,4 +40,28 @@ describe('ApiQuizDetailsContent', () => {
             'Không tìm thấy quiz đang mở.',
         );
     });
+
+    it('preserves configured imageUrl from the public quiz contract in details', async () => {
+        const list = vi.fn().mockResolvedValue([
+            {
+                id: '10000000-0000-0000-0000-000000000002',
+                title: 'Angular forms',
+                description: 'Reactive forms practice',
+                duration: 25,
+                imageUrl: 'https://images.example.com/custom-angular.webp',
+                passedScore: 75,
+                questionCount: 4,
+                updatedAt: '2026-09-12T00:00:00Z',
+            },
+        ]);
+        TestBed.configureTestingModule({
+            providers: [ApiQuizDetailsContent, {provide: ApiClient, useValue: {list}}],
+        });
+
+        const details = await TestBed.inject(ApiQuizDetailsContent).load(
+            '10000000-0000-0000-0000-000000000002',
+        );
+
+        expect(details.imageUrl).toBe('https://images.example.com/custom-angular.webp');
+    });
 });

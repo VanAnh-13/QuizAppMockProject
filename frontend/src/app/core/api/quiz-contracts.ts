@@ -3,6 +3,7 @@ export interface PublicQuizSummaryDto {
     readonly title: string;
     readonly description: string | null;
     readonly duration: number;
+    readonly imageUrl?: string | null;
     readonly passedScore: number | null;
     readonly questionCount: number;
     readonly updatedAt: string;

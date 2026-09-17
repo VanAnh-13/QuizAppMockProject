@@ -22,7 +22,7 @@ export class ApiQuizCatalog implements QuizCatalog {
                 categoryLabel: 'Kiến thức tổng hợp',
                 questionCount: quiz.questionCount,
                 status: 'open',
-                imageUrl: resolveQuizImageUrl(quiz.title, (quiz as {imageUrl?: string | null}).imageUrl),
+                imageUrl: resolveQuizImageUrl(quiz.title, quiz.imageUrl),
             }));
     }
 }

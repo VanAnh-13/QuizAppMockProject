@@ -32,4 +32,26 @@ describe('ApiQuizCatalog', () => {
             }),
         ]);
     });
+
+    it('preserves configured imageUrl from the public quiz contract', async () => {
+        const list = vi.fn().mockResolvedValue([
+            {
+                id: '10000000-0000-0000-0000-000000000001',
+                title: 'C# basics',
+                description: null,
+                duration: 20,
+                imageUrl: 'https://images.example.com/custom-csharp.webp',
+                passedScore: 70,
+                questionCount: 3,
+                updatedAt: '2026-09-12T00:00:00Z',
+            },
+        ]);
+        TestBed.configureTestingModule({
+            providers: [ApiQuizCatalog, {provide: ApiClient, useValue: {list}}],
+        });
+
+        const quizzes = await TestBed.inject(ApiQuizCatalog).listQuizzes();
+
+        expect(quizzes[0].imageUrl).toBe('https://images.example.com/custom-csharp.webp');
+    });
 });

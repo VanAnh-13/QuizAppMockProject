@@ -20,7 +20,7 @@ export class ApiQuizDetailsContent implements QuizDetailsContent {
         return {
             imageUrl: resolveQuizImageUrl(
                 quiz.title,
-                (quiz as {imageUrl?: string | null}).imageUrl,
+                quiz.imageUrl,
             ),
             title: quiz.title,
             description: quiz.description ?? '',
