@@ -27,16 +27,18 @@ export class ConfirmationService {
         }
 
         return new Promise<boolean>((resolve) => {
-            const confirmation: PendingConfirmation = {
+            const request: ConfirmationRequest = {
                 title: options.title,
                 message: options.message,
                 confirmLabel: options.confirmLabel ?? 'Xác nhận',
                 cancelLabel: options.cancelLabel ?? 'Hủy',
-                resolve,
             };
 
-            this.pending = confirmation;
-            this.request.set(confirmation);
+            this.pending = {
+                ...request,
+                resolve,
+            };
+            this.request.set(request);
         });
     }
 

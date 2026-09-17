@@ -1,5 +1,7 @@
 import {Routes} from '@angular/router';
 import {leaveAttemptGuard} from './features/quiz-attempt/presentation/leave-attempt.guard';
+import {provideQuizDetails} from './features/quiz-details/infrastructure/quiz-details-content.provider';
+import {quizDetailsResolver} from './features/quiz-details/presentation/quiz-details.resolver';
 import {requireAuthGuard} from './core/auth/require-auth.guard';
 
 export const routes: Routes = [
@@ -32,6 +34,8 @@ export const routes: Routes = [
     },
     {
         path: 'quiz/:quizId',
+        providers: [provideQuizDetails()],
+        resolve: {snapshot: quizDetailsResolver},
         loadComponent: () =>
             import('./features/quiz-details/presentation/quiz-details.page').then(
                 (m) => m.QuizDetailsPage,

@@ -85,8 +85,34 @@ export class QuizDetailsPage {
     constructor() {
         this.route.paramMap.subscribe((params) => {
             this.quizId.set(params.get('quizId') ?? '');
-            void this.load();
+            const resolved = this.route.snapshot?.data?.['snapshot'] as QuizDetailsSnapshot | undefined | null;
+            if (resolved) {
+                this.applySnapshot(resolved);
+            } else {
+                void this.load();
+            }
         });
+        if (this.route.data) {
+            this.route.data.subscribe((data) => {
+                const snapshot = data['snapshot'] as QuizDetailsSnapshot | undefined | null;
+                if (snapshot) {
+                    this.applySnapshot(snapshot);
+                }
+            });
+        }
+    }
+
+    private applySnapshot(snapshot: QuizDetailsSnapshot): void {
+        this.title.set(snapshot.title);
+        this.imageUrl.set(snapshot.imageUrl ?? null);
+        this.description.set(snapshot.description);
+        this.categoryLabel.set(snapshot.categoryLabel);
+        this.metrics.set(snapshot.metrics);
+        this.topics.set(snapshot.topics);
+        this.guidelines.set(snapshot.guidelines);
+        this.formatFacts.set(snapshot.formatFacts);
+        this.errorMessage.set(null);
+        this.isLoading.set(false);
     }
 
     protected async load(): Promise<void> {
@@ -101,14 +127,7 @@ export class QuizDetailsPage {
 
         try {
             const snapshot = await this.content.load(quizId);
-            this.title.set(snapshot.title);
-            this.imageUrl.set(snapshot.imageUrl ?? null);
-            this.description.set(snapshot.description);
-            this.categoryLabel.set(snapshot.categoryLabel);
-            this.metrics.set(snapshot.metrics);
-            this.topics.set(snapshot.topics);
-            this.guidelines.set(snapshot.guidelines);
-            this.formatFacts.set(snapshot.formatFacts);
+            this.applySnapshot(snapshot);
         } catch {
             this.errorMessage.set('Không thể tải chi tiết quiz từ máy chủ. Vui lòng thử lại.');
         } finally {
