@@ -16,6 +16,7 @@ import {AuthSession} from '../../../core/auth/auth-session';
 import {ModalDirective} from '../../../shared/ui/dialog/modal.directive';
 import {QuizDetailsSnapshot} from '../application/quiz-details-content';
 import {QUIZ_DETAILS_CONTENT, provideQuizDetails} from '../infrastructure/quiz-details-content.provider';
+import {QuizDetailsResolution} from './quiz-details.resolver';
 
 interface InfoMessage {
     readonly title: string;
@@ -85,21 +86,30 @@ export class QuizDetailsPage {
     constructor() {
         this.route.paramMap.subscribe((params) => {
             this.quizId.set(params.get('quizId') ?? '');
-            const resolved = this.route.snapshot?.data?.['snapshot'] as QuizDetailsSnapshot | undefined | null;
+            const resolved = this.route.snapshot?.data?.['snapshot'] as QuizDetailsResolution | undefined;
             if (resolved) {
-                this.applySnapshot(resolved);
+                this.applyResolution(resolved);
             } else {
                 void this.load();
             }
         });
         if (this.route.data) {
             this.route.data.subscribe((data) => {
-                const snapshot = data['snapshot'] as QuizDetailsSnapshot | undefined | null;
-                if (snapshot) {
-                    this.applySnapshot(snapshot);
+                const resolved = data['snapshot'] as QuizDetailsResolution | undefined;
+                if (resolved) {
+                    this.applyResolution(resolved);
                 }
             });
         }
+    }
+
+    private applyResolution(resolved: QuizDetailsResolution): void {
+        if ('errorMessage' in resolved) {
+            this.errorMessage.set(resolved.errorMessage);
+            this.isLoading.set(false);
+            return;
+        }
+        this.applySnapshot(resolved);
     }
 
     private applySnapshot(snapshot: QuizDetailsSnapshot): void {
