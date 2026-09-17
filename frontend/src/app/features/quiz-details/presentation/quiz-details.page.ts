@@ -11,12 +11,11 @@ import {
 import {DatePipe, NgTemplateOutlet} from '@angular/common';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {ATTEMPT_API, AttemptResult} from '../../quiz-attempt/application/attempt-api';
-import {attemptContentProvider} from '../../quiz-attempt/infrastructure/attempt-content.provider';
 import {apiErrorMessage} from '../../../core/api/api-error';
 import {AuthSession} from '../../../core/auth/auth-session';
 import {ModalDirective} from '../../../shared/ui/dialog/modal.directive';
 import {QuizDetailsSnapshot} from '../application/quiz-details-content';
-import {QUIZ_DETAILS_CONTENT, quizDetailsContentProvider,} from '../infrastructure/quiz-details-content.provider';
+import {QUIZ_DETAILS_CONTENT, provideQuizDetails} from '../infrastructure/quiz-details-content.provider';
 
 interface InfoMessage {
     readonly title: string;
@@ -45,7 +44,7 @@ const INFO_MESSAGES = {
 @Component({
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [DatePipe, RouterLink, ModalDirective, NgTemplateOutlet],
-    providers: [quizDetailsContentProvider, attemptContentProvider],
+    providers: [provideQuizDetails()],
     selector: 'app-quiz-details-page',
     styleUrls: [
         './quiz-details.page.css',
