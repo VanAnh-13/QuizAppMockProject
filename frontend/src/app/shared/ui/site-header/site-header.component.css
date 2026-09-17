@@ -111,15 +111,18 @@
     @apply text-[11px] text-muted;
 }
 
+.header__user-link,
 .header__logout-button {
     @apply flex w-full items-center gap-2 rounded-lg px-2 py-2 text-xs font-medium text-muted transition-colors;
 }
 
+.header__user-link:hover,
 .header__logout-button:hover {
     background: var(--glass-hover);
     color: var(--ink);
 }
 
+.header__user-link .material-symbols-outlined,
 .header__logout-button .material-symbols-outlined {
     @apply text-base;
 }

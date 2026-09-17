@@ -66,4 +66,11 @@ public sealed class AuthService(
 
         await unitOfWork.SaveChangesAsync(cancellationToken);
     }
+
+    public async Task<UserDto> GetCurrentUserAsync(CancellationToken cancellationToken = default)
+    {
+        var user = await authorization.RequireUserAsync(cancellationToken);
+
+        return DtoMapping.ToDto(user);
+    }
 }

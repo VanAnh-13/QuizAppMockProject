@@ -27,6 +27,14 @@
                                 <strong>{{ user.fullName || user.username }}</strong>
                                 <span>Đã đăng nhập</span>
                             </div>
+                            <a class="header__user-link" routerLink="/history">
+                                <span class="material-symbols-outlined" aria-hidden="true">history</span>
+                                Lịch sử làm bài
+                            </a>
+                            <a class="header__user-link" routerLink="/settings">
+                                <span class="material-symbols-outlined" aria-hidden="true">manage_accounts</span>
+                                Cài đặt &amp; Bảo mật
+                            </a>
                             <button
                                     class="header__logout-button"
                                     type="button"
@@ -69,6 +77,8 @@
                                     <span>Đã đăng nhập</span>
                                 </div>
                             </div>
+                            <a routerLink="/history">Lịch sử làm bài</a>
+                            <a routerLink="/settings">Cài đặt &amp; Bảo mật</a>
                             <button type="button" (click)="logout()">Đăng xuất</button>
                         } @else {
                             <a routerLink="/login"

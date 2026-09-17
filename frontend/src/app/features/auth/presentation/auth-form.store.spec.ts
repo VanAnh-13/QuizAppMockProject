@@ -112,4 +112,12 @@ describe('authReturnUrl', () => {
     it.each(['/quiz/abc-123', '/quiz/abc-123/attempt', '/quiz/abc-123/attempt?attemptId=attempt-123'])('keeps a quiz destination %s', (value) => {
         expect(authReturnUrl(value)).toBe(value);
     });
+
+    it.each(['/history', '/settings'])('keeps an account destination %s', (value) => {
+        expect(authReturnUrl(value)).toBe(value);
+    });
+
+    it.each(['/history/extra', '/settings?redirect=https://example.com', '/historyx'])('rejects an unsafe account destination %s', (value) => {
+        expect(authReturnUrl(value)).toBe('/');
+    });
 });

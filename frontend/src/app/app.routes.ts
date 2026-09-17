@@ -22,6 +22,24 @@ export const routes: Routes = [
             ),
     },
     {
+        path: 'history',
+        title: 'Lịch sử làm bài — QuizApp',
+        canActivate: [requireAuthGuard],
+        loadComponent: () =>
+            import('./features/account/presentation/account-history.page').then(
+                (m) => m.AccountHistoryPage,
+            ),
+    },
+    {
+        path: 'settings',
+        title: 'Cài đặt tài khoản & Bảo mật — QuizApp',
+        canActivate: [requireAuthGuard],
+        loadComponent: () =>
+            import('./features/account/presentation/account-settings.page').then(
+                (m) => m.AccountSettingsPage,
+            ),
+    },
+    {
         path: 'quiz/:quizId/attempt',
         canActivate: [requireAuthGuard],
         loadComponent: () =>

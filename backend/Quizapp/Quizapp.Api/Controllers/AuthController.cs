@@ -28,6 +28,15 @@ public class AuthController(IAuthService authService) : ControllerBase
     }
 
     [Authorize]
+    [HttpGet("me")]
+    public async Task<IActionResult> GetCurrentUser(CancellationToken cancellationToken)
+    {
+        var user = await authService.GetCurrentUserAsync(cancellationToken);
+
+        return Ok(user);
+    }
+
+    [Authorize]
     [HttpPost("change-password")]
     public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDto request,
         CancellationToken cancellationToken)
