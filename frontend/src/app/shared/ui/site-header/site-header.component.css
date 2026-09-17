@@ -54,8 +54,78 @@
     box-shadow: var(--glass-shadow);
 }
 
+.header__trailing {
+    @apply flex items-center gap-2;
+}
+
 .header__actions {
-    @apply hidden gap-1;
+    @apply hidden items-center gap-1;
+}
+
+.header__actions:has(.header__user-menu) {
+    @apply flex;
+}
+
+.header__user-menu {
+    @apply relative;
+}
+
+.header__user-menu summary::-webkit-details-marker {
+    display: none;
+}
+
+.header__avatar {
+    border: 1px solid var(--glass-border);
+    background: var(--brand-gradient);
+    @apply flex size-8 shrink-0 cursor-pointer list-none items-center justify-center rounded-full text-xs font-bold text-on-brand shadow-sm transition-transform;
+}
+
+.header__avatar:hover {
+    transform: scale(1.08);
+}
+
+.header__user-panel {
+    position: absolute;
+    top: 44px;
+    right: 0;
+    z-index: 50;
+    width: 200px;
+    border-radius: 0.75rem;
+    border: 1px solid var(--glass-border);
+    background: var(--glass-raised);
+    backdrop-filter: var(--glass-filter);
+    -webkit-backdrop-filter: var(--glass-filter);
+    box-shadow: var(--glass-shadow);
+    @apply grid gap-1 p-2;
+}
+
+.header__user-info {
+    @apply flex flex-col px-2 py-1.5;
+}
+
+.header__user-info strong {
+    @apply truncate text-xs font-semibold text-ink;
+}
+
+.header__user-info span {
+    @apply text-[11px] text-muted;
+}
+
+.header__logout-button {
+    @apply flex w-full items-center gap-2 rounded-lg px-2 py-2 text-xs font-medium text-muted transition-colors;
+}
+
+.header__logout-button:hover {
+    background: var(--glass-hover);
+    color: var(--ink);
+}
+
+.header__logout-button .material-symbols-outlined {
+    @apply text-base;
+}
+
+.header__mobile-user {
+    @apply flex items-center gap-2.5 px-3 py-2;
 }
 
 .header__action {
@@ -148,7 +218,9 @@
 .header__action:focus-visible,
 .header__mobile-menu summary:focus-visible,
 .header__mobile-panel a:focus-visible,
-.header__mobile-actions button:focus-visible {
+.header__mobile-actions button:focus-visible,
+.header__logout-button:focus-visible,
+.header__avatar:focus-visible {
     @apply outline-none ring-2 ring-brand ring-offset-2 ring-offset-canvas;
 }
 

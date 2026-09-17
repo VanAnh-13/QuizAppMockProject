@@ -90,7 +90,7 @@
     @apply pt-5;
 }
 
-.submit-button {
+.submission .submit-button {
     background: var(--brand-gradient);
     border: 1px solid var(--glass-border);
     color: var(--on-brand);

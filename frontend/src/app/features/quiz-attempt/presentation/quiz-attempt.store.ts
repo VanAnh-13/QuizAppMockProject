@@ -82,6 +82,11 @@ export class QuizAttemptStore implements OnDestroy {
         );
     });
     readonly formattedTime = computed(() => formatTime(this.remainingSeconds()));
+    readonly totalSeconds = signal(0);
+    readonly timePercent = computed(() => {
+        const total = this.totalSeconds();
+        return total > 0 ? (this.remainingSeconds() / total) * 100 : 100;
+    });
     readonly saveStatus = computed(() => this.getSaveStatus());
     private readonly api = inject(ATTEMPT_API);
     private readonly config = inject(ATTEMPT_CONFIG);
@@ -103,6 +108,7 @@ export class QuizAttemptStore implements OnDestroy {
         this.isLoading.set(true);
         this.errorMessage.set(null);
         this.quizId = quizId;
+        this.totalSeconds.set(0);
 
         try {
             const resolvedAttemptId = attemptId || (await this.findUnfinishedAttemptId(quizId));
@@ -538,6 +544,10 @@ export class QuizAttemptStore implements OnDestroy {
     private setRemainingTime(remainingSeconds: number): void {
         this.deadline = performance.now() + remainingSeconds * 1000;
         this.remainingSeconds.set(Math.ceil(remainingSeconds));
+
+        if (this.totalSeconds() === 0) {
+            this.totalSeconds.set(Math.ceil(remainingSeconds));
+        }
     }
 
     private replaceAnswers(answers: readonly AttemptAnswer[], questionCount: number): void {
@@ -560,7 +570,7 @@ export class QuizAttemptStore implements OnDestroy {
         this.remainingSeconds.set(remainingSeconds);
     }
 
-    private getSaveStatus(): string {
+    private getSaveStatus(): string | null {
         if (this.requiresReload()) {
             return 'Cần đồng bộ lại với máy chủ';
         }
@@ -573,7 +583,7 @@ export class QuizAttemptStore implements OnDestroy {
             return 'Có thay đổi chưa lưu';
         }
 
-        return 'Đã đồng bộ với máy chủ';
+        return null;
     }
 
     private handleWriteError(error: unknown): void {

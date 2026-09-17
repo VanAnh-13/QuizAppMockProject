@@ -95,39 +95,56 @@ button {
 }
 
 .exam-header__actions {
-    @apply gap-2 lg:col-start-3 lg:row-start-1;
+    @apply flex items-center gap-2 lg:col-start-3 lg:row-start-1;
 }
 
-.timer,
+.timer-bar {
+    @apply mx-auto mt-2.5 flex max-w-[1200px] items-center gap-3 border-t border-border-soft pt-2.5;
+}
+
+.timer-bar__track {
+    @apply h-1.5 flex-1 overflow-hidden rounded-full;
+    background: var(--glass-inset);
+    border: 1px solid var(--glass-border);
+}
+
+.timer-bar__fill {
+    @apply block h-full rounded-full transition-[width] duration-500 ease-linear;
+    background: var(--brand-gradient);
+}
+
+.timer-bar__time {
+    @apply flex shrink-0 items-center gap-1.5 font-mono text-xs font-semibold tabular-nums;
+    color: var(--ink);
+}
+
+.timer-bar__time .material-symbols-outlined {
+    @apply text-base text-brand;
+}
+
+.timer-bar--paused .timer-bar__fill {
+    background: var(--warning);
+    opacity: 0.7;
+}
+
+.timer-bar--paused .timer-bar__time {
+    color: var(--warning);
+}
+
+.timer-bar--paused .timer-bar__time .material-symbols-outlined {
+    color: var(--warning);
+}
+
 .pause-button {
     border: 1px solid var(--glass-border);
     background: var(--glass-inset);
     color: var(--ink);
-    @apply flex min-h-10 items-center gap-2 rounded-control px-3 text-xs transition-all;
+    @apply flex size-10 shrink-0 items-center justify-center rounded-control transition-all;
+    @apply hover:border-white/30 hover:bg-[var(--glass-hover)];
 }
 
-.timer {
-    border-color: rgba(99, 102, 241, 0.4);
-    background: var(--brand-soft);
-}
-
-.timer--paused {
-    border-color: rgba(245, 158, 11, 0.4);
-    background: rgba(245, 158, 11, 0.2);
-    color: var(--warning);
-}
-
-.timer__label,
-.pause-button span:last-child {
-    @apply hidden md:inline;
-}
-
-.timer strong {
-    @apply font-mono text-sm;
-}
-
-.pause-button {
-    @apply font-semibold hover:border-white/30 hover:bg-[var(--glass-hover)];
+.pause-button .material-symbols-outlined {
+    @apply text-xl;
 }
 
 .attempt-workspace {
@@ -265,6 +282,7 @@ button {
 
 .previous-button,
 .next-button,
+.submit-button--nav,
 .review-button {
     @apply inline-flex min-h-11 items-center justify-center gap-2 rounded-control px-4 text-sm font-semibold disabled:cursor-not-allowed disabled:opacity-40;
 }

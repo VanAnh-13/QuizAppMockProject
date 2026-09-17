@@ -70,4 +70,29 @@ describe('QuizExplorePage', () => {
         expect(search.value).toBe('');
         expect(element.querySelectorAll('.quiz-card')).toHaveLength(6);
     });
+
+    it('does not render a search submit button and supports instant type-as-you-go filtering', async () => {
+        const fixture = await createFixture();
+        const element = fixture.nativeElement as HTMLElement;
+
+        expect(element.querySelector('button[type="submit"]')).toBeNull();
+
+        const search = element.querySelector<HTMLInputElement>('#quiz-search')!;
+        expect(element.querySelector('.search__clear')).toBeNull();
+
+        search.value = 'sql';
+        search.dispatchEvent(new Event('input'));
+        fixture.detectChanges();
+
+        expect(element.querySelectorAll('.quiz-card')).toHaveLength(1);
+        expect(element.querySelector('.quiz-card h3')?.textContent).toContain('SQL Server');
+
+        const clearBtn = element.querySelector<HTMLButtonElement>('.search__clear');
+        expect(clearBtn).not.toBeNull();
+        clearBtn!.click();
+        fixture.detectChanges();
+
+        expect(search.value).toBe('');
+        expect(element.querySelectorAll('.quiz-card')).toHaveLength(6);
+    });
 });

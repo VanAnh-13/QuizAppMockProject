@@ -35,13 +35,6 @@
         </div>
 
         <div class="exam-header__actions">
-            <div class="timer" [class.timer--paused]="store.isPaused()">
-                <span class="material-symbols-outlined" aria-hidden="true">timer</span>
-                <span class="timer__label">{{
-                        store.isPaused() ? 'Đã tạm dừng:' : 'Thời gian còn lại:'
-                    }}</span>
-                <strong aria-live="off">{{ store.formattedTime() }}</strong>
-            </div>
             <button
                     class="pause-button"
                     type="button"
@@ -59,9 +52,18 @@
         <span class="material-symbols-outlined" aria-hidden="true">{{
                 store.isPaused() ? 'play_circle' : 'pause_circle'
             }}</span>
-                <span>{{ store.isPaused() ? 'Tiếp tục làm bài' : 'Tạm dừng bài thi' }}</span>
             </button>
         </div>
+    </div>
+
+    <div class="timer-bar" [class.timer-bar--paused]="store.isPaused()">
+        <div class="timer-bar__track">
+            <span class="timer-bar__fill" [style.width.%]="store.timePercent()"></span>
+        </div>
+        <span class="timer-bar__time" aria-live="off">
+            <span class="material-symbols-outlined" aria-hidden="true">timer</span>
+            {{ store.formattedTime() }}
+        </span>
     </div>
 </header>
 
@@ -181,7 +183,9 @@
         </section>
     </main>
 } @else if (!store.isLoading() && store.currentQuestion(); as question) {
-    <p class="attempt-status" role="status">{{ store.saveStatus() }}</p>
+    @if (store.saveStatus(); as status) {
+        <p class="attempt-status" role="status">{{ status }}</p>
+    }
     @if (store.isPaused()) {
         <p class="attempt-status attempt-status--paused" role="status">
             Bài thi đang tạm dừng. Nhấn “Tiếp tục làm bài” để trả lời.
@@ -302,16 +306,27 @@
                                     : 'Đánh dấu xem lại'
                         }}
                     </button>
-                    <button
-                            type="button"
-                            class="next-button"
-                            [disabled]="!store.canGoNext()"
-                            (click)="store.nextQuestion()"
-                    >
-                        Câu tiếp theo
-                        <span class="material-symbols-outlined"
-                                aria-hidden="true">arrow_forward</span>
-                    </button>
+                    @if (store.canGoNext()) {
+                        <button
+                                type="button"
+                                class="next-button"
+                                (click)="store.nextQuestion()"
+                        >
+                            Câu tiếp theo
+                            <span class="material-symbols-outlined"
+                                    aria-hidden="true">arrow_forward</span>
+                        </button>
+                    } @else {
+                        <button
+                                type="button"
+                                class="submit-button submit-button--nav"
+                                [disabled]="store.isBusy() || store.isPaused() || store.requiresReload()"
+                                (click)="openSubmitConfirmation()"
+                        >
+                            <span class="material-symbols-outlined" aria-hidden="true">send</span>
+                            Nộp bài
+                        </button>
+                    }
                 </div>
             </div>
         </section>
@@ -433,6 +448,42 @@
                 (click)="confirmSubmission()"
         >
             {{ store.isBusy() ? 'Đang nộp…' : 'Xác nhận nộp' }}
+        </button>
+    </div>
+</dialog>
+
+<dialog
+        #leaveDialog
+        id="leave-confirmation"
+        class="leave-dialog"
+        aria-labelledby="leave-title"
+        aria-describedby="leave-description"
+        (cancel)="cancelLeaveConfirmation($event)"
+        (close)="onLeaveDialogClose()"
+        (click)="dismissLeaveBackdrop($event)"
+>
+    <div class="leave-dialog__icon material-symbols-outlined" aria-hidden="true">
+        warning
+    </div>
+    <h2 id="leave-title">Rời khỏi bài thi?</h2>
+    <p id="leave-description">
+        {{ leaveMessage() }}
+    </p>
+    <div class="leave-dialog__actions">
+        <button
+                type="button"
+                class="btn-leave"
+                (click)="confirmLeave()"
+        >
+            Rời trang
+        </button>
+        <button
+                type="button"
+                class="btn-stay"
+                autofocus
+                (click)="cancelLeave()"
+        >
+            Ở lại làm tiếp
         </button>
     </div>
 </dialog>

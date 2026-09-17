@@ -281,4 +281,94 @@ describe('QuizAttemptPage', () => {
     const childClasses = Array.from(headerInner!.children).map(c => c.className);
     expect(childClasses).toEqual(['exam-header__identity', 'exam-progress', 'exam-header__actions']);
   });
+
+  it('replaces next button with submit button on the last question', async () => {
+    const fixture = await createFixture();
+    const store = fixture.debugElement.injector.get(QuizAttemptStore);
+    const element = fixture.nativeElement as HTMLElement;
+
+    const question1 = store.questions()[0];
+    const question2 = { ...question1, id: '20000000-0000-0000-0000-000000000002', number: 2 };
+    store.questions.set([question1, question2]);
+    store.currentQuestionNumber.set(1);
+    fixture.detectChanges();
+
+    expect(element.querySelector('.next-button')).not.toBeNull();
+    expect(element.querySelector('.submit-button--nav')).toBeNull();
+
+    store.currentQuestionNumber.set(2);
+    fixture.detectChanges();
+
+    expect(element.querySelector('.next-button')).toBeNull();
+    const submitNavBtn = element.querySelector<HTMLButtonElement>('.submit-button--nav');
+    expect(submitNavBtn).not.toBeNull();
+    expect(submitNavBtn?.textContent).toContain('Nộp bài');
+  });
+
+  it('opens liquid glass leave dialog when canLeave() is called during an active attempt and resolves false on cancel', async () => {
+    const fixture = await createFixture();
+    const component = fixture.componentInstance;
+    const element = fixture.nativeElement as HTMLElement;
+
+    const confirmSpy = vi.spyOn(window, 'confirm');
+
+    const canLeavePromise = component.canLeave();
+    fixture.detectChanges();
+
+    const leaveDialog = element.querySelector<HTMLDialogElement>('#leave-confirmation');
+    expect(leaveDialog).not.toBeNull();
+    expect(leaveDialog?.hasAttribute('open')).toBe(true);
+    expect(confirmSpy).not.toHaveBeenCalled();
+
+    const stayButton = leaveDialog?.querySelector<HTMLButtonElement>('.btn-stay');
+    expect(stayButton).not.toBeNull();
+    stayButton?.click();
+    fixture.detectChanges();
+
+    const canLeaveResult = await canLeavePromise;
+    expect(canLeaveResult).toBe(false);
+  });
+
+  it('resolves true when user confirms leave from the liquid glass dialog', async () => {
+    const fixture = await createFixture();
+    const component = fixture.componentInstance;
+    const element = fixture.nativeElement as HTMLElement;
+
+    const canLeavePromise = component.canLeave();
+    fixture.detectChanges();
+
+    const leaveDialog = element.querySelector<HTMLDialogElement>('#leave-confirmation');
+    expect(leaveDialog?.hasAttribute('open')).toBe(true);
+
+    const leaveButton = leaveDialog?.querySelector<HTMLButtonElement>('.btn-leave');
+    expect(leaveButton).not.toBeNull();
+    leaveButton?.click();
+    fixture.detectChanges();
+
+    const canLeaveResult = await canLeavePromise;
+    expect(canLeaveResult).toBe(true);
+  });
+
+  it('allows leaving immediately without dialog when attempt is already submitted or empty', async () => {
+    const fixture = await createFixture();
+    const component = fixture.componentInstance;
+    const store = fixture.debugElement.injector.get(QuizAttemptStore);
+    const element = fixture.nativeElement as HTMLElement;
+
+    store.result.set({
+      id: start.attemptId,
+      quizId,
+      quizTitle: start.quiz.title,
+      score: 80,
+      submittedAt: '2026-09-12T08:10:00Z',
+      passedScore: 75,
+    });
+    fixture.detectChanges();
+
+    const canLeaveResult = await component.canLeave();
+    expect(canLeaveResult).toBe(true);
+    const leaveDialog = element.querySelector<HTMLDialogElement>('#leave-confirmation');
+    expect(leaveDialog?.hasAttribute('open')).toBe(false);
+  });
 });
+

@@ -35,26 +35,29 @@
             </button>
             <span class="details-header__divider" aria-hidden="true"></span>
             @if (session.user(); as user) {
-                <div class="details-header__profile">
-                    <span
+                <details #userMenu class="details-header__profile details-header__user-menu">
+                    <summary
                             class="details-header__avatar material-symbols-outlined"
-                            aria-hidden="true"
+                            aria-label="Tài khoản: {{ user.fullName || user.username }}"
                     >
                         person
-                    </span>
-                    <span class="details-header__profile-copy">
-                        <strong>{{ user.fullName || user.username }}</strong>
-                        <span>Đã đăng nhập</span>
-                    </span>
-                </div>
-                <button
-                        class="details-header__auth-button"
-                        type="button"
-                        data-testid="header-logout"
-                        (click)="logout()"
-                >
-                    Đăng xuất
-                </button>
+                    </summary>
+                    <div class="details-header__user-panel">
+                        <div class="details-header__user-info">
+                            <strong>{{ user.fullName || user.username }}</strong>
+                            <span>Đã đăng nhập</span>
+                        </div>
+                        <button
+                                class="details-header__logout-button"
+                                type="button"
+                                data-testid="header-logout"
+                                (click)="logout()"
+                        >
+                            <span class="material-symbols-outlined" aria-hidden="true">logout</span>
+                            Đăng xuất
+                        </button>
+                    </div>
+                </details>
             } @else {
                 <a
                         class="details-header__auth-button"

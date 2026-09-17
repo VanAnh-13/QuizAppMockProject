@@ -47,7 +47,7 @@
         @apply hidden;
     }
 
-    .details-header__profile {
+    .details-header__user-menu {
         @apply px-1;
     }
 }

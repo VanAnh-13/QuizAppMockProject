@@ -1,4 +1,13 @@
-import {ChangeDetectionStrategy, Component, computed, inject, signal} from '@angular/core';
+import {
+    ChangeDetectionStrategy,
+    Component,
+    computed,
+    ElementRef,
+    HostListener,
+    inject,
+    signal,
+    viewChild,
+} from '@angular/core';
 import {DatePipe, NgTemplateOutlet} from '@angular/common';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {ATTEMPT_API, AttemptResult} from '../../quiz-attempt/application/attempt-api';
@@ -54,6 +63,7 @@ export class QuizDetailsPage {
     private readonly router = inject(Router);
 
     protected readonly session = inject(AuthSession);
+    private readonly userMenu = viewChild<ElementRef<HTMLDetailsElement>>('userMenu');
 
     protected readonly quizId = signal('');
     protected readonly quizUrl = computed(() => `/quiz/${encodeURIComponent(this.quizId())}`);
@@ -120,6 +130,14 @@ export class QuizDetailsPage {
         this.historyDialogOpen.set(false);
         this.history.set([]);
         this.historyError.set(null);
+    }
+
+    @HostListener('document:click', ['$event'])
+    protected onDocumentClick(event: MouseEvent): void {
+        const menu = this.userMenu()?.nativeElement;
+        if (menu?.open && !menu.contains(event.target as Node)) {
+            menu.open = false;
+        }
     }
 
     protected async openHistory(): Promise<void> {

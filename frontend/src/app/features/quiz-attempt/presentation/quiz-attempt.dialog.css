@@ -1,10 +1,12 @@
-.submit-dialog::backdrop {
+.submit-dialog::backdrop,
+.leave-dialog::backdrop {
     backdrop-filter: var(--glass-filter);
     -webkit-backdrop-filter: var(--glass-filter);
     @apply bg-slate-900/20;
 }
 
-.submit-dialog {
+.submit-dialog,
+.leave-dialog {
     border-radius: var(--glass-radius);
     border: 1px solid var(--glass-border);
     background: var(--glass-raised);
@@ -15,37 +17,56 @@
     @apply fixed inset-0 z-50 m-auto w-[calc(100%-2rem)] max-w-md p-6 text-center;
 }
 
-.submit-dialog__icon {
+.submit-dialog__icon,
+.leave-dialog__icon {
     border: 1px solid var(--glass-border);
     background: var(--brand-soft);
     color: var(--brand);
     @apply mx-auto flex size-12 items-center justify-center rounded-full text-2xl shadow-sm;
 }
 
-.submit-dialog h2 {
+.leave-dialog__icon {
+    background: rgba(245, 158, 11, 0.12);
+    color: rgb(217, 119, 6);
+    border-color: rgba(245, 158, 11, 0.25);
+}
+
+.submit-dialog h2,
+.leave-dialog h2 {
     @apply mb-0 mt-4 text-xl font-bold text-ink;
 }
 
-.submit-dialog p {
+.submit-dialog p,
+.leave-dialog p {
     @apply mb-0 mt-3 text-sm leading-6 text-muted;
 }
 
-.submit-dialog__actions {
+.submit-dialog__actions,
+.leave-dialog__actions {
     @apply mt-6 flex flex-col-reverse gap-2 sm:flex-row;
 }
 
-.submit-dialog__actions button {
+.submit-dialog__actions button,
+.leave-dialog__actions button {
     border: 1px solid var(--glass-border);
     background: var(--glass-surface);
     color: var(--ink);
     @apply min-h-11 flex-1 rounded-xl px-3 text-sm font-semibold transition-all hover:bg-[var(--glass-hover)];
 }
 
-.submit-dialog__actions button:last-child {
+.submit-dialog__actions button:last-child,
+.leave-dialog__actions .btn-stay {
     background: var(--brand-gradient);
     border: 1px solid var(--glass-border);
     box-shadow: var(--glass-shadow);
     @apply text-on-brand hover:opacity-95;
+}
+
+.leave-dialog__actions .btn-leave {
+    border: 1px solid rgba(239, 68, 68, 0.35);
+    background: rgba(239, 68, 68, 0.08);
+    color: #dc2626;
+    @apply hover:bg-red-500/20 hover:border-red-500/50;
 }
 
 .submission-toast {
