@@ -1,5 +1,5 @@
 @if (service.notifications().length) {
-    <div class="toast-container" aria-live="assertive" aria-relevant="additions">
+    <div class="toast-container">
         @for (notification of service.notifications(); track notification.id) {
             <div class="toast" role="alert">
                 <span class="toast__icon material-symbols-outlined" aria-hidden="true">error</span>
