@@ -1,0 +1,18 @@
+@if (service.notifications().length) {
+    <div class="toast-container">
+        @for (notification of service.notifications(); track notification.id) {
+            <div class="toast" role="alert">
+                <span class="toast__icon material-symbols-outlined" aria-hidden="true">error</span>
+                <p class="toast__message">{{ notification.message }}</p>
+                <button
+                        class="toast__dismiss"
+                        type="button"
+                        aria-label="Đóng thông báo"
+                        (click)="service.dismiss(notification.id)"
+                >
+                    <span class="material-symbols-outlined" aria-hidden="true">close</span>
+                </button>
+            </div>
+        }
+    </div>
+}
