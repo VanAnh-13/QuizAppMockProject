@@ -24,7 +24,7 @@ button {
 }
 
 .exam-header__inner {
-    @apply mx-auto grid max-w-[1200px] grid-cols-[minmax(0,1fr)_auto] items-center gap-3;
+    @apply mx-auto grid max-w-[1200px] grid-cols-[minmax(0,1fr)_auto] items-center gap-3 lg:grid-cols-[minmax(0,1fr)_220px_auto];
 }
 
 .exam-header__identity,
@@ -95,7 +95,7 @@ button {
 }
 
 .exam-header__actions {
-    @apply gap-2;
+    @apply gap-2 lg:col-start-3 lg:row-start-1;
 }
 
 .timer,
@@ -573,8 +573,3 @@ button {
     color: var(--warning);
 }
 
-@media (min-width: 64rem) {
-    .exam-header__inner {
-        grid-template-columns: minmax(0, 1fr) 220px auto;
-    }
-}
