@@ -19,7 +19,7 @@ export class ApiQuizCatalog implements QuizCatalog {
                 description: quiz.description ?? '',
                 durationMinutes: quiz.duration,
                 categoryId: 'general',
-                categoryLabel: 'Kiến thức tổng hợp',
+                categoryLabel: 'General knowledge',
                 questionCount: quiz.questionCount,
                 status: 'open',
                 imageUrl: resolveQuizImageUrl(quiz.title, quiz.imageUrl),

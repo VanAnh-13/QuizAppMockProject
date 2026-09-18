@@ -22,14 +22,6 @@
     align-items: center;
 }
 
-.support-link {
-    @apply relative z-10 mb-10 ml-auto flex items-center gap-1.5 text-xs text-muted transition-colors hover:text-ink;
-}
-
-.support-link .material-symbols-outlined {
-    font-size: 1.1rem;
-}
-
 .auth-card {
     position: relative;
     z-index: 10;

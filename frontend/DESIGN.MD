@@ -6,11 +6,11 @@ ___
 
 ## Identity
 
-**Style name:** LyQuiz Glass
+**Style name:** Liquid Glass
 **Brand palette:** Blue Gradient
 **Font:** Be Vietnam Pro (already loaded; do not add a second typeface)
 
-The LyQuiz Glass style is a liquid glass-morphism design language built on a fixed-position blue gradient background, semi-transparent frosted cards, and a single continuous blue gradient as the primary action colour. Every surface in the UI is a pane of frosted glass floating above the background — never an opaque white box.
+The Liquid Glass style is a liquid glass-morphism design language built on a fixed-position blue gradient background, semi-transparent frosted cards, and a single continuous blue gradient as the primary action colour. Every surface in the UI is a pane of frosted glass floating above the background — never an opaque white box.
 
 ___
 
@@ -162,5 +162,5 @@ ___
 - Semantic tokens: `--ink`, `--muted`, `--canvas`, `--on-brand`, `--success`, `--warning`, `--error`.
 - Structural glass tokens: `--glass-filter`, `--glass-border`, `--glass-radius`, `--glass-shadow`.
 - API contracts, DTOs, routes, or TypeScript business logic.
-- Vietnamese UI text, `aria-*` attributes, `role`, or tab order.
+- English UI text, `aria-*` attributes, `role`, or tab order.
 - The `Be Vietnam Pro` font declaration.

@@ -1,0 +1,109 @@
+<app-admin-shell active="roles">
+    <main class="admin-page roles-page" id="main-content" tabindex="-1">
+        <header class="admin-page__heading">
+            <div>
+                <p class="admin-page__eyebrow">Access management</p>
+                <h1>Roles &amp; permissions</h1>
+                <p>Organize your team’s access. Select a role to manage its details.</p>
+            </div>
+            <span class="roles-count">{{ store.totalCount() }} roles</span>
+        </header>
+        @if (store.errorMessage(); as message) {
+            <p class="error" role="alert">{{ message }}</p>
+        }
+        <div class="roles-layout">
+            <section class="roles-directory" aria-labelledby="roles-heading"
+                    [attr.aria-busy]="store.isLoading()">
+                <div class="roles-directory__heading">
+                    <h2 id="roles-heading">Permission groups</h2>
+                    <span class="material-symbols-outlined" aria-hidden="true">shield</span>
+                </div>
+
+                @if (store.isLoading()) {
+                    <p class="admin-state" role="status">Loading roles…</p>
+                } @else {
+                    <ul class="admin-list">
+                        @for (role of store.roles(); track role.id) {
+                            <li>
+                                <button type="button" class="role-card"
+                                        [attr.aria-pressed]="store.selectedId() === role.id"
+                                        (click)="store.select(role)">
+                                    <span class="role-card__icon material-symbols-outlined"
+                                            aria-hidden="true">admin_panel_settings</span>
+                                    <span class="role-card__copy">
+                                        <strong>{{ role.roleName }}</strong>
+                                        <span>{{ role.description || 'No description yet.' }}</span>
+                                            <span class="role-status"
+                                                    [class.role-status--inactive]="!role.isActive">
+                                                <span class="material-symbols-outlined"
+                                                        aria-hidden="true">{{ role.isActive ? 'check_circle' : 'pause_circle' }}</span>
+                                                {{ role.isActive ? 'Active' : 'Inactive' }}
+                                            </span>
+                                    </span>
+                                    <span class="role-card__arrow material-symbols-outlined"
+                                            aria-hidden="true">{{ store.selectedId() === role.id ? 'check' : 'chevron_right' }}</span>
+                                </button>
+                            </li>
+                        } @empty {
+                            <li class="admin-state">No roles found. Try a different search.</li>
+                        }
+                    </ul>
+                }
+            </section>
+            <section class="role-editor" aria-labelledby="role-editor-heading">
+                <header class="role-editor__heading">
+                    <div>
+                        <p class="admin-page__eyebrow">Role details</p>
+                        <h2 id="role-editor-heading">{{ store.selected()?.roleName || 'Select a role' }}</h2>
+                    </div>
+                    <span class="role-editor__icon material-symbols-outlined" aria-hidden="true">tune</span>
+                </header>
+                @if (store.selected()) {
+                    <form [formGroup]="store.form" (ngSubmit)="store.save()">
+                        <label class="role-field">
+                            <span>Role name <span aria-hidden="true">*</span></span>
+                            <input type="text" formControlName="roleName"
+                                    placeholder="Enter a role name" required
+                                    [attr.aria-invalid]="store.form.controls.roleName.touched && store.form.controls.roleName.invalid"
+                                    aria-describedby="role-name-error"/>
+                        </label>
+                        <p id="role-name-error" class="error"
+                                aria-live="polite">{{ store.form.controls.roleName.touched && store.form.controls.roleName.invalid ? 'Enter a role name.' : '' }}</p>
+                        <label class="role-field">
+                            <span>Description <small>Optional</small></span>
+                            <textarea rows="3" formControlName="description"
+                                    placeholder="Describe who this role is for…"></textarea>
+                        </label>
+                        <label class="role-toggle">
+                            <span><strong>Enable role</strong><small>Make this role available for access assignments.</small></span>
+                            <input type="checkbox" role="switch" formControlName="isActive"
+                                    aria-label="Enable role"/>
+                        </label>
+                        @if (store.protectedRole()) {
+                            <p class="role-note"><span class="material-symbols-outlined"
+                                    aria-hidden="true">lock</span>This is a system role and cannot
+                                be deleted.</p>
+                        }
+                        <footer class="role-editor__actions">
+                            <button class="role-delete" type="button"
+                                    [disabled]="store.protectedRole() || store.isSaving()"
+                                    (click)="store.remove()">
+                                <span class="material-symbols-outlined"
+                                        aria-hidden="true">delete</span>Delete role
+                            </button>
+                            <button class="primary-action" type="submit"
+                                    [disabled]="store.isSaving() || store.isLoading()">
+                                <span class="material-symbols-outlined"
+                                        aria-hidden="true">{{ store.isSaving() ? 'hourglass_top' : 'check' }}</span>
+                                {{ store.isSaving() ? 'Saving…' : 'Save changes' }}
+                            </button>
+                        </footer>
+                    </form>
+                } @else {
+                    <p class="admin-state">Choose a permission group to view and edit its
+                        details.</p>
+                }
+            </section>
+        </div>
+    </main>
+</app-admin-shell>

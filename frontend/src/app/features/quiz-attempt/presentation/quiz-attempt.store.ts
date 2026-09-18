@@ -27,7 +27,7 @@ type AttemptSnapshot = AttemptStart | AttemptProgress;
 @Injectable()
 export class QuizAttemptStore implements OnDestroy {
     readonly attemptId = signal<string | null>(null);
-    readonly title = signal('Bài quiz');
+    readonly title = signal('Quiz');
     readonly questions = signal<readonly Question[]>([]);
     readonly currentQuestionNumber = signal(1);
     readonly isPaused = signal(false);
@@ -133,7 +133,7 @@ export class QuizAttemptStore implements OnDestroy {
             }
 
             this.errorMessage.set(
-                apiErrorMessage(error, 'Không thể tải lượt làm bài. Vui lòng thử lại.'),
+                apiErrorMessage(error, 'Could not load your attempt. Please try again.'),
             );
         } finally {
             if (loadVersion === this.loadVersion) {
@@ -485,7 +485,7 @@ export class QuizAttemptStore implements OnDestroy {
             Array.isArray(snapshot.quiz.questions);
 
         if (!isValid) {
-            throw new Error('Lượt làm bài không hợp lệ.');
+            throw new Error('Invalid attempt.');
         }
     }
 
@@ -503,7 +503,7 @@ export class QuizAttemptStore implements OnDestroy {
             Array.isArray(question.answers);
 
         if (!isValid) {
-            throw new Error('Loại câu hỏi chưa được hỗ trợ.');
+            throw new Error('This question type is not supported.');
         }
 
         const isText = question.questionType >= FIRST_TEXT_QUESTION_TYPE;
@@ -534,7 +534,7 @@ export class QuizAttemptStore implements OnDestroy {
             : (Date.parse(snapshot.expiresAt) - Date.parse(snapshot.serverTime)) / 1000;
 
         if (!Number.isFinite(serverSeconds)) {
-            throw new Error('Thời gian từ máy chủ không hợp lệ.');
+            throw new Error('Invalid server time.');
         }
 
         const elapsedSeconds = progress?.pausedAt ? 0 : (performance.now() - requestedAt) / 1000;
@@ -572,15 +572,15 @@ export class QuizAttemptStore implements OnDestroy {
 
     private getSaveStatus(): string | null {
         if (this.requiresReload()) {
-            return 'Cần đồng bộ lại với máy chủ';
+            return 'Reload to sync with the server';
         }
 
         if (this.isSaving()) {
-            return 'Đang lưu đáp án…';
+            return 'Saving answers…';
         }
 
         if (this.dirty()) {
-            return 'Có thay đổi chưa lưu';
+            return 'You have unsaved changes';
         }
 
         return null;
@@ -599,8 +599,8 @@ export class QuizAttemptStore implements OnDestroy {
             apiErrorMessage(
                 error,
                 isExpiredRequest
-                    ? 'Đã hết giờ. Chỉ các đáp án đã lưu được chấm.'
-                    : 'Chưa xác nhận được thao tác. Hãy tải lại trạng thái trước khi tiếp tục.',
+                    ? 'Time is up. Only saved answers will be graded.'
+                    : 'The action could not be confirmed. Reload the attempt before continuing.',
             ),
         );
     }
@@ -617,7 +617,7 @@ export class QuizAttemptStore implements OnDestroy {
 
     private acceptResult(result: AttemptResult): void {
         if (result.quizId !== this.quizId || !Number.isFinite(result.score)) {
-            throw new Error('Kết quả không hợp lệ.');
+            throw new Error('Invalid result.');
         }
 
         this.result.set(result);
@@ -647,14 +647,14 @@ function hasAnswerContent(answer: AttemptAnswer): boolean {
 
 function getQuestionGuidance(questionType: number): string {
     if (questionType >= FIRST_TEXT_QUESTION_TYPE) {
-        return 'Nhập câu trả lời của bạn.';
+        return 'Enter your answer.';
     }
 
     if (questionType === MULTIPLE_CHOICE_TYPE) {
-        return 'Chọn tất cả đáp án phù hợp.';
+        return 'Select all correct answers.';
     }
 
-    return 'Chọn một đáp án.';
+    return 'Select one answer.';
 }
 
 function formatTime(totalSeconds: number): string {

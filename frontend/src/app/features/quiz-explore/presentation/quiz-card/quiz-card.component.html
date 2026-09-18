@@ -1,10 +1,10 @@
-﻿<article class="quiz-card">
+<article class="quiz-card">
     <div>
         <div class="quiz-card__media">
-            <img [src]="quiz().imageUrl ?? 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=400&auto=format&fit=crop'"
+            <img [ngSrc]="quiz().imageUrl ?? fallbackImage"
                     [alt]="quiz().title"
                     class="quiz-card__media-img"
-                    loading="lazy"/>
+                    fill/>
             <div class="quiz-card__media-gloss"></div>
         </div>
 
@@ -32,7 +32,7 @@
     <div>
         <dl class="quiz-card__metadata">
             <div>
-                <dt class="visually-hidden">Số câu hỏi</dt>
+                <dt class="visually-hidden">Questions</dt>
                 <dd>
                     <svg
                             width="17"
@@ -46,11 +46,11 @@
                         <rect x="5" y="4" width="14" height="17" rx="2"/>
                         <path d="M9 3h6v3H9zM9 11h6M9 15h4"/>
                     </svg>
-                    {{ quiz().questionCount }} câu
+                    {{ quiz().questionCount }} questions
                 </dd>
             </div>
             <div>
-                <dt class="visually-hidden">Thời gian làm bài</dt>
+                <dt class="visually-hidden">Time limit</dt>
                 <dd>
                     <svg
                             width="17"
@@ -64,17 +64,17 @@
                         <circle cx="12" cy="12" r="9"/>
                         <path d="M12 7v5l3 2"/>
                     </svg>
-                    {{ quiz().durationMinutes }} phút
+                    {{ quiz().durationMinutes }} minutes
                 </dd>
             </div>
         </dl>
         <button
                 class="quiz-card__detail"
                 type="button"
-                [attr.aria-label]="'Xem chi tiết: ' + quiz().title"
+                [attr.aria-label]="'View details: ' + quiz().title"
                 (click)="detailRequested.emit(quiz())"
         >
-            Xem chi tiết
+            View details
             <svg
                     width="18"
                     height="18"

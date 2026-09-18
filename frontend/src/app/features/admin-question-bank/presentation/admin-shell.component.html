@@ -1,0 +1,57 @@
+<div class="admin">
+    <aside class="admin-nav" aria-label="Admin menu">
+        <div class="admin-nav__brand">
+            <span class="admin-nav__mark material-symbols-outlined" aria-hidden="true">quiz</span>
+            <div>
+                <p class="admin-nav__title">Liquid Glass</p>
+                <p class="admin-nav__subtitle">Admin</p>
+            </div>
+        </div>
+
+        <nav class="admin-nav__links">
+            <a routerLink="/admin/quizzes"
+                    [attr.aria-current]="active() === 'quizzes' ? 'page' : null"
+                    [class.admin-nav__link--active]="active() === 'quizzes'">
+                <span class="material-symbols-outlined" aria-hidden="true">quiz</span>
+                Quizzes
+            </a>
+            <a
+                    routerLink="/admin/questions"
+                    [attr.aria-current]="active() === 'questions' ? 'page' : null"
+                    [class.admin-nav__link--active]="active() === 'questions'"
+            >
+                <span class="material-symbols-outlined" aria-hidden="true">inventory_2</span>
+                Question bank
+            </a>
+            <a routerLink="/admin/users"
+                    [attr.aria-current]="active() === 'users' ? 'page' : null"
+                    [class.admin-nav__link--active]="active() === 'users'">
+                <span class="material-symbols-outlined" aria-hidden="true">group</span>
+                Users
+            </a>
+            <a routerLink="/admin/roles"
+                    [attr.aria-current]="active() === 'roles' ? 'page' : null"
+                    [class.admin-nav__link--active]="active() === 'roles'">
+                <span class="material-symbols-outlined" aria-hidden="true">admin_panel_settings</span>
+                Roles
+            </a>
+        </nav>
+
+        <div class="admin-nav__account">
+            <span class="admin-nav__avatar" aria-hidden="true">{{ initials() }}</span>
+            <div>
+                <p>{{ user()?.fullName || user()?.username || 'Admin' }}</p>
+                <button type="button" (click)="logout()">Log out</button>
+            </div>
+        </div>
+
+        <a class="admin-nav__back" routerLink="/">
+            <span class="material-symbols-outlined" aria-hidden="true">arrow_back</span>
+            Back to learning
+        </a>
+    </aside>
+
+    <div class="admin__canvas">
+        <ng-content/>
+    </div>
+</div>

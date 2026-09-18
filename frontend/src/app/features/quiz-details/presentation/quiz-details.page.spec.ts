@@ -5,6 +5,8 @@ import {of} from 'rxjs';
 import {AuthSession} from '../../../core/auth/auth-session';
 import {ATTEMPT_API} from '../../quiz-attempt/application/attempt-api';
 import {QUIZ_DETAILS_CONTENT} from '../infrastructure/quiz-details-content.provider';
+import {ConfirmationService} from '../../../shared/ui/confirmation/confirmation.service';
+import {MockConfirmationService} from '../../../../testing/mock-confirmation';
 import {QuizDetailsPage} from './quiz-details.page';
 
 const quizId = '10000000-0000-0000-0000-000000000003';
@@ -56,6 +58,7 @@ describe('QuizDetailsPage', () => {
             providers: [
                 provideRouter([]),
                 {provide: ActivatedRoute, useValue: {paramMap: of(convertToParamMap({quizId}))}},
+                {provide: ConfirmationService, useClass: MockConfirmationService},
             ],
         })
             .overrideComponent(QuizDetailsPage, {
@@ -67,6 +70,7 @@ describe('QuizDetailsPage', () => {
                 },
             })
             .compileComponents();
+        vi.spyOn(TestBed.inject(Router), 'navigateByUrl').mockResolvedValue(true);
     });
 
     async function createFixture() {
@@ -133,12 +137,36 @@ describe('QuizDetailsPage', () => {
         expect(header.querySelector('[data-testid="header-register"]')).toBeNull();
 
         header.querySelector<HTMLButtonElement>('[data-testid="header-logout"]')!.click();
+        await fixture.whenStable();
         fixture.detectChanges();
 
         expect(session.user()).toBeNull();
         expect(session.token()).toBeNull();
         expect(header.querySelector('.details-header__profile')).toBeNull();
         expect(header.querySelector('[data-testid="header-login"]')).not.toBeNull();
+    });
+
+    it('does not log out when confirmation is cancelled on quiz details page', async () => {
+        vi.spyOn(TestBed.inject(Router), 'navigateByUrl').mockResolvedValue(true);
+        const fixture = await createFixture();
+        const session = TestBed.inject(AuthSession);
+        const confirmation = TestBed.inject(ConfirmationService) as unknown as MockConfirmationService;
+        confirmation.setAutoResponse(false);
+        const header = (fixture.nativeElement as HTMLElement).querySelector('header')!;
+
+        session.set({
+            token: 'test-token',
+            expiresAt: new Date(Date.now() + 60_000).toISOString(),
+            userDto: {id: 'learner-id', username: 'linh', fullName: 'Nguyễn Linh'},
+        });
+        fixture.detectChanges();
+
+        header.querySelector<HTMLButtonElement>('[data-testid="header-logout"]')!.click();
+        await fixture.whenStable();
+        fixture.detectChanges();
+
+        expect(session.user()).not.toBeNull();
+        expect(header.querySelector('.details-header__profile')).not.toBeNull();
     });
 
     it('falls back to the username and reacts when the session is cleared elsewhere', async () => {
@@ -176,7 +204,7 @@ describe('QuizDetailsPage', () => {
 
         expect(element.querySelector('#topics-title')).toBeNull();
         expect(element.querySelector('.topics-grid')).toBeNull();
-        expect(element.textContent).toContain('Thông tin chủ đề của quiz này chưa được cung cấp.');
+        expect(element.textContent).toContain('Topic details are not available for this quiz yet.');
         expect(element.querySelector('.start-button')).not.toBeNull();
     });
 
@@ -194,14 +222,14 @@ describe('QuizDetailsPage', () => {
         const element = fixture.nativeElement as HTMLElement;
 
         expect(element.querySelector('#topics-title')?.textContent).toContain(
-            'Bạn sẽ kiểm tra kiến thức về:',
+            'What you will be tested on:',
         );
         expect(element.querySelectorAll('.topics-grid .topic-card')).toHaveLength(1);
         expect(element.querySelector('.topic-card h3')?.textContent).toContain('Kiểu dữ liệu');
         expect(element.querySelector('.topic-card p')?.textContent).toContain(
             'Các kiểu dữ liệu cơ bản trong C#.',
         );
-        expect(element.textContent).not.toContain('Thông tin chủ đề của quiz này chưa được cung cấp.');
+        expect(element.textContent).not.toContain('Topic details are not available for this quiz yet.');
     });
 
     it.each(['mobile', 'desktop'])('loads signed-in history from the %s actions', async (layout) => {
@@ -232,7 +260,7 @@ describe('QuizDetailsPage', () => {
         for (const action of actions) {
             const headingId = action.getAttribute('aria-labelledby');
             expect(action.querySelector('h2')?.id).toBe(headingId);
-            expect(action.querySelector('h2')?.textContent).toContain('Sẵn sàng thử thách năng lực?');
+            expect(action.querySelector('h2')?.textContent).toContain('Ready to test your skills?');
             expect(action.querySelector('a')?.getAttribute('href')).toBe(`/quiz/${quizId}/attempt`);
         }
     });
@@ -288,7 +316,7 @@ describe('QuizDetailsPage', () => {
     it('opens information as a modal and dismisses it on Escape', async () => {
         const fixture = await createFixture();
         const element = fixture.nativeElement as HTMLElement;
-        element.querySelector<HTMLButtonElement>('[title="Thông báo"]')!.click();
+        element.querySelector<HTMLButtonElement>('[title="Notifications"]')!.click();
         fixture.detectChanges();
         const dialog = element.querySelector<HTMLDialogElement>('.details-dialog')!;
         expect(HTMLDialogElement.prototype.showModal).toHaveBeenCalled();

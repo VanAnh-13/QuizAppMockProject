@@ -6,6 +6,8 @@
 }
 
 .header {
+    position: relative;
+    z-index: 50;
     border: 1px solid var(--glass-border);
     border-radius: var(--glass-radius);
     background: var(--glass-raised);
@@ -84,19 +86,51 @@
     transform: scale(1.08);
 }
 
+.header__page-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 45;
+    background: rgba(15, 23, 42, 0.25);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    cursor: default;
+    animation: headerFadeIn 0.18s ease-out;
+}
+
 .header__user-panel {
     position: absolute;
-    top: 44px;
+    top: 48px;
     right: 0;
     z-index: 50;
-    width: 200px;
-    border-radius: 0.75rem;
+    width: 220px;
+    border-radius: 1rem;
     border: 1px solid var(--glass-border);
     background: var(--glass-raised);
     backdrop-filter: var(--glass-filter);
     -webkit-backdrop-filter: var(--glass-filter);
-    box-shadow: var(--glass-shadow);
-    @apply grid gap-1 p-2;
+    box-shadow: 0 16px 40px rgba(30, 64, 175, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.65);
+    @apply grid gap-1.5 p-2.5;
+    animation: headerSlideDown 0.18s ease-out;
+}
+
+@keyframes headerFadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes headerSlideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-6px) scale(0.97);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
 }
 
 .header__user-info {

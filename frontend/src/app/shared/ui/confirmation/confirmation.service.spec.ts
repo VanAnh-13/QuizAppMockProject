@@ -18,8 +18,8 @@ describe('ConfirmationService', () => {
         expect(service.request()).toEqual({
             title: 'Confirm Title',
             message: 'Confirm Message',
-            confirmLabel: 'Xác nhận',
-            cancelLabel: 'Hủy',
+            confirmLabel: 'Confirm',
+            cancelLabel: 'Cancel',
         });
 
         service.accept();

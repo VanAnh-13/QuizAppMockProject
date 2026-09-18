@@ -19,7 +19,7 @@ export function validatePublicQuiz(quiz: PublicQuizSummaryDto): PublicQuizSummar
         quiz.questionCount < 0 ||
         !Number.isFinite(Date.parse(quiz.updatedAt))
     ) {
-        throw new Error('Dữ liệu quiz không hợp lệ.');
+        throw new Error('Invalid quiz data.');
     }
     return quiz;
 }

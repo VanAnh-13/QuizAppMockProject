@@ -6,8 +6,8 @@ These instructions apply to everything under `frontend/`. They extend the reposi
 ## Design system
 
 Before touching any CSS, HTML, or visual component, read `frontend/DESIGN.MD`.
-It defines the **LyQuiz Glass** style and the **Blue Gradient** brand palette — the single source
-of truth for colours, glass tokens, component layers, and prohibited patterns.
+It defines the **Liquid Glass** style and the **Blue Gradient** brand palette — the single source
+of truth for colors, glass tokens, component layers, and prohibited patterns.
 
 ## Required workflow
 
@@ -61,7 +61,9 @@ frontend source file, including HTML, CSS, and TypeScript.
   stores and remote calls in API adapters.
 - Reuse existing interfaces and injection tokens instead of creating duplicate access paths.
 - Handle loading, empty, authentication, and error states explicitly. Do not swallow exceptions.
-- Preserve Vietnamese UI text and accessibility behavior unless the request explicitly changes it.
+- Write every user-facing string in English: headings, labels, buttons, placeholders,
+  empty states, validation, API fallbacks, page titles, and `aria-*` / `alt` text.
+  Keep existing accessibility attributes; only change their language.
 
 ## Verification
 

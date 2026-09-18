@@ -81,26 +81,26 @@ export class AuthFormStore {
 
         if (control.hasError('required'))
             return name === 'terms'
-                ? 'Vui lòng xác nhận trước khi đăng ký.'
-                : 'Vui lòng điền thông tin này.';
+                ? 'Please accept the terms before signing up.'
+                : 'Please complete this field.';
 
         if (control.hasError('email'))
-            return 'Địa chỉ email không hợp lệ.';
+            return 'Enter a valid email address.';
 
         if (control.hasError('minlength'))
-            return `Mật khẩu cần ít nhất ${AUTH_LIMITS.passwordMin} ký tự.`;
+            return `Password must contain at least ${AUTH_LIMITS.passwordMin} characters.`;
 
         if (control.hasError('maxlength'))
-            return `Tối đa ${control.getError('maxlength').requiredLength} ký tự.`;
+            return `Maximum ${control.getError('maxlength').requiredLength} characters.`;
 
         if (control.hasError('date'))
-            return 'Ngày sinh phải hợp lệ và không ở tương lai.';
+            return 'Enter a valid date of birth that is not in the future.';
 
         if (name === 'confirmPassword' && this.form.hasError('passwordMismatch'))
-            return 'Mật khẩu xác nhận chưa khớp.';
+            return 'Passwords do not match.';
 
         if (name === 'givenName' && this.form.hasError('fullNameLength'))
-            return `Họ và tên không quá ${AUTH_LIMITS.fullName} ký tự.`;
+            return `Full name must not exceed ${AUTH_LIMITS.fullName} characters.`;
 
         return null;
     }
@@ -139,9 +139,9 @@ export class AuthFormStore {
             return true;
         } catch (error) {
             this.error.set(error instanceof HttpErrorResponse && error.status === 401
-                ? 'Tên đăng nhập hoặc mật khẩu chưa đúng.'
-                : apiErrorMessage(error, 'Không thể xử lý yêu cầu. Vui lòng kiểm tra thông tin và thử lại.', {
-                    conflictMessage: 'Tên đăng nhập hoặc email đã được sử dụng. Vui lòng chọn thông tin khác hoặc đăng nhập.',
+                ? 'Incorrect username or password.'
+                : apiErrorMessage(error, 'Could not process your request. Check your details and try again.', {
+                    conflictMessage: 'This username or email is already in use. Choose another or log in.',
                 }));
             return false;
         } finally {

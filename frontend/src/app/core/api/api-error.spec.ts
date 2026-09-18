@@ -4,7 +4,7 @@ import {apiErrorMessage} from './api-error';
 describe('apiErrorMessage', () => {
     it('preserves quiz conflict guidance when no override is supplied', () => {
         expect(apiErrorMessage(new HttpErrorResponse({status: 409}), 'Fallback')).toBe(
-            'Dữ liệu đã thay đổi ở phiên khác hoặc bài đã được nộp. Hãy tải lại trạng thái từ máy chủ.',
+            'This attempt was updated in another session or already submitted. Reload it from the server.',
         );
     });
 
@@ -13,7 +13,16 @@ describe('apiErrorMessage', () => {
             apiErrorMessage(new HttpErrorResponse({status: 0}), 'Fallback', {
                 conflictMessage: 'Account already exists.',
             }),
-        ).toBe('Không thể kết nối máy chủ. Kiểm tra kết nối rồi thử lại.');
+        ).toBe('Cannot connect to the server. Check your connection and try again.');
+    });
+
+    it('returns the backend error message for 400 bad request when present', () => {
+        expect(
+            apiErrorMessage(
+                new HttpErrorResponse({status: 400, error: {message: 'You cannot remove your own administrator role.'}}),
+                'Fallback',
+            ),
+        ).toBe('You cannot remove your own administrator role.');
     });
 
     it('uses the fallback for unknown failures even with a conflict override', () => {

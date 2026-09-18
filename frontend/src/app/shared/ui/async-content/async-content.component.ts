@@ -9,7 +9,7 @@ import {AsyncState} from '../../state/async-state';
 })
 export class AsyncContentComponent<T = unknown> {
     readonly state = input.required<AsyncState<T>>();
-    readonly loadingMessage = input('Đang tải dữ liệu…');
+    readonly loadingMessage = input('Loading…');
     readonly retryRequested = output<void>();
     protected readonly errorMessage = computed(() => {
         const current = this.state();

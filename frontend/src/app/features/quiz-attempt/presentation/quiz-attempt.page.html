@@ -1,10 +1,10 @@
 <!--suppress HtmlUnknownAnchorTarget -->
-<a class="skip-link" href="#question-content">Chuyển đến câu hỏi hiện tại</a>
+<a class="skip-link" href="#question-content">Skip to the current question</a>
 
 <header class="exam-header">
     <div class="exam-header__inner">
         <div class="exam-header__identity">
-            <a class="exam-brand" routerLink="/" aria-label="QuizApp — Trở về trang khám phá">
+            <a class="exam-brand" routerLink="/" aria-label="QuizApp — Back to explore">
                 <span class="exam-brand__mark material-symbols-outlined"
                         aria-hidden="true">quiz</span>
                 <span>QuizApp</span>
@@ -18,14 +18,14 @@
 
         <div class="exam-progress">
             <div class="exam-progress__label">
-                <span>Tiến độ bài làm</span>
-                <strong>Đã trả lời {{ store.answeredCount() }}/{{ store.questions().length }}
-                    câu</strong>
+                <span>Quiz progress</span>
+                <strong>Answered {{ store.answeredCount() }}/{{ store.questions().length }}
+                    questions</strong>
             </div>
             <div
                     class="exam-progress__track"
                     role="progressbar"
-                    aria-label="Tiến độ bài làm"
+                    aria-label="Quiz progress"
                     aria-valuemin="0"
                     [attr.aria-valuemax]="store.questions().length"
                     [attr.aria-valuenow]="store.answeredCount()"
@@ -38,7 +38,7 @@
             <button
                     class="pause-button"
                     type="button"
-                    [attr.aria-label]="store.isPaused() ? 'Tiếp tục làm bài' : 'Tạm dừng bài thi'"
+                    [attr.aria-label]="store.isPaused() ? 'Resume quiz' : 'Pause quiz'"
                     [attr.aria-pressed]="store.isPaused()"
                     [disabled]="
           store.isLoading() ||
@@ -68,27 +68,28 @@
 </header>
 
 @if (store.isLoading()) {
-    <section class="api-state" role="status">Đang tải lượt làm bài…</section>
+    <section class="api-state" role="status">Loading your attempt…</section>
 }
 @if (store.errorMessage(); as error) {
     <section class="api-state" role="alert">
         <p>{{ error }}</p>
         <button type="button" [disabled]="store.isBusy() || store.isSaving()" (click)="reload()">
-            Tải lại trạng thái
+            Reload attempt
         </button>
-        <a routerLink="/login" [queryParams]="{returnUrl: loginReturnUrl()}">Đăng nhập</a>
+        <a routerLink="/login" [queryParams]="{returnUrl: loginReturnUrl()}">Log in</a>
     </section>
 }
 @if (store.result(); as result) {
     <main class="result-view">
         <section class="api-state result-card glass-card" role="status">
             <div class="result-card__header">
-                <div class="result-icon-badge" [class.result-icon-badge--pass]="store.resultPassed() === true">
+                <div class="result-icon-badge"
+                        [class.result-icon-badge--pass]="store.resultPassed() === true">
                     <span class="material-symbols-outlined" aria-hidden="true">
                         {{ store.resultPassed() === null ? 'task_alt' : store.resultPassed() ? 'verified' : 'history_edu' }}
                     </span>
                 </div>
-                <h2>Đã nộp bài thành công</h2>
+                <h2>Quiz submitted successfully</h2>
                 <p class="result-quiz-title">{{ result.quizTitle }}</p>
             </div>
 
@@ -123,11 +124,12 @@
                     </div>
                 </div>
 
-                <div class="score-status-pill" [class.score-status-pill--pass]="store.resultPassed() === true">
+                <div class="score-status-pill"
+                        [class.score-status-pill--pass]="store.resultPassed() === true">
                     <span class="material-symbols-outlined" aria-hidden="true">
                         {{ store.resultPassed() === null ? 'task_alt' : store.resultPassed() ? 'check_circle' : 'info' }}
                     </span>
-                    <span>{{ store.resultPassed() === null ? 'KHÔNG QUY ĐỊNH ĐIỂM ĐẠT' : store.resultPassed() ? 'ĐẠT TIÊU CHUẨN' : 'CHƯA ĐẠT CHUẨN (CẦN ≥' + store.passThreshold() + '%)' }}</span>
+                    <span>{{ store.resultPassed() === null ? 'NO PASSING SCORE SET' : store.resultPassed() ? 'PASSED' : 'NOT PASSED (NEEDS ≥' + store.passThreshold() + '%)' }}</span>
                 </div>
             </div>
 
@@ -135,7 +137,7 @@
             <div class="result-breakdown">
                 <div class="breakdown-item">
                     <div class="breakdown-labels">
-                        <span>Điểm của bạn</span>
+                        <span>Your score</span>
                         <strong>{{ result.score }}%</strong>
                     </div>
                     <div class="breakdown-bar">
@@ -146,7 +148,7 @@
                 @if (store.passThreshold(); as threshold) {
                     <div class="breakdown-item">
                         <div class="breakdown-labels">
-                            <span>Mục tiêu chuẩn</span>
+                            <span>Passing score</span>
                             <strong>{{ threshold }}%</strong>
                         </div>
                         <div class="breakdown-bar">
@@ -157,15 +159,15 @@
                 } @else {
                     <div class="breakdown-item">
                         <div class="breakdown-labels">
-                            <span>Mục tiêu chuẩn</span>
-                            <strong>Không quy định</strong>
+                            <span>Passing score</span>
+                            <strong>Not specified</strong>
                         </div>
                     </div>
                 }
             </div>
 
             <p class="result-score-text">
-                Điểm: <strong>{{ result.score }} / 100</strong>
+                Score: <strong>{{ result.score }} / 100</strong>
             </p>
 
             <!-- Centered Action Buttons with Clean Whitespace -->
@@ -173,11 +175,11 @@
                 <a class="result-button result-button--primary"
                         [routerLink]="['/quiz', result.quizId]">
                     <span class="material-symbols-outlined" aria-hidden="true">assessment</span>
-                    Về chi tiết và lịch sử bài thi
+                    View quiz details and history
                 </a>
                 <a class="result-button result-button--secondary" routerLink="/">
                     <span class="material-symbols-outlined" aria-hidden="true">explore</span>
-                    Khám phá thêm quiz
+                    Explore more quizzes
                 </a>
             </div>
         </section>
@@ -188,7 +190,7 @@
     }
     @if (store.isPaused()) {
         <p class="attempt-status attempt-status--paused" role="status">
-            Bài thi đang tạm dừng. Nhấn “Tiếp tục làm bài” để trả lời.
+            Your quiz is paused. Select “Resume quiz” to continue.
         </p>
     }
     <main class="attempt-workspace">
@@ -201,7 +203,7 @@
             <div class="question-card__meta">
                 <div>
           <span class="question-number"
-          >Câu {{ store.currentQuestionNumber() }} / {{ store.questions().length }}</span
+          >Question {{ store.currentQuestionNumber() }} / {{ store.questions().length }}</span
           >
                     <span class="question-type">
             <span class="material-symbols-outlined" aria-hidden="true">{{
@@ -209,16 +211,16 @@
                 }}</span>
                         {{
                             question.isText
-                                    ? 'Trả lời bằng văn bản'
+                                    ? 'Text response'
                                     : question.multiple
-                                            ? 'Chọn nhiều đáp án'
-                                            : 'Chọn một đáp án'
+                                            ? 'Multiple choice'
+                                            : 'Single choice'
                         }}
           </span>
                 </div>
                 <span class="question-score">
           <span class="material-symbols-outlined" aria-hidden="true">help_outline</span>
-          1.0 điểm thành phần
+          1.0 point
         </span>
             </div>
 
@@ -226,14 +228,15 @@
                 <h2 id="question-title">{{ question.prompt }}</h2>
                 <p>{{ question.guidance }}</p>
                 @if (question.image) {
-                    <img [src]="question.image" alt="Hình minh họa câu hỏi" class="question-image"/>
+                    <img [ngSrc]="question.image" alt="Question illustration" class="question-image"
+                            width="640" height="360"/>
                 }
             </div>
 
             <fieldset class="answer-list" [disabled]="!store.canEdit()">
-                <legend class="visually-hidden">Danh sách các phương án trả lời</legend>
+                <legend class="visually-hidden">Answer options</legend>
                 @if (question.isText) {
-                    <label for="text-answer">Câu trả lời của bạn</label>
+                    <label for="text-answer">Your answer</label>
                     <textarea
                             id="text-answer"
                             rows="5"
@@ -272,9 +275,8 @@
                 <div class="question-note">
                     <span class="material-symbols-outlined" aria-hidden="true">info</span>
                     <p>
-                        <strong>Lưu ý:</strong> Đối với câu hỏi chọn nhiều đáp án, việc chọn sai đáp
-                        án sẽ bị
-                        trừ điểm thành phần của câu hỏi đó (điểm tối thiểu là 0).
+                        <strong>Note:</strong> For multiple-choice questions, incorrect selections
+                        reduce the score for that question. The minimum score is zero.
                     </p>
                 </div>
             }
@@ -287,7 +289,7 @@
                         (click)="store.previousQuestion()"
                 >
                     <span class="material-symbols-outlined" aria-hidden="true">arrow_back</span>
-                    Câu trước
+                    Previous question
                 </button>
                 <div>
                     <button
@@ -302,8 +304,8 @@
                 }}</span>
                         {{
                             store.isQuestionMarked(store.currentQuestionNumber())
-                                    ? 'Đã đánh dấu'
-                                    : 'Đánh dấu xem lại'
+                                    ? 'Marked for review'
+                                    : 'Mark for review'
                         }}
                     </button>
                     @if (store.canGoNext()) {
@@ -312,7 +314,7 @@
                                 class="next-button"
                                 (click)="store.nextQuestion()"
                         >
-                            Câu tiếp theo
+                            Next question
                             <span class="material-symbols-outlined"
                                     aria-hidden="true">arrow_forward</span>
                         </button>
@@ -324,23 +326,23 @@
                                 (click)="openSubmitConfirmation()"
                         >
                             <span class="material-symbols-outlined" aria-hidden="true">send</span>
-                            Nộp bài
+                            Submit quiz
                         </button>
                     }
                 </div>
             </div>
         </section>
 
-        <aside class="attempt-sidebar" aria-label="Điều hướng bài thi">
+        <aside class="attempt-sidebar" aria-label="Quiz navigation">
             <section class="palette-card" aria-labelledby="palette-title">
                 <div class="palette-card__heading">
                     <div>
-                        <h2 id="palette-title">Danh sách câu hỏi</h2>
-                        <p>{{ store.questions().length }} câu hỏi</p>
+                        <h2 id="palette-title">Questions</h2>
+                        <p>{{ store.questions().length }} questions</p>
                     </div>
                 </div>
 
-                <nav class="question-palette" aria-label="Bộ điều hướng câu hỏi">
+                <nav class="question-palette" aria-label="Question navigation">
                     @for (question of store.questions(); track question.id) {
                         <button
                                 type="button"
@@ -348,13 +350,13 @@
                                 [class.question-palette__button--current]="store.currentQuestionNumber() === question.number "
                                 [class.question-palette__button--marked]="store.isQuestionMarked(question.number)"
                                 [attr.aria-current]="store.currentQuestionNumber() === question.number ? 'step' : null"
-                                [title]="`Câu ${question.number}${store.currentQuestionNumber() === question.number
-                                ? ' - Đang làm'
+                                [title]="`Question ${question.number}${store.currentQuestionNumber() === question.number
+                                ? ' - Current'
                                 : store.isQuestionMarked(question.number)
-                                ? ' - Đánh dấu xem lại'
+                                ? ' - Mark for review'
                                 : store.isQuestionAnswered(question.number)
-                                ? ' - Đã trả lời'
-                                : ' - Chưa trả lời'}`"
+                                ? ' - Answered'
+                                : ' - Unanswered'}`"
                                 (click)="store.goToQuestion(question.number)"
                         >
                             <span>{{ question.number }}</span>
@@ -376,11 +378,11 @@
 
                 <div class="palette-legend">
           <span
-          ><i class="palette-legend__answered"></i>Đã trả lời ({{ store.answeredCount() }})</span
+          ><i class="palette-legend__answered"></i>Answered ({{ store.answeredCount() }})</span
           >
-                    <span><i class="palette-legend__current"></i>Đang chọn (1)</span>
+                    <span><i class="palette-legend__current"></i>Current (1)</span>
                     <span><i
-                            class="palette-legend__empty"></i>Chưa làm ({{ store.unansweredCount() }}
+                            class="palette-legend__empty"></i>Unanswered ({{ store.unansweredCount() }}
                         )</span>
                 </div>
 
@@ -392,15 +394,15 @@
                             (click)="openSubmitConfirmation()"
                     >
                         <span class="material-symbols-outlined" aria-hidden="true">send</span>
-                        Nộp bài thi
+                        Submit quiz
                     </button>
-                    <p>Bạn có thể xem lại và thay đổi đáp án trước khi bấm nộp bài.</p>
+                    <p>You can review and change your answers before submitting.</p>
                 </div>
             </section>
 
             <div class="keyboard-tip">
                 <span class="material-symbols-outlined" aria-hidden="true">keyboard</span>
-                <p>Dùng phím <kbd>←</kbd> và <kbd>→</kbd> để chuyển câu hỏi nhanh chóng.</p>
+                <p>Use <kbd>←</kbd> and <kbd>→</kbd> to move between questions.</p>
             </div>
         </aside>
     </main>
@@ -408,10 +410,10 @@
 <footer class="exam-footer">
     <div>
         <p>
-            Mã phiên: <strong>{{ store.attemptId() ?? 'Chưa tải' }}</strong>
-            <span aria-hidden="true">•</span> Chế độ: Độc lập có giám sát thời gian
+            Attempt ID: <strong>{{ store.attemptId() ?? 'Not loaded' }}</strong>
+            <span aria-hidden="true">•</span> Mode: Timed individual attempt
         </p>
-        <p>QuizApp — Nền tảng đánh giá năng lực lập trình</p>
+        <p>QuizApp — Test your programming skills</p>
     </div>
 </footer>
 
@@ -428,10 +430,10 @@
     <div class="submit-dialog__icon material-symbols-outlined" aria-hidden="true">
         assignment_turned_in
     </div>
-    <h2 id="submit-title">Xác nhận nộp bài?</h2>
+    <h2 id="submit-title">Submit your quiz?</h2>
     <p id="submit-description">
-        Bạn còn <strong>{{ store.unansweredCount() }} câu chưa trả lời</strong>. Sau khi nộp,
-        bạn sẽ không thể thay đổi đáp án.
+        You have <strong>{{ store.unansweredCount() }} unanswered questions</strong>. You cannot
+        change your answers after submitting.
     </p>
     <div class="submit-dialog__actions">
         <button
@@ -440,14 +442,14 @@
                 [disabled]="store.isBusy()"
                 (click)="closeSubmitConfirmation()"
         >
-            Tiếp tục xem lại
+            Keep reviewing
         </button>
         <button
                 type="button"
                 [disabled]="store.isBusy() || store.requiresReload()"
                 (click)="confirmSubmission()"
         >
-            {{ store.isBusy() ? 'Đang nộp…' : 'Xác nhận nộp' }}
+            {{ store.isBusy() ? 'Submitting…' : 'Confirm submission' }}
         </button>
     </div>
 </dialog>
@@ -465,7 +467,7 @@
     <div class="leave-dialog__icon material-symbols-outlined" aria-hidden="true">
         warning
     </div>
-    <h2 id="leave-title">Rời khỏi bài thi?</h2>
+    <h2 id="leave-title">Leave this quiz?</h2>
     <p id="leave-description">
         {{ leaveMessage() }}
     </p>
@@ -475,7 +477,7 @@
                 class="btn-leave"
                 (click)="confirmLeave()"
         >
-            Rời trang
+            Leave page
         </button>
         <button
                 type="button"
@@ -483,7 +485,7 @@
                 autofocus
                 (click)="cancelLeave()"
         >
-            Ở lại làm tiếp
+            Stay and continue
         </button>
     </div>
 </dialog>

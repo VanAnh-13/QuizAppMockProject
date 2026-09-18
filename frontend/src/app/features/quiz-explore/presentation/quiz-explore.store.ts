@@ -23,7 +23,7 @@ export class QuizExploreStore {
             categoryMap.set(quiz.categoryId, categoryLabels[quiz.categoryId]);
 
         return [
-            {id: 'all', label: 'Tất cả'},
+            {id: 'all', label: 'All'},
             ...Array.from(categoryMap, ([id, label]) => ({id, label})),
         ];
     });
@@ -56,7 +56,7 @@ export class QuizExploreStore {
             if (version !== this.loadVersion) return;
             this.allQuizzes.set([]);
             this.errorMessage.set(
-                apiErrorMessage(error, 'Không thể tải danh sách quiz từ máy chủ. Vui lòng thử lại.'),
+                apiErrorMessage(error, 'Could not load quizzes from the server. Please try again.'),
             );
         } finally {
             if (version === this.loadVersion) this.isLoading.set(false);
@@ -123,12 +123,12 @@ export class QuizExploreStore {
 }
 
 const categoryLabels: Readonly<Record<QuizSummary['categoryId'], string>> = {
-    general: 'Kiến thức tổng hợp',
+    general: 'General knowledge',
     csharp: 'C#/.NET',
     'sql-server': 'SQL Server',
     angular: 'Angular',
     typescript: 'TypeScript',
-    api: 'Lập trình web',
+    api: 'Web development',
 };
 
 function normalizeSearch(value: string): string {

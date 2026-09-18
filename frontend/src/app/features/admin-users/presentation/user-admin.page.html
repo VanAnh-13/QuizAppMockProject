@@ -1,0 +1,165 @@
+<app-admin-shell active="users">
+    <main class="admin-page users-page" id="main-content" tabindex="-1">
+        <header class="admin-page__heading">
+            <div>
+                <p class="admin-page__eyebrow">Accounts</p>
+                <h1>Users &amp; roles</h1>
+                <p>Manage user access, review account details, and assign permission roles.</p>
+            </div>
+            <span class="users-count">{{ store.totalCount() }} users</span>
+        </header>
+
+        @if (store.errorMessage(); as message) {
+            <p class="error" role="alert">{{ message }}</p>
+        }
+
+        <div class="users-layout">
+            <section class="users-directory" aria-labelledby="users-heading" [attr.aria-busy]="store.isLoading()">
+                <div class="users-directory__heading">
+                    <h2 id="users-heading">Accounts list</h2>
+                    <span class="material-symbols-outlined" aria-hidden="true">group</span>
+                </div>
+
+                <label class="users-search">
+                    <span class="material-symbols-outlined" aria-hidden="true">search</span>
+                    <input type="search" [formControl]="store.searchControl"
+                           placeholder="Search by name, email, or username..."
+                           aria-label="Search users" />
+                </label>
+
+                @if (store.isLoading()) {
+                    <p class="admin-state" role="status">Loading users…</p>
+                } @else {
+                    <ul class="admin-list">
+                        @for (user of store.users(); track user.id) {
+                            <li>
+                                <button type="button" class="user-card"
+                                        [attr.aria-pressed]="store.selectedId() === user.id"
+                                        (click)="store.select(user)">
+                                    <div class="user-card__avatar" aria-hidden="true">
+                                        {{ initialsFrom(user.fullName, user.username) }}
+                                    </div>
+                                    <div class="user-card__copy">
+                                        <strong>{{ user.fullName || user.username }}</strong>
+                                        <span class="user-card__meta">&#64;{{ user.username }} · {{ user.email }}</span>
+                                        <div class="user-card__tags">
+                                            @for (role of user.roles; track role.id) {
+                                                <span class="user-tag">{{ role.roleName }}</span>
+                                            }
+                                            <span class="user-status" [class.user-status--locked]="!user.isActive">
+                                                <span class="material-symbols-outlined" aria-hidden="true">
+                                                    {{ user.isActive ? 'check_circle' : 'lock' }}
+                                                </span>
+                                                {{ user.isActive ? 'Active' : 'Locked' }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <span class="user-card__arrow material-symbols-outlined" aria-hidden="true">
+                                        {{ store.selectedId() === user.id ? 'check' : 'chevron_right' }}
+                                    </span>
+                                </button>
+                            </li>
+                        } @empty {
+                            <li class="admin-state">No users found. Try a different search.</li>
+                        }
+                    </ul>
+
+                    <footer class="admin-pager">
+                        <p>{{ store.rangeStart() }}–{{ store.rangeEnd() }} of {{ store.totalCount() }}</p>
+                        <div>
+                            <button type="button" [disabled]="!store.hasPreviousPage()"
+                                    (click)="store.load(store.currentPage() - 1)">Previous</button>
+                            <button type="button" [disabled]="!store.hasNextPage()"
+                                    (click)="store.load(store.currentPage() + 1)">Next</button>
+                        </div>
+                    </footer>
+                }
+            </section>
+
+            <section class="user-editor" aria-labelledby="user-editor-heading">
+                <header class="user-editor__heading">
+                    <div>
+                        <p class="admin-page__eyebrow">Account details</p>
+                        <h2 id="user-editor-heading">{{ store.selected()?.fullName || store.selected()?.username || 'Select a user' }}</h2>
+                    </div>
+                    <span class="user-editor__icon material-symbols-outlined" aria-hidden="true">manage_accounts</span>
+                </header>
+
+                @if (store.selected(); as user) {
+                    <div class="user-profile-header">
+                        <div class="user-profile-avatar" aria-hidden="true">{{ store.initials() }}</div>
+                        <div class="user-profile-info">
+                            <h3>{{ user.fullName || user.username }}</h3>
+                            <p>&#64;{{ user.username }} · {{ user.email }}</p>
+                        </div>
+                    </div>
+
+                    <div class="user-metadata-grid">
+                        <div class="user-meta-item">
+                            <small>Username</small>
+                            <strong>{{ user.username }}</strong>
+                        </div>
+                        <div class="user-meta-item">
+                            <small>Email</small>
+                            <strong>{{ user.email }}</strong>
+                        </div>
+                        <div class="user-meta-item">
+                            <small>Phone</small>
+                            <strong>{{ user.phoneNumber || '—' }}</strong>
+                        </div>
+                        <div class="user-meta-item">
+                            <small>Date of birth</small>
+                            <strong>{{ user.dateOfBirth || '—' }}</strong>
+                        </div>
+                    </div>
+
+                    <div class="user-roles-section">
+                        <h4>Assigned roles</h4>
+                        <p>Select which roles this user has access to.</p>
+                        <div class="user-roles-list">
+                            @for (role of store.roles(); track role.id) {
+                                <label class="user-role-card"
+                                       [class.user-role-card--assigned]="store.selectedRoleIds().includes(role.id)">
+                                    <div class="user-role-card__info">
+                                        <strong>{{ role.roleName }}</strong>
+                                        @if (role.description) {
+                                            <em>{{ role.description }}</em>
+                                        }
+                                    </div>
+                                    <input type="checkbox"
+                                           class="user-role-checkbox"
+                                           [checked]="store.selectedRoleIds().includes(role.id)"
+                                           (change)="store.toggleRole(role.id)"
+                                           aria-label="Assign role {{ role.roleName }}" />
+                                </label>
+                            }
+                        </div>
+                    </div>
+
+                    <footer class="user-editor__actions">
+                        <button class="user-lock-btn"
+                                [class.user-lock-btn--unlock]="!user.isActive"
+                                type="button"
+                                (click)="store.toggleActive()">
+                            <span class="material-symbols-outlined" aria-hidden="true">
+                                {{ user.isActive ? 'lock' : 'lock_open' }}
+                            </span>
+                            {{ user.isActive ? 'Lock account' : 'Unlock account' }}
+                        </button>
+                        <button class="primary-action"
+                                type="button"
+                                [disabled]="store.isSaving()"
+                                (click)="store.saveRoles()">
+                            <span class="material-symbols-outlined" aria-hidden="true">
+                                {{ store.isSaving() ? 'hourglass_top' : 'verified_user' }}
+                            </span>
+                            {{ store.isSaving() ? 'Saving…' : 'Save roles' }}
+                        </button>
+                    </footer>
+                } @else {
+                    <p class="admin-state">Select a user to view and edit their profile and permissions.</p>
+                }
+            </section>
+        </div>
+    </main>
+</app-admin-shell>

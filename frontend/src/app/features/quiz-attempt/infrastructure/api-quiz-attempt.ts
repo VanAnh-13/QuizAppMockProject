@@ -65,7 +65,7 @@ function validateAttemptResult(result: AttemptResult): AttemptResult {
         !Number.isFinite(Date.parse(result.submittedAt)) ||
         !Number.isFinite(result.score)
     ) {
-        throw new Error('Kết quả làm bài không hợp lệ.');
+        throw new Error('Invalid attempt result.');
     }
     return {...result, passedScore: Number.isFinite(result.passedScore) ? result.passedScore : null};
 }

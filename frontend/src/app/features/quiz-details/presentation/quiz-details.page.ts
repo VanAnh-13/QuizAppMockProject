@@ -8,12 +8,13 @@ import {
     signal,
     viewChild,
 } from '@angular/core';
-import {DatePipe, NgTemplateOutlet} from '@angular/common';
+import {DatePipe, NgOptimizedImage, NgTemplateOutlet} from '@angular/common';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
 import {ATTEMPT_API, AttemptResult} from '../../quiz-attempt/application/attempt-api';
 import {apiErrorMessage} from '../../../core/api/api-error';
 import {AuthSession} from '../../../core/auth/auth-session';
 import {ModalDirective} from '../../../shared/ui/dialog/modal.directive';
+import {ConfirmationService} from '../../../shared/ui/confirmation/confirmation.service';
 import {QuizDetailsSnapshot} from '../application/quiz-details-content';
 import {QUIZ_DETAILS_CONTENT, provideQuizDetails} from '../infrastructure/quiz-details-content.provider';
 import {QuizDetailsResolution} from './quiz-details.resolver';
@@ -25,26 +26,26 @@ interface InfoMessage {
 
 const INFO_MESSAGES = {
     about: {
-        title: 'Giới thiệu QuizApp',
-        message: 'Nội dung giới thiệu đang được hoàn thiện trong bản trải nghiệm này.',
+        title: 'About QuizApp',
+        message: 'More about QuizApp will be available in a future update.',
     },
     contact: {
-        title: 'Liên hệ',
-        message: 'Kênh liên hệ hỗ trợ chưa được tích hợp trong bản trải nghiệm này.',
+        title: 'Contact',
+        message: 'Support contact details are not available in this preview.',
     },
     notifications: {
-        title: 'Thông báo',
-        message: 'Bạn chưa có thông báo mới trong bản trải nghiệm này.',
+        title: 'Notifications',
+        message: 'You have no new notifications.',
     },
     help: {
-        title: 'Trợ giúp & Hỏi đáp',
-        message: 'Trung tâm trợ giúp chưa được tích hợp trong bản trải nghiệm này.',
+        title: 'Help & FAQ',
+        message: 'The help center is not available in this preview.',
     },
 } as const satisfies Record<string, InfoMessage>;
 
 @Component({
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [DatePipe, RouterLink, ModalDirective, NgTemplateOutlet],
+    imports: [DatePipe, RouterLink, ModalDirective, NgTemplateOutlet, NgOptimizedImage],
     providers: [provideQuizDetails()],
     selector: 'app-quiz-details-page',
     styleUrls: [
@@ -63,6 +64,7 @@ export class QuizDetailsPage {
     private readonly router = inject(Router);
 
     protected readonly session = inject(AuthSession);
+    private readonly confirmation = inject(ConfirmationService);
     private readonly userMenu = viewChild<ElementRef<HTMLDetailsElement>>('userMenu');
 
     protected readonly quizId = signal('');
@@ -129,7 +131,7 @@ export class QuizDetailsPage {
         const quizId = this.quizId();
         if (!quizId) {
             this.isLoading.set(false);
-            this.errorMessage.set('Không tìm thấy mã quiz trên đường dẫn.');
+            this.errorMessage.set('The URL does not include a quiz ID.');
             return;
         }
         this.isLoading.set(true);
@@ -139,7 +141,7 @@ export class QuizDetailsPage {
             const snapshot = await this.content.load(quizId);
             this.applySnapshot(snapshot);
         } catch {
-            this.errorMessage.set('Không thể tải chi tiết quiz từ máy chủ. Vui lòng thử lại.');
+            this.errorMessage.set('Could not load quiz details from the server. Please try again.');
         } finally {
             this.isLoading.set(false);
         }
@@ -153,11 +155,26 @@ export class QuizDetailsPage {
         this.activeInfo.set(null);
     }
 
-    protected logout(): void {
+    protected async logout(): Promise<void> {
+        const menu = this.userMenu()?.nativeElement;
+        if (menu) {
+            menu.open = false;
+        }
+        const confirmed = await this.confirmation.confirm({
+            title: 'Are you sure to log out?',
+            message: 'Are you sure you want to log out of your account?',
+            confirmLabel: 'Yes',
+            cancelLabel: 'No',
+            variant: 'primary',
+            icon: 'logout',
+        });
+        if (!confirmed) return;
+
         this.session.clear();
         this.historyDialogOpen.set(false);
         this.history.set([]);
         this.historyError.set(null);
+        void this.router.navigateByUrl('/login');
     }
 
     @HostListener('document:click', ['$event'])
@@ -192,7 +209,7 @@ export class QuizDetailsPage {
         } catch (error) {
             this.history.set([]);
             this.historyError.set(
-                apiErrorMessage(error, 'Không thể tải lịch sử làm bài. Vui lòng thử lại.'),
+                apiErrorMessage(error, 'Could not load your attempt history. Please try again.'),
             );
         } finally {
             this.historyLoading.set(false);

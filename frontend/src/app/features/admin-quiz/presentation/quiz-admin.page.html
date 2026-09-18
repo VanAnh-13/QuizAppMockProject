@@ -1,0 +1,159 @@
+<app-admin-shell active="quizzes">
+    <main class="admin-page quizzes-page" id="main-content" tabindex="-1">
+        <header class="admin-page__heading">
+            <div>
+                <p class="admin-page__eyebrow">Catalog</p>
+                <h1>Quizzes</h1>
+                <p>Manage quiz catalog, timing limits, passing scores, and publish state.</p>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <span class="quizzes-count">{{ store.totalCount() }} quizzes</span>
+                <button class="primary-action" type="button" (click)="store.startCreate()">
+                    <span class="material-symbols-outlined" aria-hidden="true">add</span>
+                    New quiz
+                </button>
+            </div>
+        </header>
+
+        @if (store.errorMessage(); as message) {
+            <p class="error" role="alert">{{ message }}</p>
+        }
+
+        <div class="quizzes-layout">
+            <section class="quizzes-directory" aria-labelledby="quizzes-heading" [attr.aria-busy]="store.isLoading()">
+                <div class="quizzes-directory__heading">
+                    <h2 id="quizzes-heading">Quiz catalog</h2>
+                    <span class="material-symbols-outlined" aria-hidden="true">quiz</span>
+                </div>
+
+                <label class="quizzes-search">
+                    <span class="material-symbols-outlined" aria-hidden="true">search</span>
+                    <input type="search" [formControl]="store.searchControl"
+                           placeholder="Search by quiz title..."
+                           aria-label="Search quizzes" />
+                </label>
+
+                @if (store.isLoading()) {
+                    <p class="admin-state" role="status">Loading quizzes…</p>
+                } @else {
+                    <ul class="admin-list">
+                        @for (quiz of store.quizzes(); track quiz.id) {
+                            <li>
+                                <button type="button" class="quiz-card"
+                                        [attr.aria-pressed]="store.selectedId() === quiz.id"
+                                        (click)="store.select(quiz)">
+                                    <div class="quiz-card__icon material-symbols-outlined" aria-hidden="true">
+                                        assignment
+                                    </div>
+                                    <div class="quiz-card__copy">
+                                        <strong>{{ quiz.title }}</strong>
+                                        <div class="quiz-card__pills">
+                                            <span class="quiz-pill">
+                                                <span class="material-symbols-outlined">schedule</span>
+                                                {{ quiz.duration }} min
+                                            </span>
+                                            <span class="quiz-pill">
+                                                <span class="material-symbols-outlined">grade</span>
+                                                {{ quiz.passedScore ?? '—' }}% pass
+                                            </span>
+                                            <span class="quiz-status" [class.quiz-status--inactive]="!quiz.isActive">
+                                                <span class="material-symbols-outlined" aria-hidden="true">
+                                                    {{ quiz.isActive ? 'check_circle' : 'pause_circle' }}
+                                                </span>
+                                                {{ quiz.isActive ? 'Active' : 'Inactive' }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <span class="quiz-card__arrow material-symbols-outlined" aria-hidden="true">
+                                        {{ store.selectedId() === quiz.id ? 'check' : 'chevron_right' }}
+                                    </span>
+                                </button>
+                            </li>
+                        } @empty {
+                            <li class="admin-state">No quizzes found. Try a different search.</li>
+                        }
+                    </ul>
+
+                    <footer class="admin-pager">
+                        <p>{{ store.rangeStart() }}–{{ store.rangeEnd() }} of {{ store.totalCount() }}</p>
+                        <div>
+                            <button type="button" [disabled]="!store.hasPreviousPage()"
+                                    (click)="store.load(store.currentPage() - 1)">Previous</button>
+                            <button type="button" [disabled]="!store.hasNextPage()"
+                                    (click)="store.load(store.currentPage() + 1)">Next</button>
+                        </div>
+                    </footer>
+                }
+            </section>
+
+            <section class="quiz-editor" aria-labelledby="quiz-editor-heading">
+                <header class="quiz-editor__heading">
+                    <div>
+                        <p class="admin-page__eyebrow">Quiz details</p>
+                        <h2 id="quiz-editor-heading">{{ store.selected()?.title || (store.selectedId() === null ? 'New quiz' : 'Select a quiz') }}</h2>
+                    </div>
+                    <span class="quiz-editor__icon material-symbols-outlined" aria-hidden="true">edit_note</span>
+                </header>
+
+                <form [formGroup]="store.form" (ngSubmit)="store.save()">
+                    <label class="quiz-field">
+                        <span>Quiz title <small>Required</small></span>
+                        <input type="text" formControlName="title" placeholder="e.g. Angular: Component & Signals" />
+                    </label>
+
+                    <label class="quiz-field">
+                        <span>Description</span>
+                        <textarea rows="3" formControlName="description" placeholder="Briefly describe what this quiz tests..."></textarea>
+                    </label>
+
+                    <div class="quiz-row">
+                        <label class="quiz-field">
+                            <span>Duration (minutes)</span>
+                            <input type="number" min="1" formControlName="duration" placeholder="15" />
+                        </label>
+                        <label class="quiz-field">
+                            <span>Passing score (%)</span>
+                            <input type="number" min="0" max="100" formControlName="passedScore" placeholder="70" />
+                        </label>
+                    </div>
+
+                    <label class="quiz-field">
+                        <span>Cover image URL</span>
+                        <input type="url" formControlName="image" placeholder="https://images.unsplash.com/..." />
+                    </label>
+
+                    <label class="quiz-toggle">
+                        <div>
+                            <strong>Active in catalog</strong>
+                            <small>Allow candidates and students to find and take this quiz</small>
+                        </div>
+                        <input type="checkbox" formControlName="isActive" aria-label="Active in catalog" />
+                    </label>
+
+                    <footer class="quiz-editor__actions">
+                        @if (store.selected(); as currentQuiz) {
+                            <button class="quiz-toggle-btn"
+                                    [class.quiz-toggle-btn--activate]="!currentQuiz.isActive"
+                                    type="button"
+                                    (click)="store.toggleActive(currentQuiz)">
+                                <span class="material-symbols-outlined" aria-hidden="true">
+                                    {{ currentQuiz.isActive ? 'pause_circle' : 'play_circle' }}
+                                </span>
+                                {{ currentQuiz.isActive ? 'Deactivate quiz' : 'Activate quiz' }}
+                            </button>
+                        } @else {
+                            <div></div>
+                        }
+
+                        <button class="primary-action" type="submit" [disabled]="store.isSaving() || store.isLoading()">
+                            <span class="material-symbols-outlined" aria-hidden="true">
+                                {{ store.isSaving() ? 'hourglass_top' : 'check' }}
+                            </span>
+                            {{ store.isSaving() ? 'Saving…' : 'Save quiz' }}
+                        </button>
+                    </footer>
+                </form>
+            </section>
+        </div>
+    </main>
+</app-admin-shell>

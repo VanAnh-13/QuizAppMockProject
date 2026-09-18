@@ -25,7 +25,7 @@ describe('ApiQuizDetailsContent', () => {
 
         expect(list).toHaveBeenCalledWith('public/quizzes');
         expect(details.title).toBe('Angular forms');
-        expect(details.metrics.map((metric) => metric.value)).toEqual(['4 câu hỏi', '25 phút', '75%']);
+        expect(details.metrics.map((metric) => metric.value)).toEqual(['4 questions', '25 minutes', '75%']);
     });
 
     it('rejects a quiz that is absent from the active catalog', async () => {
@@ -37,7 +37,7 @@ describe('ApiQuizDetailsContent', () => {
         });
 
         await expect(TestBed.inject(ApiQuizDetailsContent).load('missing')).rejects.toThrow(
-            'Không tìm thấy quiz đang mở.',
+            'This quiz is not available.',
         );
     });
 

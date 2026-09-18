@@ -1,9 +1,12 @@
 import {signal} from '@angular/core';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
-import {provideRouter} from '@angular/router';
+import {provideRouter, Router} from '@angular/router';
 import {ApiClient} from '../../../core/api/api-client';
 import {AuthResponse, AuthSession} from '../../../core/auth/auth-session';
 import {SiteHeaderComponent} from './site-header.component';
+
+import {ConfirmationService} from '../confirmation/confirmation.service';
+import {MockConfirmationService} from '../../../../testing/mock-confirmation';
 
 describe('SiteHeaderComponent', () => {
     it('renders the mobile menu for small screens', () => {
@@ -24,7 +27,7 @@ describe('SiteHeaderComponent', () => {
         const fixture = TestBed.createComponent(SiteHeaderComponent);
         fixture.detectChanges();
 
-        expect(mobileAction(fixture, 'Đăng ký').getAttribute('href')).toBe('/register?returnUrl=%2F');
+        expect(mobileAction(fixture, 'Sign up').getAttribute('href')).toBe('/register?returnUrl=%2F');
     });
 
     it('links to login from the mobile menu', () => {
@@ -32,23 +35,24 @@ describe('SiteHeaderComponent', () => {
         const fixture = TestBed.createComponent(SiteHeaderComponent);
         fixture.detectChanges();
 
-        expect(mobileAction(fixture, 'Đăng nhập').getAttribute('href')).toBe('/login?returnUrl=%2F');
+        expect(mobileAction(fixture, 'Log in').getAttribute('href')).toBe('/login?returnUrl=%2F');
     });
 
-    it('clears the session and emits sessionChanged on mobile logout', () => {
+    it('clears the session and emits sessionChanged on mobile logout when confirmed', async () => {
         const {clear} = configure({id: '1', username: 'learner', fullName: 'Quiz Learner'});
         const fixture = TestBed.createComponent(SiteHeaderComponent);
         fixture.detectChanges();
         const emitted = vi.fn();
         fixture.componentInstance.sessionChanged.subscribe(emitted);
 
-        mobileAction(fixture, 'Đăng xuất').click();
+        mobileAction(fixture, 'Log out').click();
+        await fixture.whenStable();
 
         expect(clear).toHaveBeenCalledTimes(1);
         expect(emitted).toHaveBeenCalledTimes(1);
     });
 
-    it('renders user avatar menu and handles logout for signed in user', () => {
+    it('renders user avatar menu and handles logout for signed in user when confirmed', async () => {
         const {clear} = configure({id: '1', username: 'learner', fullName: 'Quiz Learner'});
         const fixture = TestBed.createComponent(SiteHeaderComponent);
         fixture.detectChanges();
@@ -63,23 +67,45 @@ describe('SiteHeaderComponent', () => {
         );
         expect(logoutBtn).toBeTruthy();
         logoutBtn!.click();
+        await fixture.whenStable();
 
         expect(clear).toHaveBeenCalledTimes(1);
         expect(emitted).toHaveBeenCalledTimes(1);
+    });
+
+    it('does not log out when user cancels confirmation', async () => {
+        const {clear, confirmation} = configure({id: '1', username: 'learner', fullName: 'Quiz Learner'});
+        confirmation.setAutoResponse(false);
+        const fixture = TestBed.createComponent(SiteHeaderComponent);
+        fixture.detectChanges();
+        const emitted = vi.fn();
+        fixture.componentInstance.sessionChanged.subscribe(emitted);
+
+        const logoutBtn = (fixture.nativeElement as HTMLElement).querySelector<HTMLButtonElement>(
+            '[data-testid="header-logout"]',
+        );
+        logoutBtn!.click();
+        await fixture.whenStable();
+
+        expect(clear).not.toHaveBeenCalled();
+        expect(emitted).not.toHaveBeenCalled();
     });
 });
 
 function configure(user: AuthResponse['userDto'] | null) {
     const clear = vi.fn();
+    const confirmation = new MockConfirmationService();
     TestBed.configureTestingModule({
         imports: [SiteHeaderComponent],
         providers: [
             {provide: ApiClient, useValue: {post: vi.fn()}},
             {provide: AuthSession, useValue: {user: signal(user), clear}},
+            {provide: ConfirmationService, useValue: confirmation},
             provideRouter([]),
         ],
     });
-    return {clear};
+    vi.spyOn(TestBed.inject(Router), 'navigateByUrl').mockResolvedValue(true);
+    return {clear, confirmation};
 }
 
 function mobileAction(

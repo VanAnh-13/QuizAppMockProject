@@ -9,20 +9,25 @@ export function apiErrorMessage(
 
     switch (error.status) {
         case 0:
-            return 'Không thể kết nối máy chủ. Kiểm tra kết nối rồi thử lại.';
+            return 'Cannot connect to the server. Check your connection and try again.';
+        case 400:
+            if (typeof error.error?.message === 'string' && error.error.message.trim()) {
+                return error.error.message.trim();
+            }
+            return fallback;
         case 401:
-            return 'Vui lòng đăng nhập lại để tiếp tục.';
+            return 'Please log in again to continue.';
         case 403:
-            return 'Tài khoản của bạn không có quyền truy cập nội dung này.';
+            return 'Your account does not have permission to access this content.';
         case 404:
-            return 'Không tìm thấy quiz hoặc lượt làm bài này.';
+            return 'This quiz or attempt could not be found.';
         case 409:
             return (
                 options.conflictMessage ??
-                'Dữ liệu đã thay đổi ở phiên khác hoặc bài đã được nộp. Hãy tải lại trạng thái từ máy chủ.'
+                'This attempt was updated in another session or already submitted. Reload it from the server.'
             );
         case 422:
-            return 'Thông tin gửi lên chưa hợp lệ. Vui lòng kiểm tra và thử lại.';
+            return 'Some submitted details are invalid. Please check them and try again.';
         default:
             return fallback;
     }

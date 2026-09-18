@@ -9,12 +9,12 @@ export const quizDetailsResolver: ResolveFn<QuizDetailsResolution> = async (
     route: ActivatedRouteSnapshot,
 ) => {
     const quizId = route.paramMap.get('quizId');
-    if (!quizId) return {errorMessage: 'Không tìm thấy mã quiz trên đường dẫn.'};
+    if (!quizId) return {errorMessage: 'The URL does not include a quiz ID.'};
 
     try {
         const content = inject(QUIZ_DETAILS_CONTENT);
         return await content.load(quizId);
     } catch {
-        return {errorMessage: 'Không thể tải chi tiết quiz từ máy chủ. Vui lòng thử lại.'};
+        return {errorMessage: 'Could not load quiz details from the server. Please try again.'};
     }
 };

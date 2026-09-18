@@ -1,20 +1,30 @@
 @if (service.request(); as request) {
     <dialog appModal
-            class="confirmation-dialog"
+            class="confirmation-dialog confirmation-dialog--{{ request.variant ?? 'primary' }}"
             aria-labelledby="confirmation-title"
             aria-describedby="confirmation-message"
             (modalDismissed)="service.cancel()"
     >
-        <div class="confirmation-dialog__icon material-symbols-outlined" aria-hidden="true">
-            help_outline
+        <div class="confirmation-dialog__glow" aria-hidden="true"></div>
+        <div class="confirmation-dialog__icon-wrapper confirmation-dialog__icon-wrapper--{{ request.variant ?? 'primary' }}">
+            <span class="material-symbols-outlined confirmation-dialog__icon" aria-hidden="true">
+                {{ request.icon ?? (request.variant === 'danger' ? 'delete' : 'help_outline') }}
+            </span>
         </div>
-        <h2 id="confirmation-title">{{ request.title }}</h2>
-        <p id="confirmation-message">{{ request.message }}</p>
+        <h2 id="confirmation-title" class="confirmation-dialog__title">{{ request.title }}</h2>
+        <p id="confirmation-message" class="confirmation-dialog__message">{{ request.message }}</p>
         <div class="confirmation-dialog__actions">
-            <button type="button" (click)="service.cancel()">
-                {{ request.cancelLabel }}
-            </button>
-            <button type="button" autofocus (click)="service.accept()">
+            @if (request.mode !== 'notify') {
+                <button type="button"
+                        class="confirmation-dialog__btn confirmation-dialog__btn--cancel"
+                        (click)="service.cancel()">
+                    {{ request.cancelLabel ?? 'No' }}
+                </button>
+            }
+            <button type="button"
+                    class="confirmation-dialog__btn confirmation-dialog__btn--confirm confirmation-dialog__btn--{{ request.variant ?? 'primary' }}"
+                    autofocus
+                    (click)="service.accept()">
                 {{ request.confirmLabel }}
             </button>
         </div>

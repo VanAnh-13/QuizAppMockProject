@@ -9,12 +9,12 @@ export interface AuthField {
 }
 
 const USERNAME_FIELD: AuthField = {
-    name: 'username', label: 'Tên đăng nhập', placeholder: 'Nhập tên đăng nhập',
+    name: 'username', label: 'Username', placeholder: 'Enter your username',
     type: 'text', autocomplete: 'username', required: true, icon: 'person',
 };
 
 const PASSWORD_FIELD: AuthField = {
-    name: 'password', label: 'Mật khẩu', placeholder: 'Nhập mật khẩu của bạn',
+    name: 'password', label: 'Password', placeholder: 'Enter your password',
     type: 'password', autocomplete: 'current-password', required: true, icon: 'lock',
 };
 
@@ -23,13 +23,20 @@ export const LOGIN_FIELDS: readonly AuthField[] = [USERNAME_FIELD, PASSWORD_FIEL
 export const REGISTER_FIELDS: readonly AuthField[] = [
     {
         name: 'familyName',
-        label: 'Họ và tên đệm',
-        placeholder: 'Nguyễn Văn',
+        label: 'Family name',
+        placeholder: 'Smith',
         type: 'text',
         autocomplete: 'family-name',
         required: true
     },
-    {name: 'givenName', label: 'Tên', placeholder: 'An', type: 'text', autocomplete: 'given-name', required: true},
+    {
+        name: 'givenName',
+        label: 'Given name',
+        placeholder: 'Alex',
+        type: 'text',
+        autocomplete: 'given-name',
+        required: true
+    },
     {
         name: 'email',
         label: 'Email',
@@ -42,18 +49,18 @@ export const REGISTER_FIELDS: readonly AuthField[] = [
     USERNAME_FIELD,
     {
         name: 'phoneNumber',
-        label: 'Số điện thoại',
+        label: 'Phone number',
         placeholder: '0912 345 678',
         type: 'tel',
         autocomplete: 'tel',
         required: false
     },
-    {name: 'dateOfBirth', label: 'Ngày sinh', placeholder: '', type: 'date', autocomplete: 'bday', required: false},
-    {...PASSWORD_FIELD, autocomplete: 'new-password', placeholder: 'Tối thiểu 8 ký tự'},
+    {name: 'dateOfBirth', label: 'Date of birth', placeholder: '', type: 'date', autocomplete: 'bday', required: false},
+    {...PASSWORD_FIELD, autocomplete: 'new-password', placeholder: 'At least 8 characters'},
     {
         name: 'confirmPassword',
-        label: 'Xác nhận mật khẩu',
-        placeholder: 'Nhập lại mật khẩu',
+        label: 'Confirm password',
+        placeholder: 'Enter your password again',
         type: 'password',
         autocomplete: 'new-password',
         required: true

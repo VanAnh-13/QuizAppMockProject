@@ -1,7 +1,12 @@
 import {ChangeDetectionStrategy, Component} from '@angular/core';
 import {BrandComponent} from '../brand/brand.component';
 import {SiteInfoDialogComponent} from '../site-info-dialog/site-info-dialog.component';
-import {SITE_NAVIGATION} from '../../../core/config/site-content';
+import {SITE_NAVIGATION, SiteInformation} from '../../../core/config/site-content';
+
+export interface NavItem {
+    readonly id: SiteInformation;
+    readonly label: string;
+}
 
 @Component({
     selector: 'app-site-footer',
@@ -12,5 +17,5 @@ import {SITE_NAVIGATION} from '../../../core/config/site-content';
 })
 export class SiteFooterComponent {
     protected readonly currentYear = new Date().getFullYear();
-    protected readonly navigation = SITE_NAVIGATION;
+    protected readonly navItems: readonly NavItem[] = SITE_NAVIGATION;
 }

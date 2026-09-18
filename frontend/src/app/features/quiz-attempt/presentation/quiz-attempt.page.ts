@@ -10,7 +10,7 @@ import {
     viewChild,
 } from '@angular/core';
 import {ActivatedRoute, RouterLink} from '@angular/router';
-import {Location} from '@angular/common';
+import {Location, NgOptimizedImage} from '@angular/common';
 import {ConfirmationService} from '../../../shared/ui/confirmation/confirmation.service';
 import {provideQuizAttempt} from '../infrastructure/attempt-content.provider';
 import {ATTEMPT_CONFIG} from '../application/attempt-config';
@@ -18,7 +18,7 @@ import {QuizAttemptStore} from './quiz-attempt.store';
 
 @Component({
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [RouterLink],
+    imports: [RouterLink, NgOptimizedImage],
     providers: [provideQuizAttempt(), QuizAttemptStore],
     selector: 'app-quiz-attempt-page',
     styleUrls: ['./quiz-attempt.page.css', './quiz-attempt.sidebar.css', './quiz-attempt.dialog.css'],
@@ -28,7 +28,7 @@ export class QuizAttemptPage implements OnDestroy {
     protected readonly store = inject(QuizAttemptStore);
     protected readonly submitDialogOpen = signal(false);
     protected readonly leaveDialogOpen = signal(false);
-    protected readonly leaveMessage = signal('Bạn đang làm bài. Bạn có chắc muốn rời trang?');
+    protected readonly leaveMessage = signal('You have an active attempt. Are you sure you want to leave?');
     private readonly submitDialog = viewChild<ElementRef<HTMLDialogElement>>('submitDialog');
     private readonly leaveDialog = viewChild<ElementRef<HTMLDialogElement>>('leaveDialog');
     private leaveResolver: ((value: boolean) => void) | null = null;
@@ -76,10 +76,10 @@ export class QuizAttemptPage implements OnDestroy {
         if (
             this.store.dirty() &&
             !(await this.confirmation.confirm({
-                title: 'Tải lại trạng thái?',
-                message: 'Tải lại sẽ thay đáp án chưa lưu bằng bản trên máy chủ. Bạn có muốn tiếp tục?',
-                confirmLabel: 'Tải lại',
-                cancelLabel: 'Hủy',
+                title: 'Reload attempt?',
+                message: 'Reloading will replace unsaved answers with the server version. Continue?',
+                confirmLabel: 'Reload',
+                cancelLabel: 'Cancel',
             }))
         )
             return;
@@ -98,12 +98,12 @@ export class QuizAttemptPage implements OnDestroy {
 
         if (this.store.dirty() || this.store.isSaving()) {
             if (await this.store.save()) {
-                return this.promptLeaveConfirmation('Bạn đang làm bài. Bạn có chắc muốn rời trang?');
+                return this.promptLeaveConfirmation('You have an active attempt. Are you sure you want to leave?');
             }
-            return this.promptLeaveConfirmation('Có đáp án chưa lưu thành công. Bạn vẫn muốn rời trang?');
+            return this.promptLeaveConfirmation('Some answers have not been saved. Leave anyway?');
         }
 
-        return this.promptLeaveConfirmation('Bạn đang làm bài. Bạn có chắc muốn rời trang?');
+        return this.promptLeaveConfirmation('You have an active attempt. Are you sure you want to leave?');
     }
 
     private promptLeaveConfirmation(message: string): Promise<boolean> {

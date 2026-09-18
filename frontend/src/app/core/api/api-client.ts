@@ -27,6 +27,14 @@ export class ApiClient {
         return firstValueFrom(this.http.put<T>(this.url(path), body));
     }
 
+    patch<T>(path: string, body: unknown): Promise<T> {
+        return firstValueFrom(this.http.patch<T>(this.url(path), body));
+    }
+
+    delete<T>(path: string): Promise<T> {
+        return firstValueFrom(this.http.delete<T>(this.url(path)));
+    }
+
     async list<T>(path: string, params: Record<string, string | number> = {}): Promise<readonly T[]> {
         const items: T[] = [];
 
@@ -45,14 +53,14 @@ export class ApiClient {
                 page.totalCount < 0 ||
                 page.pageNumber !== pageNumber
             ) {
-                throw new Error('Dữ liệu phân trang không hợp lệ.');
+                throw new Error('Invalid pagination data.');
             }
 
             items.push(...page.items);
 
             if (items.length >= page.totalCount) return items;
 
-            if (page.items.length === 0) throw new Error('Danh sách từ máy chủ chưa đầy đủ.');
+            if (page.items.length === 0) throw new Error('The server returned an incomplete list.');
 
             pageNumber++;
         }
