@@ -120,4 +120,12 @@ describe('authReturnUrl', () => {
     it.each(['/history/extra', '/settings?redirect=https://example.com', '/historyx'])('rejects an unsafe account destination %s', (value) => {
         expect(authReturnUrl(value)).toBe('/');
     });
+
+    it.each(['/admin', '/admin/questions', '/admin/users'])('keeps an admin destination %s', (value) => {
+        expect(authReturnUrl(value)).toBe(value);
+    });
+
+    it.each(['/admin?redirect=https://example.com', '/administrator', '/admin/questions?next=/login'])('rejects an unsafe admin destination %s', (value) => {
+        expect(authReturnUrl(value)).toBe('/');
+    });
 });

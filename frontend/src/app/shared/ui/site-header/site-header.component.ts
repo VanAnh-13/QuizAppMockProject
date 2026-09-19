@@ -30,6 +30,7 @@ export class SiteHeaderComponent {
     protected logout(): void {
         this.session.clear();
         this.sessionChanged.emit();
+        void this.router.navigateByUrl('/login');
     }
 
     @HostListener('document:click', ['$event'])

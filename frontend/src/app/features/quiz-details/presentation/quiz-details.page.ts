@@ -158,6 +158,7 @@ export class QuizDetailsPage {
         this.historyDialogOpen.set(false);
         this.history.set([]);
         this.historyError.set(null);
+        void this.router.navigateByUrl('/login');
     }
 
     @HostListener('document:click', ['$event'])

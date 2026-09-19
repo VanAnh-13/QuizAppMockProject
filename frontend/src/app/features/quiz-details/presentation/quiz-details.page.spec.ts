@@ -132,6 +132,7 @@ describe('QuizDetailsPage', () => {
         expect(header.querySelector('[data-testid="header-login"]')).toBeNull();
         expect(header.querySelector('[data-testid="header-register"]')).toBeNull();
 
+        const navigateByUrl = vi.spyOn(TestBed.inject(Router), 'navigateByUrl').mockResolvedValue(true);
         header.querySelector<HTMLButtonElement>('[data-testid="header-logout"]')!.click();
         fixture.detectChanges();
 
@@ -139,6 +140,7 @@ describe('QuizDetailsPage', () => {
         expect(session.token()).toBeNull();
         expect(header.querySelector('.details-header__profile')).toBeNull();
         expect(header.querySelector('[data-testid="header-login"]')).not.toBeNull();
+        expect(navigateByUrl).toHaveBeenCalledWith('/login');
     });
 
     it('falls back to the username and reacts when the session is cleared elsewhere', async () => {

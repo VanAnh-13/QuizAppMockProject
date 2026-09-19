@@ -1,6 +1,6 @@
 import {signal} from '@angular/core';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
-import {provideRouter} from '@angular/router';
+import {provideRouter, Router} from '@angular/router';
 import {ApiClient} from '../../../core/api/api-client';
 import {AuthResponse, AuthSession} from '../../../core/auth/auth-session';
 import {SiteHeaderComponent} from './site-header.component';
@@ -35,7 +35,7 @@ describe('SiteHeaderComponent', () => {
         expect(mobileAction(fixture, 'Đăng nhập').getAttribute('href')).toBe('/login?returnUrl=%2F');
     });
 
-    it('clears the session and emits sessionChanged on mobile logout', () => {
+    it('clears the session, emits sessionChanged, and goes to login on mobile logout', () => {
         const {clear} = configure({id: '1', username: 'learner', fullName: 'Quiz Learner'});
         const fixture = TestBed.createComponent(SiteHeaderComponent);
         fixture.detectChanges();
@@ -46,6 +46,7 @@ describe('SiteHeaderComponent', () => {
 
         expect(clear).toHaveBeenCalledTimes(1);
         expect(emitted).toHaveBeenCalledTimes(1);
+        expect(TestBed.inject(Router).navigateByUrl).toHaveBeenCalledWith('/login');
     });
 
     it('renders user avatar menu and handles logout for signed in user', () => {
@@ -66,6 +67,7 @@ describe('SiteHeaderComponent', () => {
 
         expect(clear).toHaveBeenCalledTimes(1);
         expect(emitted).toHaveBeenCalledTimes(1);
+        expect(TestBed.inject(Router).navigateByUrl).toHaveBeenCalledWith('/login');
     });
 });
 
@@ -79,6 +81,7 @@ function configure(user: AuthResponse['userDto'] | null) {
             provideRouter([]),
         ],
     });
+    vi.spyOn(TestBed.inject(Router), 'navigateByUrl').mockResolvedValue(true);
     return {clear};
 }
 
