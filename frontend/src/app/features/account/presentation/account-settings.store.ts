@@ -12,6 +12,7 @@ export class AccountSettingsStore {
     private loadVersion = 0;
 
     readonly profile = signal<AccountProfile | null>(null);
+    readonly activeRoles = computed(() => this.profile()?.roles.filter((role) => role.isActive) ?? []);
     readonly isLoading = signal(true);
     readonly loadError = signal<string | null>(null);
     readonly busy = signal(false);

@@ -69,11 +69,11 @@
                     <div class="profile-field">
                         <dt>Vai trò người dùng</dt>
                         <dd>
-                            @if (profile.roles.length === 0) {
-                                <span class="role-chip">Học viên</span>
+                            @if (store.activeRoles().length === 0) {
+                                <span>No active roles</span>
                             } @else {
                                 <span class="profile-field__roles">
-                                    @for (role of profile.roles; track role.id) {
+                                    @for (role of store.activeRoles(); track role.id) {
                                         <span class="role-chip">{{ role.roleName }}</span>
                                     }
                                 </span>

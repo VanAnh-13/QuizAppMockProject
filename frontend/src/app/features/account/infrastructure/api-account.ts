@@ -1,5 +1,6 @@
 import {inject, Injectable} from '@angular/core';
 import {ApiClient} from '../../../core/api/api-client';
+import {RoleDto} from '../../auth/domain/auth-contracts';
 import {AccountApi} from '../application/account-api';
 import {
     AccountProfile,
@@ -13,7 +14,7 @@ interface ProfilePayload {
     readonly fullName: string | null;
     readonly phoneNumber: string | null;
     readonly dateOfBirth: string | null;
-    readonly roles: readonly { readonly id: string; readonly roleName: string }[];
+    readonly roles: readonly RoleDto[];
 }
 
 @Injectable()
@@ -49,7 +50,7 @@ function validateProfile(profile: ProfilePayload): AccountProfile {
         roles: Array.isArray(profile.roles)
             ? profile.roles
                 .filter((role) => typeof role?.roleName === 'string')
-                .map((role) => ({id: role.id, roleName: role.roleName}))
+                .map((role) => ({id: role.id, roleName: role.roleName, isActive: role.isActive === true}))
             : [],
     };
 }

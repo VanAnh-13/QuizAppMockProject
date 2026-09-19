@@ -1,6 +1,7 @@
 export interface AccountRole {
     readonly id: string;
     readonly roleName: string;
+    readonly isActive: boolean;
 }
 
 export interface AccountProfile {

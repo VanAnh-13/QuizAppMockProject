@@ -11,7 +11,7 @@ const profile: AccountProfile = {
     fullName: 'Nguyễn Minh Tuấn',
     phoneNumber: '0912345678',
     dateOfBirth: '1996-08-15',
-    roles: [{id: 'role-id', roleName: 'Admin'}],
+    roles: [{id: 'role-id', roleName: 'Admin', isActive: true}],
 };
 
 describe('AccountSettingsStore', () => {
@@ -41,6 +41,21 @@ describe('AccountSettingsStore', () => {
         expect(store.initials()).toBe('MT');
         expect(store.isLoading()).toBe(false);
         expect(store.loadError()).toBeNull();
+    });
+
+    it('exposes only active assigned roles and updates when all roles are disabled', async () => {
+        const {store} = setup();
+        await store.load();
+        const active = {id: 'teacher', roleName: 'Teacher', isActive: true};
+        const disabled = {id: 'editor', roleName: 'Editor', isActive: false};
+        store.profile.set({...profile, roles: [active, disabled]});
+
+        expect(store.activeRoles()).toEqual([active]);
+
+        store.profile.set({...profile, roles: [disabled]});
+        expect(store.activeRoles()).toEqual([]);
+        store.profile.set(null);
+        expect(store.activeRoles()).toEqual([]);
     });
 
     it('reports a friendly message when the profile cannot be loaded', async () => {

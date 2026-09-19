@@ -22,7 +22,7 @@ describe('ApiAccount', () => {
         fullName: 'Nguyễn Minh Tuấn',
         phoneNumber: '0912345678',
         dateOfBirth: '1996-08-15',
-        roles: [{id: 'role-id', roleName: 'Admin'}],
+        roles: [{id: 'role-id', roleName: 'Admin', isActive: true}],
     };
 
     it('reads the signed-in profile from the authenticated endpoint', async () => {
@@ -38,8 +38,27 @@ describe('ApiAccount', () => {
             fullName: 'Nguyễn Minh Tuấn',
             phoneNumber: '0912345678',
             dateOfBirth: '1996-08-15',
-            roles: [{id: 'role-id', roleName: 'Admin'}],
+            roles: [{id: 'role-id', roleName: 'Admin', isActive: true}],
         });
+    });
+
+    it('preserves role status and does not activate missing or malformed flags', async () => {
+        const {account} = setup({
+            ...profilePayload,
+            roles: [
+                {id: 'active', roleName: 'Teacher', isActive: true},
+                {id: 'disabled', roleName: 'Editor', isActive: false},
+                {id: 'missing', roleName: 'Reviewer'},
+                {id: 'malformed', roleName: 'Moderator', isActive: 'true'},
+            ],
+        });
+
+        expect((await account.profile()).roles).toEqual([
+            {id: 'active', roleName: 'Teacher', isActive: true},
+            {id: 'disabled', roleName: 'Editor', isActive: false},
+            {id: 'missing', roleName: 'Reviewer', isActive: false},
+            {id: 'malformed', roleName: 'Moderator', isActive: false},
+        ]);
     });
 
     it('normalizes optional profile fields and missing roles', async () => {

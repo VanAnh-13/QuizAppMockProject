@@ -14,7 +14,7 @@ describe('AccountSettingsPage', () => {
         fullName: 'Nguyễn Minh Tuấn',
         phoneNumber: '0912345678',
         dateOfBirth: '1996-08-15',
-        roles: [{id: 'role-id', roleName: 'Học viên'}],
+        roles: [{id: 'role-id', roleName: 'Học viên', isActive: true}],
     };
 
     async function setup(changePassword = vi.fn().mockResolvedValue(undefined)) {
@@ -71,6 +71,23 @@ describe('AccountSettingsPage', () => {
         expect(card.textContent).toContain('0912345678');
         expect(card.querySelector('.role-chip')?.textContent).toContain('Học viên');
         expect(card.querySelector('.profile-card__avatar')?.textContent?.trim()).toBe('MT');
+    });
+
+    it('renders only active role badges and shows an honest empty state', async () => {
+        const {fixture, element} = await setup();
+        const store = fixture.debugElement.injector.get(AccountSettingsStore);
+        const disabled = {id: 'editor', roleName: 'Editor', isActive: false};
+        store.profile.set({...profile, roles: [...profile.roles, disabled]});
+        fixture.detectChanges();
+
+        expect([...element.querySelectorAll('.role-chip')].map((badge) => badge.textContent?.trim()))
+            .toEqual(['Học viên']);
+
+        store.profile.set({...profile, roles: [disabled]});
+        fixture.detectChanges();
+
+        expect(element.querySelector('.role-chip')).toBeNull();
+        expect(element.textContent).toContain('No active roles');
     });
 
     it('keeps the three password fields masked until the toggle is pressed', async () => {
