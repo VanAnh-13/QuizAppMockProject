@@ -49,14 +49,16 @@ export class AccountHistoryStore {
         })),
     );
     private loadVersion = 0;
+    private requestedPage = 1;
 
     constructor() {
         void this.load(1);
     }
 
-    async load(pageNumber = this.currentPage()): Promise<void> {
+    async load(pageNumber = this.requestedPage): Promise<void> {
         if (!Number.isInteger(pageNumber) || pageNumber < 1) return;
 
+        this.requestedPage = pageNumber;
         const version = ++this.loadVersion;
         this.isLoading.set(true);
         this.errorMessage.set(null);

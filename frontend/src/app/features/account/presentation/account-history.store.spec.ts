@@ -71,6 +71,39 @@ describe('AccountHistoryStore', () => {
         expect(store.hasPreviousPage()).toBe(true);
     });
 
+    it('retries the failed destination rather than the previously displayed page', async () => {
+        const {store, history} = setup();
+        await store.load(1);
+        history.mockRejectedValueOnce(new HttpErrorResponse({status: 500}));
+
+        store.goToPage(2);
+        await vi.waitUntil(() => !store.isLoading());
+
+        expect(store.errorMessage()).not.toBeNull();
+        expect(store.currentPage()).toBe(1);
+        await store.load();
+
+        expect(history).toHaveBeenLastCalledWith(2, 8);
+        expect(store.currentPage()).toBe(2);
+        expect(store.historyRows()).toHaveLength(4);
+        expect(store.rangeStart()).toBe(9);
+        expect(store.errorMessage()).toBeNull();
+    });
+
+    it('does not replace the retry destination with an invalid page request', async () => {
+        const {store, history} = setup();
+        await store.load(1);
+        history.mockRejectedValueOnce(new HttpErrorResponse({status: 500}));
+        await store.load(2);
+
+        await store.load(NaN);
+        await store.load(0);
+        await store.load();
+
+        expect(history).toHaveBeenLastCalledWith(2, 8);
+        expect(store.currentPage()).toBe(2);
+    });
+
     it('clamps navigation to the available pages', async () => {
         const {store} = setup();
         await store.load(1);
