@@ -146,4 +146,43 @@ describe('AccountSettingsPage', () => {
         );
         expect(element.querySelector<HTMLInputElement>('#currentPassword')!.value).toBe('');
     });
+
+    it.each([
+        {status: 200, clearsSession: true},
+        {status: 401, clearsSession: true},
+        {status: 500, clearsSession: false},
+    ])('handles a $status password response after the page is destroyed', async ({status, clearsSession}) => {
+        let resolve!: () => void;
+        let reject!: (reason: unknown) => void;
+        const response = new Promise<void>((resolveResponse, rejectResponse) => {
+            resolve = resolveResponse;
+            reject = rejectResponse;
+        });
+        const {fixture, element, clear} = await setup(vi.fn().mockReturnValue(response));
+        const store = fixture.debugElement.injector.get(AccountSettingsStore);
+        store.form.setValue({
+            currentPassword: 'Original-password-123!',
+            newPassword: 'Changed-password-456!',
+            confirmNewPassword: 'Changed-password-456!',
+        });
+        element.querySelector<HTMLButtonElement>('.password-toggle')!.click();
+        const visiblePasswords = fixture.componentInstance['visiblePasswords']();
+        const pending = fixture.componentInstance['submit']();
+
+        expect(store.busy()).toBe(true);
+        expect(clear).not.toHaveBeenCalled();
+        fixture.destroy();
+        const detectChanges = vi.spyOn(fixture.componentInstance['changeDetector'], 'detectChanges');
+        const querySelector = vi.spyOn(element, 'querySelector');
+
+        if (status === 200) resolve();
+        else reject(new HttpErrorResponse({status}));
+
+        await expect(pending).resolves.toBeUndefined();
+
+        expect(clear).toHaveBeenCalledTimes(clearsSession ? 1 : 0);
+        expect(fixture.componentInstance['visiblePasswords']()).toBe(visiblePasswords);
+        expect(detectChanges).not.toHaveBeenCalled();
+        expect(querySelector).not.toHaveBeenCalled();
+    });
 });

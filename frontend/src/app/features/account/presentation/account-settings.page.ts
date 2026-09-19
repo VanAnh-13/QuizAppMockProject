@@ -55,12 +55,11 @@ export class AccountSettingsPage {
     protected async submit(): Promise<void> {
         const succeeded = await this.store.submit();
 
+        if (this.store.requiresSignIn()) this.session.clear();
+
         if (this.destroyed) return;
 
         this.visiblePasswords.set(new Set());
-
-        // Changing the password rotates the security stamp, so the current token no longer works.
-        if (this.store.requiresSignIn()) this.session.clear();
 
         this.changeDetector.detectChanges();
 
