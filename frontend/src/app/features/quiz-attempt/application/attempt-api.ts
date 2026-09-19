@@ -1,4 +1,5 @@
 import {InjectionToken} from '@angular/core';
+import {PagedResult} from '../../../core/api/api-client';
 
 export interface AttemptAnswer {
     readonly questionId: string;
@@ -76,6 +77,8 @@ export interface AttemptApi {
     result(attemptId: string): Promise<AttemptResult>;
 
     unfinished(quizId: string): Promise<readonly AttemptSummary[]>;
+
+    historyPage(pageNumber: number, pageSize: number): Promise<PagedResult<AttemptResult>>;
 
     history(quizId: string): Promise<readonly AttemptResult[]>;
 }

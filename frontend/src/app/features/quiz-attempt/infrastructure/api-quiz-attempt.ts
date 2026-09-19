@@ -1,5 +1,5 @@
 import {inject, Injectable} from '@angular/core';
-import {ApiClient} from '../../../core/api/api-client';
+import {ApiClient, PagedResult} from '../../../core/api/api-client';
 import {
     AttemptAnswer,
     AttemptApi,
@@ -43,6 +43,28 @@ export class ApiQuizAttempt implements AttemptApi {
 
     unfinished(quizId: string): Promise<readonly AttemptSummary[]> {
         return this.api.list('attempts/in-progress', {quizId});
+    }
+
+    async historyPage(pageNumber: number, pageSize: number): Promise<PagedResult<AttemptResult>> {
+        const page = await this.api.get<PagedResult<AttemptResult>>('quiz-history', {
+            pageNumber,
+            pageSize,
+        });
+
+        if (
+            !Array.isArray(page?.items) ||
+            !Number.isInteger(page.totalCount) ||
+            page.totalCount < 0
+        ) {
+            throw new Error('Invalid attempt history page.');
+        }
+
+        return {
+            items: page.items.map(validateAttemptResult),
+            totalCount: page.totalCount,
+            pageNumber: Number.isInteger(page.pageNumber) ? page.pageNumber : pageNumber,
+            pageSize: Number.isInteger(page.pageSize) ? page.pageSize : pageSize,
+        };
     }
 
     async history(quizId: string): Promise<readonly AttemptResult[]> {

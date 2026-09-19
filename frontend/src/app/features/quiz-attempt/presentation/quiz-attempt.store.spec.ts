@@ -57,6 +57,7 @@ describe('QuizAttemptStore', () => {
             result: vi.fn(),
             unfinished: vi.fn().mockResolvedValue([]),
             history: vi.fn(),
+            historyPage: vi.fn(),
             ...overrides,
         };
         TestBed.configureTestingModule({

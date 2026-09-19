@@ -1,11 +1,10 @@
 import {HttpErrorResponse} from '@angular/common/http';
 import {TestBed} from '@angular/core/testing';
-import {ACCOUNT_API} from '../application/account-api';
+import {ATTEMPT_API, AttemptResult} from '../../quiz-attempt/application/attempt-api';
 import {ACCOUNT_CONFIG} from '../application/account-config';
-import {AttemptHistoryEntry} from '../domain/account-contracts';
 import {AccountHistoryStore} from './account-history.store';
 
-function entry(id: string, score = 80, passedScore: number | null = 70): AttemptHistoryEntry {
+function entry(id: string, score = 80, passedScore: number | null = 70): AttemptResult {
     return {
         id,
         quizId: `quiz-${id}`,
@@ -33,7 +32,7 @@ describe('AccountHistoryStore', () => {
         TestBed.configureTestingModule({
             providers: [
                 AccountHistoryStore,
-                {provide: ACCOUNT_API, useValue: {history}},
+                {provide: ATTEMPT_API, useValue: {historyPage: history}},
                 {provide: ACCOUNT_CONFIG, useValue: {pageSize}},
             ],
         });
@@ -117,7 +116,7 @@ describe('AccountHistoryStore', () => {
     it('surfaces a friendly message and clears rows when loading fails', async () => {
         const {store} = setup();
         await store.load(1);
-        TestBed.inject(ACCOUNT_API).history = vi
+        TestBed.inject(ATTEMPT_API).historyPage = vi
             .fn()
             .mockRejectedValue(new HttpErrorResponse({status: 500}));
 

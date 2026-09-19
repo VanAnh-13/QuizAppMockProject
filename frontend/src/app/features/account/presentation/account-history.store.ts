@@ -1,8 +1,8 @@
 import {computed, inject, Injectable, signal} from '@angular/core';
 import {apiErrorMessage} from '../../../core/api/api-error';
-import {ACCOUNT_API} from '../application/account-api';
+import {ATTEMPT_API, AttemptResult} from '../../quiz-attempt/application/attempt-api';
 import {ACCOUNT_CONFIG} from '../application/account-config';
-import {AttemptHistoryEntry, formatScore} from '../domain/account-contracts';
+import {formatScore} from '../domain/account-contracts';
 
 export interface AttemptHistoryRow {
     readonly id: string;
@@ -35,8 +35,8 @@ export class AccountHistoryStore {
     );
     readonly hasPreviousPage = computed(() => this.currentPage() > 1);
     readonly hasNextPage = computed(() => this.currentPage() < this.totalPages());
-    private readonly api = inject(ACCOUNT_API);
-    private readonly entries = signal<readonly AttemptHistoryEntry[]>([]);
+    private readonly api = inject(ATTEMPT_API);
+    private readonly entries = signal<readonly AttemptResult[]>([]);
     readonly historyRows = computed<readonly AttemptHistoryRow[]>(() =>
         this.entries().map((entry) => ({
             id: entry.id,
@@ -62,7 +62,7 @@ export class AccountHistoryStore {
         this.errorMessage.set(null);
 
         try {
-            const page = await this.api.history(pageNumber, this.pageSize);
+            const page = await this.api.historyPage(pageNumber, this.pageSize);
             if (version !== this.loadVersion) return;
 
             this.entries.set(page.items);

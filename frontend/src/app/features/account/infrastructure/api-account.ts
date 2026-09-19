@@ -1,10 +1,8 @@
 import {inject, Injectable} from '@angular/core';
-import {ApiClient, PagedResult} from '../../../core/api/api-client';
+import {ApiClient} from '../../../core/api/api-client';
 import {AccountApi} from '../application/account-api';
 import {
     AccountProfile,
-    AttemptHistoryEntry,
-    AttemptHistoryPage,
     ChangePasswordRequest,
 } from '../domain/account-contracts';
 
@@ -24,28 +22,6 @@ export class ApiAccount implements AccountApi {
 
     async profile(): Promise<AccountProfile> {
         return validateProfile(await this.api.get<ProfilePayload>('auth/me'));
-    }
-
-    async history(pageNumber: number, pageSize: number): Promise<AttemptHistoryPage> {
-        const page = await this.api.get<PagedResult<AttemptHistoryEntry>>('quiz-history', {
-            pageNumber,
-            pageSize,
-        });
-
-        if (
-            !Array.isArray(page?.items) ||
-            !Number.isInteger(page.totalCount) ||
-            page.totalCount < 0
-        ) {
-            throw new Error('Dữ liệu lịch sử làm bài không hợp lệ.');
-        }
-
-        return {
-            items: page.items.map(validateHistoryEntry),
-            totalCount: page.totalCount,
-            pageNumber: Number.isInteger(page.pageNumber) ? page.pageNumber : pageNumber,
-            pageSize: Number.isInteger(page.pageSize) ? page.pageSize : pageSize,
-        };
     }
 
     async changePassword(request: ChangePasswordRequest): Promise<void> {
@@ -76,19 +52,4 @@ function validateProfile(profile: ProfilePayload): AccountProfile {
                 .map((role) => ({id: role.id, roleName: role.roleName}))
             : [],
     };
-}
-
-function validateHistoryEntry(entry: AttemptHistoryEntry): AttemptHistoryEntry {
-    if (
-        !entry ||
-        typeof entry.id !== 'string' ||
-        typeof entry.quizId !== 'string' ||
-        typeof entry.quizTitle !== 'string' ||
-        !Number.isFinite(Date.parse(entry.submittedAt)) ||
-        !Number.isFinite(entry.score)
-    ) {
-        throw new Error('Lượt làm bài không hợp lệ.');
-    }
-
-    return {...entry, passedScore: Number.isFinite(entry.passedScore) ? entry.passedScore : null};
 }

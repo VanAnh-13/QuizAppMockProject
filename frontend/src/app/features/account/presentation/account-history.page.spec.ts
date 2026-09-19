@@ -1,6 +1,6 @@
 import {TestBed} from '@angular/core/testing';
 import {provideRouter} from '@angular/router';
-import {ACCOUNT_API} from '../application/account-api';
+import {ATTEMPT_API} from '../../quiz-attempt/application/attempt-api';
 import {ACCOUNT_CONFIG} from '../application/account-config';
 import {AccountHistoryPage} from './account-history.page';
 import {AccountHistoryStore} from './account-history.store';
@@ -33,7 +33,7 @@ describe('AccountHistoryPage', () => {
             .overrideComponent(AccountHistoryPage, {
                 set: {
                     providers: [
-                        {provide: ACCOUNT_API, useValue: {history}},
+                        {provide: ATTEMPT_API, useValue: {historyPage: history}},
                         {provide: ACCOUNT_CONFIG, useValue: {pageSize: 2}},
                         AccountHistoryStore,
                     ],
