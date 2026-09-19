@@ -24,7 +24,7 @@ describe('SiteHeaderComponent', () => {
         const fixture = TestBed.createComponent(SiteHeaderComponent);
         fixture.detectChanges();
 
-        expect(mobileAction(fixture, 'Đăng ký').getAttribute('href')).toBe('/register?returnUrl=%2F');
+        expect(mobileAction(fixture, 'Sign up').getAttribute('href')).toBe('/register?returnUrl=%2F');
     });
 
     it('links to login from the mobile menu', () => {
@@ -32,7 +32,7 @@ describe('SiteHeaderComponent', () => {
         const fixture = TestBed.createComponent(SiteHeaderComponent);
         fixture.detectChanges();
 
-        expect(mobileAction(fixture, 'Đăng nhập').getAttribute('href')).toBe('/login?returnUrl=%2F');
+        expect(mobileAction(fixture, 'Log in').getAttribute('href')).toBe('/login?returnUrl=%2F');
     });
 
     it('clears the session, emits sessionChanged, and goes to login on mobile logout', () => {
@@ -42,7 +42,7 @@ describe('SiteHeaderComponent', () => {
         const emitted = vi.fn();
         fixture.componentInstance.sessionChanged.subscribe(emitted);
 
-        mobileAction(fixture, 'Đăng xuất').click();
+        mobileAction(fixture, 'Log out').click();
 
         expect(clear).toHaveBeenCalledTimes(1);
         expect(emitted).toHaveBeenCalledTimes(1);
