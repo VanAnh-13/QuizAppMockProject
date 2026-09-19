@@ -266,13 +266,19 @@ fieldset {
 }
 
 .primary-button {
-    background: var(--brand);
+    background: var(--brand-gradient);
+    border: 1px solid var(--glass-border);
     color: var(--on-brand);
+    box-shadow: var(--glass-shadow);
     @apply inline-flex min-h-[44px] items-center justify-center gap-2 self-start rounded-xl px-8 text-sm font-semibold transition-colors;
 }
 
 .primary-button:hover:not(:disabled) {
-    background: var(--brand-gradient);
+    filter: brightness(1.08);
+}
+
+.primary-button:active:not(:disabled) {
+    transform: scale(0.98);
 }
 
 .primary-button:disabled {
