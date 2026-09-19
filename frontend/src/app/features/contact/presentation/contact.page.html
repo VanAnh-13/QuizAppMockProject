@@ -1,0 +1,249 @@
+<app-site-header/>
+
+<main class="contact" id="main-content" tabindex="-1">
+    <!-- Ambient glowing backgrounds for depth -->
+    <div class="ambient-glow ambient-glow--top-left" aria-hidden="true"></div>
+    <div class="ambient-glow ambient-glow--center-right" aria-hidden="true"></div>
+
+    <header class="contact-hero">
+        <div class="hero-badge">
+            <span class="material-symbols-outlined hero-badge__icon" aria-hidden="true">mail</span>
+            <span>Support and feedback</span>
+        </div>
+        <h1 class="hero-title">
+            Contact <span class="hero-title__highlight">us</span>
+        </h1>
+        <p class="hero-subtitle">
+            Questions or feedback? We read every message and will help you keep your
+            learning path on track.
+        </p>
+
+        <!-- Quick Info Cards -->
+        <div class="contact-quick-cards" aria-label="Support Highlights">
+            <div class="quick-card">
+                <div class="quick-card__icon-wrap">
+                    <span class="material-symbols-outlined" aria-hidden="true">bolt</span>
+                </div>
+                <div class="quick-card__text">
+                    <span class="quick-card__title">Quick Response</span>
+                    <span class="quick-card__desc">Within 24 business hours</span>
+                </div>
+            </div>
+            <div class="quick-card">
+                <div class="quick-card__icon-wrap">
+                    <span class="material-symbols-outlined" aria-hidden="true">support_agent</span>
+                </div>
+                <div class="quick-card__text">
+                    <span class="quick-card__title">Direct Support</span>
+                    <span class="quick-card__desc">Dedicated learner assistance</span>
+                </div>
+            </div>
+            <div class="quick-card">
+                <div class="quick-card__icon-wrap">
+                    <span class="material-symbols-outlined" aria-hidden="true">rate_review</span>
+                </div>
+                <div class="quick-card__text">
+                    <span class="quick-card__title">Active Feedback</span>
+                    <span class="quick-card__desc">Help us shape QuizApp</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="contact-layout">
+        <section class="contact-form" aria-labelledby="feedback-title">
+            <header class="contact-form__header">
+                <div class="section-badge">
+                    <span class="material-symbols-outlined" aria-hidden="true">edit_note</span>
+                    <span>Direct Message</span>
+                </div>
+                <h2 id="feedback-title">
+                    Send feedback
+                    <span class="response-badge">Reply within 24 hours</span>
+                </h2>
+                <p>Fill in the form and we will reply to the inbox you provide.</p>
+            </header>
+
+            <form id="contact-form" class="fields" [formGroup]="form" (ngSubmit)="submit()"
+                    novalidate>
+                <div class="field">
+                    <label for="fullName">
+                        Full name <span class="required" aria-hidden="true">*</span>
+                    </label>
+                    <div class="input-wrap">
+                        <span class="input-icon material-symbols-outlined"
+                                aria-hidden="true">person</span>
+                        <input
+                                id="fullName"
+                                type="text"
+                                formControlName="fullName"
+                                autocomplete="name"
+                                placeholder="For example: Nguyen Van An"
+                                [attr.aria-invalid]="fieldError('fullName') ? 'true' : null"
+                                [attr.aria-describedby]="fieldError('fullName') ? 'fullName-error' : null"
+                        />
+                    </div>
+                    @if (fieldError('fullName'); as message) {
+                        <p class="field-error" id="fullName-error">
+                            <span class="material-symbols-outlined" aria-hidden="true">error</span>
+                            {{ message }}
+                        </p>
+                    }
+                </div>
+
+                <div class="field">
+                    <label for="email">
+                        Email <span class="required" aria-hidden="true">*</span>
+                    </label>
+                    <div class="input-wrap">
+                        <span class="input-icon material-symbols-outlined"
+                                aria-hidden="true">mail</span>
+                        <input
+                                id="email"
+                                type="email"
+                                formControlName="email"
+                                autocomplete="email"
+                                placeholder="you@example.com"
+                                [attr.aria-invalid]="fieldError('email') ? 'true' : null"
+                                [attr.aria-describedby]="fieldError('email') ? 'email-error' : null"
+                        />
+                    </div>
+                    @if (fieldError('email'); as message) {
+                        <p class="field-error" id="email-error">
+                            <span class="material-symbols-outlined" aria-hidden="true">error</span>
+                            {{ message }}
+                        </p>
+                    }
+                </div>
+
+                <div class="field">
+                    <label for="subject">Subject</label>
+                    <div class="input-wrap">
+                        <span class="input-icon material-symbols-outlined"
+                                aria-hidden="true">topic</span>
+                        <input
+                                id="subject"
+                                type="text"
+                                formControlName="subject"
+                                autocomplete="off"
+                                placeholder="Summarize your question or suggestion"
+                        />
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label for="message">
+                        Message <span class="required" aria-hidden="true">*</span>
+                    </label>
+                    <div class="input-wrap textarea-wrap">
+                        <textarea
+                                id="message"
+                                formControlName="message"
+                                rows="5"
+                                placeholder="Write your feedback or questions in detail…"
+                                [attr.aria-invalid]="fieldError('message') ? 'true' : null"
+                                [attr.aria-describedby]="fieldError('message') ? 'message-error' : null"
+                        ></textarea>
+                    </div>
+                    @if (fieldError('message'); as message) {
+                        <p class="field-error" id="message-error">
+                            <span class="material-symbols-outlined" aria-hidden="true">error</span>
+                            {{ message }}
+                        </p>
+                    }
+                </div>
+
+                <div class="form-actions">
+                    <button class="primary-button" type="submit">
+                        <span class="material-symbols-outlined" aria-hidden="true">send</span>
+                        Send feedback
+                    </button>
+                    <p class="form-hint">
+                        <span class="material-symbols-outlined" aria-hidden="true">schedule</span>
+                        We typically reply within 1–2 business days.
+                    </p>
+                </div>
+            </form>
+
+            @if (submitted()) {
+                <div class="success-notice" role="status">
+                    <div class="success-notice__icon-wrap">
+                        <span class="material-symbols-outlined"
+                                aria-hidden="true">check_circle</span>
+                    </div>
+                    <div class="success-notice__body">
+                        <p class="success-notice__title">Thank you for your feedback!</p>
+                        <p>Your message was recorded in this preview. Please check your inbox
+                            soon.</p>
+                    </div>
+                </div>
+            }
+        </section>
+
+        <aside class="info-card" aria-labelledby="info-title">
+            <header class="info-card__header">
+                <div class="section-badge">
+                    <span class="material-symbols-outlined" aria-hidden="true">support</span>
+                    <span>Support Channels</span>
+                </div>
+                <h2 id="info-title">Contact details</h2>
+                <p>Reach the QuizApp administration and technical support team directly.</p>
+            </header>
+
+            <ul class="contact-list">
+                <li class="contact-item">
+                    <span class="contact-list__icon material-symbols-outlined" aria-hidden="true">location_on</span>
+                    <div class="contact-item__body">
+                        <span class="contact-list__label">Office address</span>
+                        <span>FPT Building, Duy Tan Street, Cau Giay, Hanoi</span>
+                    </div>
+                </li>
+                <li class="contact-item">
+                    <span class="contact-list__icon material-symbols-outlined" aria-hidden="true">mail</span>
+                    <div class="contact-item__body">
+                        <span class="contact-list__label">Email</span>
+                        <a href="mailto:quizapp@fpt.edu.vn">quizapp&#64;fpt.edu.vn</a>
+                    </div>
+                </li>
+                <li class="contact-item">
+                    <span class="contact-list__icon material-symbols-outlined" aria-hidden="true">schedule</span>
+                    <div class="contact-item__body">
+                        <span class="contact-list__label">Working hours</span>
+                        <span>Monday – Friday: 08:00 – 17:00</span>
+                    </div>
+                </li>
+            </ul>
+
+            <section class="faq" aria-labelledby="faq-title">
+                <header class="faq__header">
+                    <h3 id="faq-title">
+                        <span class="material-symbols-outlined"
+                                aria-hidden="true">help_center</span>
+                        Frequently asked questions
+                    </h3>
+                </header>
+                <div class="faq-list">
+                    @for (item of faqs; track item.question) {
+                        <details class="faq-item">
+                            <summary>
+                                <span>{{ item.question }}</span>
+                                <span class="material-symbols-outlined faq-item__chevron"
+                                        aria-hidden="true">chevron_right</span>
+                            </summary>
+                            <p>{{ item.answer }}</p>
+                        </details>
+                    }
+                </div>
+                <div class="help-note">
+                    <span class="material-symbols-outlined" aria-hidden="true">info</span>
+                    <div>
+                        <strong>Need account help?</strong>
+                        <p>Include your student code or registered email for faster resolution.</p>
+                    </div>
+                </div>
+            </section>
+        </aside>
+    </div>
+</main>
+
+<app-site-footer/>

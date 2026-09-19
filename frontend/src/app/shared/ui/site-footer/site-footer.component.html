@@ -8,10 +8,10 @@
             </p>
         </div>
         <nav aria-label="Footer navigation">
-            @for (item of navItems; track item.id) {
-                <button type="button" (click)="information.open(item.id)">{{ item.label }}</button>
+            <a routerLink="/" fragment="quiz-list">Explore quizzes</a>
+            @for (item of navItems; track item.path) {
+                <a [routerLink]="item.path" routerLinkActive="active">{{ item.label }}</a>
             }
         </nav>
     </div>
 </footer>
-<app-site-info-dialog #information dialogId="footer-information"/>

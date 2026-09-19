@@ -18,7 +18,7 @@
 }
 
 .footer p,
-.footer button {
+.footer a {
     @apply text-xs leading-6 text-muted transition-colors;
 }
 
@@ -30,15 +30,16 @@
     @apply flex items-center gap-6;
 }
 
-.footer button {
+.footer a {
     @apply inline-flex min-h-11 items-center rounded-sm bg-transparent no-underline;
 }
 
-.footer button:hover {
+.footer a:hover,
+.footer a.active {
     color: var(--ink);
 }
 
-.footer button:focus-visible {
+.footer a:focus-visible {
     @apply outline-none ring-2 ring-brand ring-offset-2 ring-offset-canvas;
 }
 

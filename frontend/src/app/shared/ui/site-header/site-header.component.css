@@ -52,7 +52,7 @@
 }
 
 .header__navigation-link--active::after {
-    background: #a855f7;
+    background: var(--brand-gradient);
     box-shadow: var(--glass-shadow);
 }
 

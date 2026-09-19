@@ -1,21 +1,16 @@
 import {ChangeDetectionStrategy, Component} from '@angular/core';
+import {RouterLink, RouterLinkActive} from '@angular/router';
 import {BrandComponent} from '../brand/brand.component';
-import {SiteInfoDialogComponent} from '../site-info-dialog/site-info-dialog.component';
-import {SITE_NAVIGATION, SiteInformation} from '../../../core/config/site-content';
-
-export interface NavItem {
-    readonly id: SiteInformation;
-    readonly label: string;
-}
+import {SITE_NAVIGATION} from '../../../core/config/site-content';
 
 @Component({
     selector: 'app-site-footer',
-    imports: [BrandComponent, SiteInfoDialogComponent],
+    imports: [BrandComponent, RouterLink, RouterLinkActive],
     templateUrl: './site-footer.component.html',
     styleUrl: './site-footer.component.css',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SiteFooterComponent {
     protected readonly currentYear = new Date().getFullYear();
-    protected readonly navItems: readonly NavItem[] = SITE_NAVIGATION;
+    protected readonly navItems = SITE_NAVIGATION;
 }

@@ -8,9 +8,9 @@
                 <span>QuizApp</span>
             </a>
             <nav class="details-header__navigation" aria-label="Main navigation">
-                <a routerLink="/" fragment="quiz-list" aria-current="page">Explore quizzes</a>
-                <button type="button" (click)="openInfo('about')">About</button>
-                <button type="button" (click)="openInfo('contact')">Contact</button>
+                <a routerLink="/" fragment="quiz-list">Explore quizzes</a>
+                <a routerLink="/about">About</a>
+                <a routerLink="/contact">Contact</a>
             </nav>
         </div>
 
@@ -48,7 +48,8 @@
                             <span>Signed in</span>
                         </div>
                         <a class="details-header__user-link" routerLink="/history">
-                            <span class="material-symbols-outlined" aria-hidden="true">history</span>
+                            <span class="material-symbols-outlined"
+                                    aria-hidden="true">history</span>
                             Attempt history
                         </a>
                         <a class="details-header__user-link" routerLink="/settings">
@@ -275,8 +276,8 @@
         <p>© 2025 QuizApp. Build your programming knowledge and problem-solving skills.</p>
         <nav aria-label="Footer navigation">
             <a routerLink="/">Explore quizzes</a>
-            <button type="button" (click)="openInfo('about')">About</button>
-            <button type="button" (click)="openInfo('contact')">Contact</button>
+            <a routerLink="/about">About</a>
+            <a routerLink="/contact">Contact</a>
         </nav>
     </div>
 </footer>

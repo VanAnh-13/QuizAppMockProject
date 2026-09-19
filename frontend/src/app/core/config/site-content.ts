@@ -1,8 +1,8 @@
 ﻿export type SiteInformation = 'about' | 'contact' | 'login' | 'register' | 'terms' | 'privacy' | 'passwordReset';
 
 export const SITE_NAVIGATION = [
-    {id: 'about', label: 'About'},
-    {id: 'contact', label: 'Contact'},
+    {path: '/about', label: 'About'},
+    {path: '/contact', label: 'Contact'},
 ] as const;
 
 export const SITE_INFORMATION: Readonly<

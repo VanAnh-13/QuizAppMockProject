@@ -38,7 +38,7 @@ describe('SiteHeaderComponent', () => {
         expect(mobileAction(fixture, 'Log in').getAttribute('href')).toBe('/login?returnUrl=%2F');
     });
 
-    it('clears the session, emits sessionChanged, and goes to login on mobile logout', () => {
+    it('clears the session, emits sessionChanged, and goes to login on mobile logout', async () => {
         const {clear} = configure({id: '1', username: 'learner', fullName: 'Quiz Learner'});
         const fixture = TestBed.createComponent(SiteHeaderComponent);
         fixture.detectChanges();
@@ -46,6 +46,7 @@ describe('SiteHeaderComponent', () => {
         fixture.componentInstance.sessionChanged.subscribe(emitted);
 
         mobileAction(fixture, 'Log out').click();
+        await fixture.whenStable();
 
         expect(clear).toHaveBeenCalledTimes(1);
         expect(emitted).toHaveBeenCalledTimes(1);
@@ -91,6 +92,30 @@ describe('SiteHeaderComponent', () => {
         expect(clear).not.toHaveBeenCalled();
         expect(emitted).not.toHaveBeenCalled();
     });
+
+    it('closes the account menu and removes the page backdrop', () => {
+        configure({id: '1', username: 'learner', fullName: 'Quiz Learner'});
+        const fixture = TestBed.createComponent(SiteHeaderComponent);
+        fixture.detectChanges();
+
+        const menu = (fixture.nativeElement as HTMLElement).querySelector<HTMLDetailsElement>(
+            'details.header__user-menu',
+        );
+        expect(menu).toBeTruthy();
+        menu!.open = true;
+        menu!.dispatchEvent(new Event('toggle'));
+        fixture.detectChanges();
+
+        expect(fixture.nativeElement.querySelector('.header__page-backdrop')).toBeTruthy();
+
+        (fixture.nativeElement as HTMLElement)
+            .querySelector<HTMLElement>('.header__page-backdrop')!
+            .click();
+        fixture.detectChanges();
+
+        expect(menu!.open).toBe(false);
+        expect(fixture.nativeElement.querySelector('.header__page-backdrop')).toBeNull();
+    });
 });
 
 function configure(user: AuthResponse['userDto'] | null) {
@@ -106,7 +131,7 @@ function configure(user: AuthResponse['userDto'] | null) {
         ],
     });
     vi.spyOn(TestBed.inject(Router), 'navigateByUrl').mockResolvedValue(true);
-    return {clear};
+    return {clear, confirmation};
 }
 
 function mobileAction(

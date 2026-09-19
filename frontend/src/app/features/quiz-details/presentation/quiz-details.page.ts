@@ -25,14 +25,6 @@ interface InfoMessage {
 }
 
 const INFO_MESSAGES = {
-    about: {
-        title: 'About QuizApp',
-        message: 'More about QuizApp will be available in a future update.',
-    },
-    contact: {
-        title: 'Contact',
-        message: 'Support contact details are not available in this preview.',
-    },
     notifications: {
         title: 'Notifications',
         message: 'You have no new notifications.',
