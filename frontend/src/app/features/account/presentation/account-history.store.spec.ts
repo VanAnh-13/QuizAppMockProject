@@ -55,6 +55,46 @@ describe('AccountHistoryStore', () => {
         expect(store.errorMessage()).toBeNull();
     });
 
+    it.each([
+        {page: 1, expected: [1, 2, 3, 4, 5]},
+        {page: 2, expected: [1, 2, 3, 4, 5]},
+        {page: 500, expected: [498, 499, 500, 501, 502]},
+        {page: 999, expected: [996, 997, 998, 999, 1000]},
+        {page: 1000, expected: [996, 997, 998, 999, 1000]},
+    ])('limits the window at page $page of a thousand-page history', async ({page, expected}) => {
+        const {store} = setup(8000);
+        await store.load(page);
+
+        expect(store.totalPages()).toBe(1000);
+        expect(store.pageNumbers()).toEqual(expected);
+        expect(store.pageNumbers()).toContain(store.currentPage());
+    });
+
+    it.each([
+        {totalCount: 0, expected: [1]},
+        {totalCount: 8, expected: [1]},
+        {totalCount: 24, expected: [1, 2, 3]},
+        {totalCount: 40, expected: [1, 2, 3, 4, 5]},
+    ])('does not create extra pages for $totalCount attempts', async ({totalCount, expected}) => {
+        const {store} = setup(totalCount);
+        await store.load(1);
+
+        expect(store.pageNumbers()).toEqual(expected);
+    });
+
+    it('slides the window when next and previous navigation cross its center', async () => {
+        const {store} = setup(8000);
+        await store.load(3);
+
+        store.nextPage();
+        await vi.waitUntil(() => !store.isLoading());
+        expect(store.pageNumbers()).toEqual([2, 3, 4, 5, 6]);
+
+        store.previousPage();
+        await vi.waitUntil(() => !store.isLoading());
+        expect(store.pageNumbers()).toEqual([1, 2, 3, 4, 5]);
+    });
+
     it('requests the server page and reports a partial final page', async () => {
         const {store, history} = setup();
         await store.load(1);

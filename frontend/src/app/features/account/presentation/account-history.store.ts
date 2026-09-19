@@ -4,6 +4,8 @@ import {ATTEMPT_API, AttemptResult} from '../../quiz-attempt/application/attempt
 import {ACCOUNT_CONFIG} from '../application/account-config';
 import {formatScore} from '../domain/account-contracts';
 
+const PAGE_WINDOW_SIZE = 5;
+
 export interface AttemptHistoryRow {
     readonly id: string;
     readonly quizId: string;
@@ -24,9 +26,15 @@ export class AccountHistoryStore {
     readonly totalPages = computed(() =>
         Math.max(1, Math.ceil(this.totalCount() / this.pageSize)),
     );
-    readonly pageNumbers = computed(() =>
-        Array.from({length: this.totalPages()}, (_, index) => index + 1),
-    );
+    readonly pageNumbers = computed(() => {
+        const count = Math.min(PAGE_WINDOW_SIZE, this.totalPages());
+        const start = Math.max(1, Math.min(
+            this.currentPage() - Math.floor(count / 2),
+            this.totalPages() - count + 1,
+        ));
+
+        return Array.from({length: count}, (_, index) => start + index);
+    });
     readonly rangeStart = computed(() =>
         this.totalCount() === 0 ? 0 : (this.currentPage() - 1) * this.pageSize + 1,
     );
