@@ -117,15 +117,18 @@
     @apply text-[11px] text-muted;
 }
 
+.details-header__user-link,
 .details-header__logout-button {
     @apply flex w-full items-center gap-2 rounded-lg px-2 py-2 text-xs font-medium text-muted transition-colors;
 }
 
+.details-header__user-link:hover,
 .details-header__logout-button:hover {
     background: var(--glass-hover);
     color: var(--ink);
 }
 
+.details-header__user-link .material-symbols-outlined,
 .details-header__logout-button .material-symbols-outlined {
     @apply text-base;
 }
@@ -142,6 +145,7 @@
 }
 
 .details-header__auth-button:focus-visible,
+.details-header__user-link:focus-visible,
 .details-header__logout-button:focus-visible,
 .details-header__avatar:focus-visible {
     @apply outline-none ring-2 ring-brand ring-offset-2 ring-offset-canvas;

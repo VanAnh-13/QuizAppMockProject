@@ -97,6 +97,7 @@ describe('QuizDetailsPage', () => {
 
         expect(header.querySelector('.details-header__profile')).toBeNull();
         expect(header.textContent).not.toContain('Anh LV');
+        expect(header.querySelector('.details-header__user-link')).toBeNull();
         expect(header.querySelector('[data-testid="header-login"]')?.getAttribute('href')).toBe(
             `/login?returnUrl=${encodeURIComponent(`/quiz/${quizId}`)}`,
         );
@@ -133,6 +134,17 @@ describe('QuizDetailsPage', () => {
         fixture.detectChanges();
 
         expect(header.querySelector('.details-header__profile')?.textContent).toContain('Nguyễn Linh');
+        const accountLinks = [...header.querySelectorAll<HTMLAnchorElement>('.details-header__user-link')];
+        expect(accountLinks.map((link) => link.getAttribute('href'))).toEqual(['/history', '/settings']);
+        expect(accountLinks[0]?.textContent).toContain('Attempt history');
+        expect(accountLinks[1]?.textContent).toContain('Settings & security');
+        for (const link of accountLinks) {
+            link.click();
+            expect(TestBed.inject(Router).navigateByUrl).toHaveBeenLastCalledWith(
+                TestBed.inject(Router).parseUrl(link.getAttribute('href')!),
+                expect.objectContaining({skipLocationChange: false}),
+            );
+        }
         expect(header.querySelector('[data-testid="header-login"]')).toBeNull();
         expect(header.querySelector('[data-testid="header-register"]')).toBeNull();
 
