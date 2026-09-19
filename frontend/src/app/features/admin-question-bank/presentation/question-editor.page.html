@@ -1,0 +1,201 @@
+<app-admin-shell active="questions">
+    <main class="admin-page editor" id="main-content" tabindex="-1">
+        <p class="admin-card__meta">
+            <a routerLink="/admin/questions">Question bank</a>
+            / {{ store.isNew() ? 'New question' : 'Edit question' }}
+        </p>
+        <header class="editor__heading">
+            <div>
+                <h1>{{ store.isNew() ? 'Create question and answers' : 'Edit question' }}</h1>
+                <p>
+                    @if (store.isNew()) {
+                        Enter the prompt, set difficulty, and define the answer options.
+                    } @else {
+                        Updates save the prompt, difficulty, question type, and status.
+                    }
+                </p>
+            </div>
+            <div class="actions">
+                <button class="ghost-action" type="button" (click)="store.cancel()">Cancel</button>
+                <button class="primary-action" type="submit" form="question-editor-form"
+                        [disabled]="store.isSaving()">
+                    <span class="material-symbols-outlined" aria-hidden="true">save</span>
+                    Save question
+                </button>
+            </div>
+        </header>
+
+        @if (store.errorMessage(); as message) {
+            <p class="error" role="alert">{{ message }}</p>
+        }
+
+        @if (store.isLoading()) {
+            <p role="status">Loading question...</p>
+        } @else {
+            <div class="editor__grid">
+                <form id="question-editor-form" class="editor__form" [formGroup]="store.form"
+                        (ngSubmit)="store.save()">
+                    <section class="editor-card" aria-labelledby="question-info">
+                        <h2 id="question-info">1. Question details</h2>
+                        <div class="field">
+                            <label for="question-content">Question text *</label>
+                            <textarea id="question-content" rows="3" formControlName="content"
+                                    placeholder="Enter the question here..."></textarea>
+                        </div>
+                        <div class="field">
+                            <label for="question-image">Illustration image URL (optional)</label>
+                            <input id="question-image" type="url" formControlName="image"
+                                    placeholder="https://example.com/image.png"/>
+                        </div>
+                        <div class="field-row">
+                            <div class="field">
+                                <label for="question-level">Difficulty *</label>
+                                <select id="question-level" formControlName="level">
+                                    @for (level of store.levels; track level) {
+                                        <option [ngValue]="level">{{ questionLevelLabel(level) }}</option>
+                                    }
+                                </select>
+                            </div>
+                            <div class="field">
+                                <label for="question-type">Question type *</label>
+                                <select id="question-type" formControlName="questionType">
+                                    @for (type of store.types; track type) {
+                                        <option [ngValue]="type">{{ store.typeLabel(type) }}</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <label class="switch">
+                            <span>
+                                <strong>Published</strong>
+                                <span class="note">Allow this question to appear in linked quizzes.</span>
+                            </span>
+                            <input type="checkbox" formControlName="isActive"/>
+                        </label>
+                    </section>
+
+                    @if (store.usesChoiceAnswers() || store.usesAcceptedAnswers()) {
+                        <section class="editor-card" formArrayName="answers"
+                                aria-labelledby="question-answers">
+                            <div class="answers-header">
+                                <div>
+                                    <h2 id="question-answers">
+                                        2. {{ store.usesAcceptedAnswers() ? 'Accepted answers' : 'Answer options' }}
+                                    </h2>
+                                    <p class="answers-note">
+                                        @if (store.isNew()) {
+                                            Add the answer options and select which ones are correct.
+                                        } @else {
+                                            Answer options are read-only for existing questions.
+                                        }
+                                    </p>
+                                </div>
+                                <span class="answers-count-badge">{{ store.form.controls.answers.controls.length }} options</span>
+                            </div>
+
+                            <div class="answer-cards-list">
+                                @for (answer of store.form.controls.answers.controls; track $index; let i = $index) {
+                                    <div class="answer-glass-card"
+                                            [class.answer-glass-card--correct]="answer.controls.isCorrect.value"
+                                            [formGroupName]="i">
+                                        <span class="answer-index" aria-hidden="true">{{ 'ABCDEFGHIJ'[i] || (i + 1) }}</span>
+                                        <input class="answer-glass-input" type="text" formControlName="text"
+                                                [attr.aria-label]="'Option ' + (i + 1)"
+                                                placeholder="Enter option text..."/>
+                                        <label class="answer-toggle"
+                                                [class.answer-toggle--checked]="answer.controls.isCorrect.value"
+                                                [title]="answer.controls.isCorrect.value ? 'Marked as correct' : 'Mark as correct'">
+                                            <input type="checkbox" formControlName="isCorrect" class="sr-only"/>
+                                            <span class="material-symbols-outlined answer-toggle__icon" aria-hidden="true">
+                                                {{ answer.controls.isCorrect.value ? 'check_circle' : 'radio_button_unchecked' }}
+                                            </span>
+                                            <span>Correct</span>
+                                        </label>
+                                        <button class="answer-delete-btn" type="button"
+                                                (click)="store.removeAnswer(i)"
+                                                [attr.aria-label]="'Remove option ' + (i + 1)"
+                                                title="Remove this option">
+                                            <span class="material-symbols-outlined" aria-hidden="true">delete</span>
+                                            <span class="delete-text">Remove</span>
+                                        </button>
+                                    </div>
+                                } @empty {
+                                    <div class="answers-empty-state">No options added yet. Click below to add one.</div>
+                                }
+                            </div>
+
+                            <button class="answer-add-action" type="button" (click)="store.addAnswer()">
+                                <span class="material-symbols-outlined" aria-hidden="true">add_circle</span>
+                                Add option
+                            </button>
+                        </section>
+                    }
+
+                </form>
+
+                <aside class="editor__preview editor-card" aria-label="Learner preview">
+                    <div class="preview-header">
+                        <div class="preview-header__meta">
+                            <span class="preview-badge">
+                                <span class="material-symbols-outlined" aria-hidden="true">visibility</span>
+                                Learner preview
+                            </span>
+                            <span class="preview-note">Correct answers stay hidden</span>
+                        </div>
+                    </div>
+
+                    <div class="preview-chips">
+                        <span class="preview-chip">
+                            <span class="material-symbols-outlined preview-chip__icon" aria-hidden="true">
+                                {{ store.form.controls.questionType.value === QuestionType.MultipleChoice ? 'check_box' : 'radio_button_checked' }}
+                            </span>
+                            {{ store.typeLabel(store.form.controls.questionType.value) }}
+                        </span>
+                        <span class="preview-chip">
+                            <span class="material-symbols-outlined preview-chip__icon" aria-hidden="true">signal_cellular_alt</span>
+                            {{ questionLevelLabel(store.form.controls.level.value) }}
+                        </span>
+                    </div>
+
+                    <h3 class="preview-question-prompt">
+                        {{ store.form.controls.content.value || 'Question text will appear here...' }}
+                    </h3>
+
+                    @if (store.form.controls.image.value; as imageUrl) {
+                        <div class="preview-image-wrapper">
+                            <img [ngSrc]="imageUrl" alt="Question illustration" class="preview-image"
+                                    width="640" height="360"/>
+                        </div>
+                    }
+
+                    <div class="preview-options-list" role="group" aria-label="Preview answer options">
+                        @for (answer of store.previewAnswers(); track $index) {
+                            <div class="preview-option"
+                                 [class.preview-option--selected]="selectedPreviewOptionIndex() === $index"
+                                 (click)="togglePreviewSelection($index)">
+                                <span class="preview-option__letter">{{ optionLetter($index) }}</span>
+                                <div class="preview-option__control"
+                                     [class.preview-option__control--checkbox]="store.form.controls.questionType.value === QuestionType.MultipleChoice"
+                                     aria-hidden="true">
+                                    @if (selectedPreviewOptionIndex() === $index) {
+                                        <span class="material-symbols-outlined preview-option__control-icon">
+                                            {{ store.form.controls.questionType.value === QuestionType.MultipleChoice ? 'check' : 'circle' }}
+                                        </span>
+                                    }
+                                </div>
+                                <span class="preview-option__text" [class.preview-option__text--empty]="!answer.text">
+                                    {{ answer.text || 'Empty option' }}
+                                </span>
+                            </div>
+                        } @empty {
+                            <div class="preview-empty-state">
+                                <span class="material-symbols-outlined" aria-hidden="true">list_alt</span>
+                                <span>No options added yet</span>
+                            </div>
+                        }
+                    </div>
+                </aside>
+            </div>
+        }
+    </main>
+</app-admin-shell>

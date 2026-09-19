@@ -9,7 +9,7 @@ describe('ToastComponent', () => {
         });
 
         const fixture = TestBed.createComponent(ToastComponent);
-        TestBed.inject(ErrorNotificationService).show('Không thể tải danh sách quiz.');
+        TestBed.inject(ErrorNotificationService).show('Could not load quizzes.');
         fixture.detectChanges();
         const element = fixture.nativeElement as HTMLElement;
         const container = element.querySelector('.toast-container');

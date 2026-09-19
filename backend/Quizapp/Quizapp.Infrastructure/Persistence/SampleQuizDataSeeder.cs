@@ -14,6 +14,7 @@ public static class SampleQuizDataSeeder
     public static readonly Guid RoleAdminId = Guid.Parse("a0000000-0000-0000-0000-000000000001");
     public static readonly Guid RoleUserId = Guid.Parse("a0000000-0000-0000-0000-000000000002");
     public static readonly Guid DemoUserId = Guid.Parse("b0000000-0000-0000-0000-000000000001");
+    public static readonly Guid DemoAdminId = Guid.Parse("b0000000-0000-0000-0000-000000000002");
 
     // 10 Sample Quizzes
     public static readonly Guid Quiz1CsharpOopId = Guid.Parse("10000000-0000-0000-0000-000000000001");
@@ -51,9 +52,14 @@ public static class SampleQuizDataSeeder
             {
                 Id = RoleAdminId,
                 RoleName = "Admin",
-                Description = "Quản trị viên hệ thống"
+                Description = "Quản trị viên hệ thống",
+                IsActive = true
             };
             db.Roles.Add(adminRole);
+        }
+        else if (!adminRole.IsActive)
+        {
+            adminRole.IsActive = true;
         }
 
         var userRole = await db.Roles
@@ -64,46 +70,85 @@ public static class SampleQuizDataSeeder
             {
                 Id = RoleUserId,
                 RoleName = "User",
-                Description = "Người dùng tham gia bài thi"
+                Description = "Người dùng tham gia bài thi",
+                IsActive = true
             };
             db.Roles.Add(userRole);
         }
-
-        var demoUser = await db.Users
-            .FirstOrDefaultAsync(user => user.Username == "demo_user", cancellationToken)
-            ?? await db.Users
-                .FirstOrDefaultAsync(user => user.Email == "demo@quizapp.local", cancellationToken);
-        if (demoUser is null)
+        else if (!userRole.IsActive)
         {
-            var hasher = new PasswordHasher<object>();
-            var passwordHash = hasher.HashPassword(new object(), "Password123!");
-
-            demoUser = new User
-            {
-                Id = DemoUserId,
-                Username = "demo_user",
-                Email = "demo@quizapp.local",
-                Password = passwordHash,
-                FullName = "Học viên Demo",
-                Status = UserStatus.Active,
-                SecurityStamp = Guid.Parse("c0000000-0000-0000-0000-000000000001"),
-                CreateAt = SeedTimestamp,
-                UpdateAt = SeedTimestamp
-            };
-            db.Users.Add(demoUser);
+            userRole.IsActive = true;
         }
 
-        var hasUserRoleAssignment = await db.UserRoles.AnyAsync(
-            assignment => assignment.UserId == demoUser.Id && assignment.RoleId == userRole.Id,
+        var hasher = new PasswordHasher<object>();
+        var passwordHash = hasher.HashPassword(new object(), "Password123!");
+
+        var demoUser = await EnsureDemoAccountAsync(
+            db,
+            username: "demo_user",
+            email: "demo@quizapp.local",
+            fallbackId: DemoUserId,
+            fullName: "Học viên Demo",
+            securityStamp: Guid.Parse("c0000000-0000-0000-0000-000000000001"),
+            passwordHash,
             cancellationToken);
-        if (!hasUserRoleAssignment)
+
+        var demoAdmin = await EnsureDemoAccountAsync(
+            db,
+            username: "demo_admin",
+            email: "admin@quizapp.local",
+            fallbackId: DemoAdminId,
+            fullName: "Quản trị viên Demo",
+            securityStamp: Guid.Parse("c0000000-0000-0000-0000-000000000002"),
+            passwordHash,
+            cancellationToken);
+
+        await EnsureUserRoleAsync(db, demoUser.Id, userRole.Id, cancellationToken);
+        await EnsureUserRoleAsync(db, demoAdmin.Id, adminRole.Id, cancellationToken);
+    }
+
+    private static async Task<User> EnsureDemoAccountAsync(
+        QuizAppDbContext db,
+        string username,
+        string email,
+        Guid fallbackId,
+        string fullName,
+        Guid securityStamp,
+        string passwordHash,
+        CancellationToken cancellationToken)
+    {
+        var user = await db.Users.FirstOrDefaultAsync(item => item.Username == username, cancellationToken)
+                   ?? await db.Users.FirstOrDefaultAsync(item => item.Email == email, cancellationToken);
+        if (user is not null) return user;
+
+        user = new User
         {
-            db.UserRoles.Add(new UserRole
-            {
-                UserId = demoUser.Id,
-                RoleId = userRole.Id
-            });
-        }
+            Id = fallbackId,
+            Username = username,
+            Email = email,
+            Password = passwordHash,
+            FullName = fullName,
+            Status = UserStatus.Active,
+            SecurityStamp = securityStamp,
+            CreateAt = SeedTimestamp,
+            UpdateAt = SeedTimestamp
+        };
+        db.Users.Add(user);
+        return user;
+    }
+
+    private static async Task EnsureUserRoleAsync(
+        QuizAppDbContext db,
+        Guid userId,
+        Guid roleId,
+        CancellationToken cancellationToken)
+    {
+        var assigned = await db.UserRoles.AnyAsync(
+            assignment => assignment.UserId == userId && assignment.RoleId == roleId,
+            cancellationToken);
+        if (assigned) return;
+
+        db.UserRoles.Add(new UserRole { UserId = userId, RoleId = roleId });
     }
 
     private static async Task SeedQuizzesAndQuestionsAsync(QuizAppDbContext db, CancellationToken cancellationToken)

@@ -2,32 +2,26 @@
 
 <main class="auth-layout" [class.auth-layout--register]="registering">
     <section class="form-panel" aria-labelledby="auth-title">
-        @if (!registering) {
-            <button class="support-link" type="button" (click)="information.open('contact')">
-                <span class="material-symbols-outlined" aria-hidden="true">help_outline</span>
-                Trợ giúp &amp; hỗ trợ
-            </button>
-        }
         <div class="auth-card" [class.auth-card--register]="registering">
             <div class="auth-card__heading" [class.auth-card__heading--centered]="registering">
                 @if (registering) {
-                    <span class="auth-badge"><span aria-hidden="true">&lt;/&gt;</span> Nền tảng kiểm tra tri thức lập trình</span>
+                    <span class="auth-badge"><span aria-hidden="true">&lt;/&gt;</span> Test your programming knowledge</span>
                 }
                 @if (registering) {
-                    <h1 id="auth-title">Tạo tài khoản QuizApp</h1>
+                    <h1 id="auth-title">Create your QuizApp account</h1>
                 } @else {
-                    <h1 id="auth-title">Đăng nhập</h1>
+                    <h1 id="auth-title">Log in</h1>
                 }
-                <p>{{ registering ? 'Tham gia cộng đồng rèn luyện kiến thức lập trình' : 'Tiếp tục hành trình học tập của bạn' }}</p>
+                <p>{{ registering ? 'Join a community of programming learners' : 'Continue your learning journey' }}</p>
             </div>
             @if (registered) {
-                <p class="notice" role="status">Tài khoản đã được tạo. Hãy đăng nhập để tiếp
-                    tục.</p>
+                <p class="notice" role="status">Your account has been created. Log in to
+                    continue.</p>
             }
             <form [formGroup]="store.form" (ngSubmit)="submit()" [attr.aria-busy]="store.busy()"
                     novalidate>
                 <fieldset [disabled]="store.busy()">
-                    <legend class="visually-hidden">{{ registering ? 'Thông tin đăng ký' : 'Thông tin đăng nhập' }}</legend>
+                    <legend class="visually-hidden">{{ registering ? 'Registration details' : 'Login details' }}</legend>
                     <div class="fields" [class.fields--register]="registering">
                         @for (field of fields; track field.name) {
                             <div class="field">
@@ -58,7 +52,7 @@
                                         <button
                                                 class="password-toggle"
                                                 type="button"
-                                                [attr.aria-label]="(visiblePasswords().has(field.name) ? 'Ẩn ' : 'Hiện ') + field.label.toLowerCase()"
+                                                [attr.aria-label]="(visiblePasswords().has(field.name) ? 'Hide ' : 'Show ') + field.label.toLowerCase()"
                                                 [attr.aria-pressed]="visiblePasswords().has(field.name)"
                                                 [attr.aria-controls]="field.name"
                                                 (click)="togglePassword(field.name)"
@@ -85,19 +79,19 @@
                                     [attr.aria-describedby]="store.fieldError('terms') ? 'terms-error' : null"
                             />
                             <div>
-                                <label for="terms">Tôi đồng ý với </label>
+                                <label for="terms">I agree to the </label>
                                 <button
                                         type="button"
                                         class="text-link"
                                         (click)="information.open('terms')">
-                                    Điều khoản dịch vụ
+                                    Terms of service
                                 </button>
-                                và
+                                and
                                 <button
                                         type="button"
                                         class="text-link"
                                         (click)="information.open('privacy')">
-                                    Chính sách bảo mật
+                                    Privacy policy
                                 </button>
                             </div>
                         </div>
@@ -109,13 +103,13 @@
                             <label>
                                 <input type="checkbox"
                                         formControlName="remember"/>
-                                Ghi nhớ đăng nhập
+                                Remember me
                             </label>
                             <button
                                     type="button"
                                     class="text-link"
                                     (click)="information.open('passwordReset')">
-                                Đặt lại mật khẩu?
+                                Reset password?
                             </button>
                         </div>
                     }
@@ -123,7 +117,7 @@
                         <p class="error-notice" role="alert" tabindex="-1">{{ message }}</p>
                     }
                     <button class="primary-button" type="submit" [disabled]="store.busy()">
-                        {{ store.busy() ? 'Đang xử lý…' : registering ? 'Đăng ký tài khoản' : 'Đăng nhập' }}
+                        {{ store.busy() ? 'Working…' : registering ? 'Create account' : 'Log in' }}
                         <span class="material-symbols-outlined"
                                 aria-hidden="true">arrow_forward</span>
                     </button>
@@ -131,39 +125,42 @@
             </form>
             @if (!registering) {
                 <div class="divider">
-                    <span>hoặc</span>
+                    <span>or</span>
                 </div>
                 <a class="guest-button" routerLink="/">
                     <span class="material-symbols-outlined" aria-hidden="true">explore</span>
-                    Tiếp tục không cần đăng nhập
+                    Continue as a guest
                 </a>
             }
             <p class="switch-mode">
-                {{ registering ? 'Đã có tài khoản?' : 'Chưa có tài khoản?' }}
+                {{ registering ? 'Already have an account?' : 'New to QuizApp?' }}
                 <a [routerLink]="registering ? '/login' : '/register'"
                         [queryParams]="{ returnUrl }">
-                    {{ registering ? 'Đăng nhập ngay' : 'Tạo tài khoản miễn phí' }}
+                    {{ registering ? 'Log in' : 'Create a free account' }}
                 </a>
             </p>
             @if (registering) {
                 <p class="privacy-note"><span class="material-symbols-outlined" aria-hidden="true">lock</span>
-                    Mật khẩu không được hiển thị trong hồ sơ của bạn.</p>
+                    Your password is never shown on your profile.</p>
             }
         </div>
         @if (!registering) {
-            <p class="session-note">Chỉ chọn “Ghi nhớ đăng nhập” trên thiết bị cá nhân.</p>
+            <p class="session-note">Only choose “Remember me” on your own device.</p>
             <footer class="login-footer">
                 <span>QuizApp © {{ year }}</span>
                 <div>
+                    <button type="button" (click)="information.open('contact')">
+                        Help &amp; support
+                    </button>
                     <button
                             type="button"
                             (click)="information.open('terms')">
-                        Điều khoản sử dụng
+                        Terms of use
                     </button>
                     <button
                             type="button"
                             (click)="information.open('privacy')">
-                        Chính sách riêng tư
+                        Privacy policy
                     </button>
                 </div>
             </footer>
@@ -173,11 +170,11 @@
 
 @if (registering) {
     <footer class="register-footer">
-        <span>© {{ year }} QuizApp. Học mỗi ngày, vững từng bước.</span>
-        <nav aria-label="Điều hướng cuối trang">
-            <a routerLink="/">Khám phá quiz</a>
-            <button type="button" (click)="information.open('about')">Giới thiệu</button>
-            <button type="button" (click)="information.open('contact')">Liên hệ</button>
+        <span>© {{ year }} QuizApp. Learn every day. Grow with every step.</span>
+        <nav aria-label="Footer navigation">
+            <a routerLink="/">Explore quizzes</a>
+            <button type="button" (click)="information.open('about')">About</button>
+            <button type="button" (click)="information.open('contact')">Contact</button>
         </nav>
     </footer>
 }

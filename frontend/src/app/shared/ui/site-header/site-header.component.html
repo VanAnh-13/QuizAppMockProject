@@ -15,7 +15,7 @@
         <div class="header__trailing">
             <div class="header__actions">
                 @if (session.user(); as user) {
-                    <details #userMenu class="header__profile header__user-menu">
+                    <details #userMenu class="header__profile header__user-menu" (toggle)="onMenuToggle($event)">
                         <summary
                                 class="header__avatar material-symbols-outlined"
                                 aria-label="Account: {{ user.fullName || user.username }}"
@@ -71,7 +71,8 @@
                     <div class="header__mobile-actions">
                         @if (session.user(); as user) {
                             <div class="header__mobile-user">
-                                <span class="header__avatar material-symbols-outlined" aria-hidden="true">person</span>
+                                <span class="header__avatar material-symbols-outlined"
+                                        aria-hidden="true">person</span>
                                 <div class="header__user-info">
                                     <strong>{{ user.fullName || user.username }}</strong>
                                     <span>Signed in</span>
@@ -95,5 +96,9 @@
         </div>
     </div>
 </header>
+
+@if (isMenuOpen()) {
+    <div class="header__page-backdrop" (click)="closeMenu()" aria-hidden="true"></div>
+}
 
 <app-site-info-dialog #information dialogId="header-information"/>

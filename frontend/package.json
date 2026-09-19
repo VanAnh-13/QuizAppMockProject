@@ -1,4 +1,4 @@
-﻿{
+{
   "name": "frontend",
   "version": "0.0.0",
   "scripts": {
@@ -6,7 +6,9 @@
     "start": "ng serve",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "check:rules": "node ../scripts/check-rules.mjs",
+    "verify": "pnpm run check:rules && pnpm test --watch=false && pnpm run build"
   },
   "private": true,
   "packageManager": "pnpm@11.16.0",

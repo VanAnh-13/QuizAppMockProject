@@ -1,0 +1,164 @@
+<app-admin-shell active="questions">
+    <main class="admin-page questions-page" id="main-content" tabindex="-1">
+        <header class="admin-page__heading">
+            <div>
+                <p class="admin-page__eyebrow">Learning content</p>
+                <h1>Question bank</h1>
+                <p>Shared questions you can reuse across quizzes.</p>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <span class="questions-count">{{ store.totalCount() }} questions</span>
+                <a class="primary-action" routerLink="/admin/questions/new">
+                    <span class="material-symbols-outlined" aria-hidden="true">add</span>
+                    New question
+                </a>
+            </div>
+        </header>
+
+        @if (store.errorMessage(); as message) {
+            <p class="error" role="alert">{{ message }}</p>
+        }
+
+        <div class="questions-layout">
+            <section class="questions-directory" aria-labelledby="questions-heading" [attr.aria-busy]="store.isLoading()">
+                <div class="questions-directory__heading">
+                    <h2 id="questions-heading">Question repository</h2>
+                    <span class="material-symbols-outlined" aria-hidden="true">folder_open</span>
+                </div>
+
+                <label class="questions-search">
+                    <span class="material-symbols-outlined" aria-hidden="true">search</span>
+                    <input id="question-search" type="search" placeholder="Search by question text..."
+                           [formControl]="searchControl" aria-label="Search questions" />
+                </label>
+
+                @if (store.isLoading()) {
+                    <p class="admin-state" role="status" aria-live="polite">Loading questions…</p>
+                } @else {
+                    <ul class="admin-list" aria-label="Question list">
+                        @for (row of store.questionRows(); track row.id) {
+                            <li>
+                                <button type="button" class="question-list-card admin-card"
+                                        [attr.aria-pressed]="store.selectedId() === row.id"
+                                        (click)="store.select(row)">
+                                    <div class="question-list-card__icon material-symbols-outlined" aria-hidden="true">
+                                        {{ row.typeIcon }}
+                                    </div>
+                                    <div class="question-list-card__copy">
+                                        <strong class="question-list-card__title">{{ row.content }}</strong>
+                                        <div class="question-list-card__meta">
+                                            <span class="question-code-tag">{{ row.code }}</span>
+                                            <span class="meta-dot">·</span>
+                                            <span class="question-type-tag">{{ row.typeLabel }}</span>
+                                            <span class="meta-dot">·</span>
+                                            <span class="level-chip" [attr.data-level]="row.level">{{ row.levelLabel }}</span>
+                                            <span class="meta-dot">·</span>
+                                            <span class="question-status-dot" [class.question-status-dot--inactive]="!row.isActive">
+                                                <span class="material-symbols-outlined" aria-hidden="true">
+                                                    {{ row.isActive ? 'check_circle' : 'pause_circle' }}
+                                                </span>
+                                                {{ row.statusLabel }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <span class="question-list-card__arrow material-symbols-outlined" aria-hidden="true">
+                                        {{ store.selectedId() === row.id ? 'check' : 'chevron_right' }}
+                                    </span>
+                                </button>
+                            </li>
+                        } @empty {
+                            <li class="admin-state">No matching questions found.</li>
+                        }
+                    </ul>
+
+                    <footer class="admin-pager">
+                        <p>{{ store.rangeStart() }}–{{ store.rangeEnd() }} of {{ store.totalCount() }}</p>
+                        <div>
+                            <button type="button" [disabled]="!store.hasPreviousPage()"
+                                    (click)="store.previousPage()">Previous</button>
+                            <button type="button" [disabled]="!store.hasNextPage()"
+                                    (click)="store.nextPage()">Next</button>
+                        </div>
+                    </footer>
+                }
+            </section>
+
+            <section class="question-detail" aria-labelledby="question-detail-heading">
+                @if (store.selected(); as selected) {
+                    <header class="question-detail__header">
+                        <div>
+                            <div class="question-detail__eyebrow-row">
+                                <span class="question-code-badge">{{ selected.code }}</span>
+                                <span class="question-status-badge" [class.question-status-badge--inactive]="!selected.isActive">
+                                    <span class="material-symbols-outlined" aria-hidden="true">
+                                        {{ selected.isActive ? 'check_circle' : 'pause_circle' }}
+                                    </span>
+                                    {{ selected.statusLabel }}
+                                </span>
+                            </div>
+                            <h2 id="question-detail-heading">{{ selected.content }}</h2>
+                        </div>
+                    </header>
+
+                    <div class="question-detail__meta-grid">
+                        <div class="meta-card">
+                            <span class="meta-card__label">Question type</span>
+                            <strong class="meta-card__value">
+                                <span class="material-symbols-outlined" aria-hidden="true">{{ selected.typeIcon }}</span>
+                                {{ selected.typeLabel }}
+                            </strong>
+                        </div>
+                        <div class="meta-card">
+                            <span class="meta-card__label">Difficulty level</span>
+                            <strong class="meta-card__value">
+                                <span class="material-symbols-outlined" aria-hidden="true">signal_cellular_alt</span>
+                                {{ selected.levelLabel }}
+                            </strong>
+                        </div>
+                        <div class="meta-card">
+                            <span class="meta-card__label">Reference code</span>
+                            <strong class="meta-card__value">
+                                <span class="material-symbols-outlined" aria-hidden="true">tag</span>
+                                {{ selected.code }}
+                            </strong>
+                        </div>
+                        <div class="meta-card">
+                            <span class="meta-card__label">Catalog status</span>
+                            <strong class="meta-card__value">
+                                <span class="material-symbols-outlined" aria-hidden="true">{{ selected.isActive ? 'verified' : 'block' }}</span>
+                                {{ selected.isActive ? 'Active in quizzes' : 'Deactivated' }}
+                            </strong>
+                        </div>
+                    </div>
+
+                    <div class="question-detail__prompt-box">
+                        <span class="prompt-box__label">
+                            <span class="material-symbols-outlined" aria-hidden="true">format_quote</span>
+                            Question prompt
+                        </span>
+                        <p class="prompt-box__text">{{ selected.content }}</p>
+                    </div>
+
+                    <footer class="question-detail__actions">
+                        <button type="button"
+                                class="question-action-btn question-action-btn--toggle"
+                                [class.question-action-btn--activate]="!selected.isActive"
+                                [disabled]="store.isBusy()"
+                                (click)="store.toggleActive(selected.id)">
+                            <span class="material-symbols-outlined" aria-hidden="true">
+                                {{ selected.isActive ? 'pause_circle' : 'play_circle' }}
+                            </span>
+                            {{ selected.isActive ? 'Deactivate question' : 'Activate question' }}
+                        </button>
+                        <a class="primary-action" [routerLink]="['/admin/questions', selected.id]">
+                            <span class="material-symbols-outlined" aria-hidden="true">edit</span>
+                            Edit question
+                        </a>
+                    </footer>
+                } @else {
+                    <p class="admin-state">Select a question to view details and options.</p>
+                }
+            </section>
+        </div>
+    </main>
+</app-admin-shell>

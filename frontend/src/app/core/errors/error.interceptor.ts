@@ -28,10 +28,10 @@ function shouldNotify(status: number): boolean {
 
 function messageForStatus(status: number): string {
     if (status === 0) {
-        return 'Không thể kết nối máy chủ. Kiểm tra kết nối mạng rồi thử lại.';
+        return 'Cannot connect to the server. Check your connection and try again.';
     }
     if (status === 503) {
-        return 'Máy chủ đang bảo trì. Vui lòng thử lại sau.';
+        return 'The server is undergoing maintenance. Please try again later.';
     }
-    return 'Đã xảy ra lỗi phía máy chủ. Vui lòng thử lại sau.';
+    return 'A server error occurred. Please try again later.';
 }

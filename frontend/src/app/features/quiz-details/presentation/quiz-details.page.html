@@ -1,16 +1,16 @@
 <header class="details-header">
     <div class="details-header__inner">
         <div class="details-header__leading">
-            <a class="details-brand" routerLink="/" aria-label="QuizApp — Trang khám phá">
+            <a class="details-brand" routerLink="/" aria-label="QuizApp — Explore">
                 <span class="details-brand__mark">
                     <span class="material-symbols-outlined" aria-hidden="true">quiz</span>
                 </span>
                 <span>QuizApp</span>
             </a>
-            <nav class="details-header__navigation" aria-label="Điều hướng chính">
-                <a routerLink="/" fragment="quiz-list" aria-current="page">Khám phá quiz</a>
-                <button type="button" (click)="openInfo('about')">Giới thiệu</button>
-                <button type="button" (click)="openInfo('contact')">Liên hệ</button>
+            <nav class="details-header__navigation" aria-label="Main navigation">
+                <a routerLink="/" fragment="quiz-list" aria-current="page">Explore quizzes</a>
+                <button type="button" (click)="openInfo('about')">About</button>
+                <button type="button" (click)="openInfo('contact')">Contact</button>
             </nav>
         </div>
 
@@ -18,8 +18,8 @@
             <button
                     class="details-header__icon-button"
                     type="button"
-                    title="Thông báo"
-                    aria-label="Thông báo"
+                    title="Notifications"
+                    aria-label="Notifications"
                     (click)="openInfo('notifications')"
             >
                 <span class="material-symbols-outlined" aria-hidden="true">notifications</span>
@@ -27,8 +27,8 @@
             <button
                     class="details-header__icon-button"
                     type="button"
-                    title="Trợ giúp & Hỏi đáp"
-                    aria-label="Trợ giúp và hỏi đáp"
+                    title="Help & FAQ"
+                    aria-label="Help and frequently asked questions"
                     (click)="openInfo('help')"
             >
                 <span class="material-symbols-outlined" aria-hidden="true">help_outline</span>
@@ -38,14 +38,14 @@
                 <details #userMenu class="details-header__profile details-header__user-menu">
                     <summary
                             class="details-header__avatar material-symbols-outlined"
-                            aria-label="Tài khoản: {{ user.fullName || user.username }}"
+                            aria-label="Account: {{ user.fullName || user.username }}"
                     >
                         person
                     </summary>
                     <div class="details-header__user-panel">
                         <div class="details-header__user-info">
                             <strong>{{ user.fullName || user.username }}</strong>
-                            <span>Đã đăng nhập</span>
+                            <span>Signed in</span>
                         </div>
                         <button
                                 class="details-header__logout-button"
@@ -54,7 +54,7 @@
                                 (click)="logout()"
                         >
                             <span class="material-symbols-outlined" aria-hidden="true">logout</span>
-                            Đăng xuất
+                            Log out
                         </button>
                     </div>
                 </details>
@@ -65,7 +65,7 @@
                         routerLink="/login"
                         [queryParams]="{returnUrl: quizUrl()}"
                 >
-                    Đăng nhập
+                    Log in
                 </a>
                 <a
                         class="details-header__auth-button details-header__auth-button--primary"
@@ -73,7 +73,7 @@
                         routerLink="/register"
                         [queryParams]="{returnUrl: quizUrl()}"
                 >
-                    Đăng ký
+                    Sign up
                 </a>
             }
         </div>
@@ -81,29 +81,29 @@
 </header>
 
 <main class="quiz-details" id="main-content" tabindex="-1">
-    <nav class="breadcrumb" aria-label="Đường dẫn">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
         <ol>
             <li>
                 <a routerLink="/">
                     <span class="material-symbols-outlined" aria-hidden="true">explore</span>
-                    <span>Khám phá quiz</span>
+                    <span>Explore quizzes</span>
                 </a>
             </li>
             <li aria-hidden="true"><span class="material-symbols-outlined">chevron_right</span></li>
-            <li aria-current="page">{{ title() || 'Chi tiết quiz' }}</li>
+            <li aria-current="page">{{ title() || 'Quiz details' }}</li>
         </ol>
     </nav>
 
     @if (isLoading()) {
         <div class="details-state" role="status" aria-live="polite">
-            <h2>Đang tải chi tiết quiz</h2>
-            <p>Vui lòng chờ trong giây lát.</p>
+            <h2>Loading quiz details</h2>
+            <p>Please wait a moment.</p>
         </div>
     } @else if (errorMessage(); as errorMessage) {
         <div class="details-state" role="alert">
-            <h2>Không thể tải chi tiết quiz</h2>
+            <h2>Could not load quiz details</h2>
             <p>{{ errorMessage }}</p>
-            <button type="button" (click)="load()">Thử lại</button>
+            <button type="button" (click)="load()">Try again</button>
         </div>
     } @else {
         <ng-template #quizActions let-titleId="titleId">
@@ -117,18 +117,18 @@
                             play_circle
                         </span>
                     <div>
-                        <h2 [id]="titleId">Sẵn sàng thử thách năng lực?</h2>
-                        <p>Hệ thống sẽ lưu vết kết quả vào hồ sơ học tập của bạn.</p>
+                        <h2 [id]="titleId">Ready to test your skills?</h2>
+                        <p>Your results will be saved to your learning profile.</p>
                     </div>
                 </div>
                 <div class="cta-card__actions">
                     <button class="history-button" type="button" (click)="openHistory()">
                             <span class="material-symbols-outlined"
                                     aria-hidden="true">history</span>
-                        <span>Xem lịch sử lần thi</span>
+                        <span>View attempt history</span>
                     </button>
                     <a class="start-button" [routerLink]="['/quiz', quizId(), 'attempt']">
-                        <span>Bắt đầu làm bài</span>
+                        <span>Start quiz</span>
                         <span class="material-symbols-outlined" aria-hidden="true">
                                 arrow_forward
                             </span>
@@ -143,8 +143,8 @@
                     <div class="overview-card__top">
                         @if (imageUrl(); as imgUrl) {
                             <div class="course-thumb">
-                                <img [src]="imgUrl" [alt]="title()" class="course-thumb__img"
-                                        loading="eager"/>
+                                <img [ngSrc]="imgUrl" [alt]="title()" class="course-thumb__img"
+                                        fill priority/>
                                 <div class="course-thumb__shine" aria-hidden="true"></div>
                             </div>
                         }
@@ -187,7 +187,7 @@
                             <span class="material-symbols-outlined" aria-hidden="true">
                                 psychology
                             </span>
-                            <h2 id="topics-title">Bạn sẽ kiểm tra kiến thức về:</h2>
+                            <h2 id="topics-title">What you will be tested on:</h2>
                         </div>
                         <div class="topics-grid">
                             @for (topic of topics(); track topic.title) {
@@ -207,11 +207,11 @@
                         </div>
                     </section>
                 } @else {
-                    <p class="topics-card">Thông tin chủ đề của quiz này chưa được cung cấp.</p>
+                    <p class="topics-card">Topic details are not available for this quiz yet.</p>
                 }
 
             </div>
-            <aside class="quiz-details__sidebar" aria-label="Bắt đầu và thông tin bài thi">
+            <aside class="quiz-details__sidebar" aria-label="Start quiz and quiz information">
                 <div class="quiz-details__actions--desktop">
                     <ng-container
                             *ngTemplateOutlet="quizActions; context: {titleId: 'cta-title-desktop'}"/>
@@ -221,7 +221,7 @@
                         <span class="material-symbols-outlined" aria-hidden="true">
                             verified_user
                         </span>
-                        <h2 id="guidelines-title">Quy chế &amp; Hướng dẫn làm bài</h2>
+                        <h2 id="guidelines-title">Guidelines &amp; instructions</h2>
                     </div>
                     <ol class="guidelines-list">
                         @for (guideline of guidelines(); track guideline.title) {
@@ -237,8 +237,8 @@
                     <div class="guidelines-card__note">
                         <span class="material-symbols-outlined" aria-hidden="true">info</span>
                         <p>
-                            Tránh chuyển tab liên tục hoặc tải lại trang để đảm bảo phiên làm bài
-                            diễn ra mượt mà nhất.
+                            Avoid repeatedly switching tabs or reloading the page to keep your
+                            attempt running smoothly.
                         </p>
                     </div>
                 </section>
@@ -246,7 +246,7 @@
                 <section class="format-card" aria-labelledby="format-title">
                     <h2 id="format-title">
                         <span class="material-symbols-outlined" aria-hidden="true">lightbulb</span>
-                        <span>Cấu trúc đề thi</span>
+                        <span>Quiz format</span>
                     </h2>
                     <dl>
                         @for (fact of formatFacts(); track fact.label) {
@@ -264,11 +264,11 @@
 
 <footer class="details-footer">
     <div class="details-footer__inner">
-        <p>© 2025 QuizApp. Nền tảng học tập &amp; rèn luyện tư duy lập trình.</p>
-        <nav aria-label="Điều hướng cuối trang">
-            <a routerLink="/">Khám phá quiz</a>
-            <button type="button" (click)="openInfo('about')">Giới thiệu</button>
-            <button type="button" (click)="openInfo('contact')">Liên hệ</button>
+        <p>© 2025 QuizApp. Build your programming knowledge and problem-solving skills.</p>
+        <nav aria-label="Footer navigation">
+            <a routerLink="/">Explore quizzes</a>
+            <button type="button" (click)="openInfo('about')">About</button>
+            <button type="button" (click)="openInfo('contact')">Contact</button>
         </nav>
     </div>
 </footer>
@@ -279,17 +279,17 @@
         <span class="details-dialog__icon material-symbols-outlined" aria-hidden="true">
             history
         </span>
-        <h2 id="history-title">Lịch sử lần thi</h2>
+        <h2 id="history-title">Attempt history</h2>
         @if (historyLoading()) {
-            <p role="status">Đang tải lịch sử lần thi…</p>
+            <p role="status">Loading attempt history…</p>
         } @else if (historyError(); as error) {
             <p role="alert">{{ error }}</p>
-            <a routerLink="/login" [queryParams]="{returnUrl: quizUrl()}">Đăng nhập</a>
-            <button type="button" (click)="loadHistory()">Thử lại</button>
+            <a routerLink="/login" [queryParams]="{returnUrl: quizUrl()}">Log in</a>
+            <button type="button" (click)="loadHistory()">Try again</button>
         } @else if (history().length === 0) {
-            <p>Bạn chưa có lần thi nào cho quiz này.</p>
+            <p>You have not attempted this quiz yet.</p>
         } @else {
-            <div class="history-chart" aria-label="Biểu đồ điểm số">
+            <div class="history-chart" aria-label="Score chart">
                 <div class="history-chart__bars">
                     @for (attempt of history(); track attempt.id) {
                         <div class="history-chart__col">
@@ -301,7 +301,7 @@
                                         [class.history-chart__bar--passed]="attempt.passedScore !== null && attempt.score >= attempt.passedScore"
                                 ></div>
                             </div>
-                            <span class="history-chart__idx">Lần {{ history().length - $index }}</span>
+                            <span class="history-chart__idx">Attempt {{ history().length - $index }}</span>
                         </div>
                     }
                 </div>
@@ -315,7 +315,7 @@
                 }
             </ul>
         }
-        <button type="button" autofocus (click)="closeHistory()">Đã hiểu</button>
+        <button type="button" autofocus (click)="closeHistory()">Got it</button>
     </dialog>
 }
 
@@ -325,6 +325,6 @@
         <span class="details-dialog__icon material-symbols-outlined" aria-hidden="true">info</span>
         <h2 id="info-title">{{ info.title }}</h2>
         <p>{{ info.message }}</p>
-        <button type="button" autofocus (click)="closeInfo()">Đã hiểu</button>
+        <button type="button" autofocus (click)="closeInfo()">Got it</button>
     </dialog>
 }

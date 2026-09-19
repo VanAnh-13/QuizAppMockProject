@@ -1,8 +1,8 @@
 .submit-dialog::backdrop,
 .leave-dialog::backdrop {
-    backdrop-filter: var(--glass-filter);
-    -webkit-backdrop-filter: var(--glass-filter);
-    @apply bg-slate-900/20;
+    background: rgba(23, 32, 51, 0.2);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
 }
 
 .submit-dialog,

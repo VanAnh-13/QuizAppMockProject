@@ -37,7 +37,7 @@ describe('errorInterceptor', () => {
 
         await expect(promise).rejects.toBeDefined();
         expect(notificationService.show).toHaveBeenCalledWith(
-            'Đã xảy ra lỗi phía máy chủ. Vui lòng thử lại sau.',
+            'A server error occurred. Please try again later.',
         );
     });
 
@@ -49,7 +49,7 @@ describe('errorInterceptor', () => {
 
         await expect(promise).rejects.toBeDefined();
         expect(notificationService.show).toHaveBeenCalledWith(
-            'Không thể kết nối máy chủ. Kiểm tra kết nối mạng rồi thử lại.',
+            'Cannot connect to the server. Check your connection and try again.',
         );
     });
 
@@ -81,7 +81,7 @@ describe('errorInterceptor', () => {
         await expect(promise).rejects.toMatchObject({status: 500});
         expect(notificationService.show).toHaveBeenCalledTimes(1);
         expect(notificationService.show).toHaveBeenCalledWith(
-            'Đã xảy ra lỗi phía máy chủ. Vui lòng thử lại sau.',
+            'A server error occurred. Please try again later.',
         );
     });
 

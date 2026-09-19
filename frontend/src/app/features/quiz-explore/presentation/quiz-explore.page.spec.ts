@@ -32,7 +32,7 @@ describe('QuizExplorePage', () => {
         const element = fixture.nativeElement as HTMLElement;
 
         expect(element.querySelectorAll('.quiz-card')).toHaveLength(6);
-        expect(element.querySelector('.quiz-card h3')?.textContent).toContain('C# Cơ bản & OOP');
+        expect(element.querySelector('.quiz-card h3')?.textContent).toContain('C# Fundamentals & OOP');
     });
 
     it('routes every catalog card to its own details screen', async () => {
@@ -62,7 +62,7 @@ describe('QuizExplorePage', () => {
         fixture.detectChanges();
         await fixture.whenStable();
         fixture.detectChanges();
-        expect(element.querySelector('.catalog__empty')?.textContent).toContain('Chưa tìm thấy');
+        expect(element.querySelector('.catalog__empty')?.textContent).toContain('No matching quizzes');
         element.querySelector<HTMLButtonElement>('.catalog__empty button')!.click();
         fixture.detectChanges();
         await fixture.whenStable();

@@ -16,19 +16,18 @@
                 >
                     <path d="m12 3 2.4 6.6L21 12l-6.6 2.4L12 21l-2.4-6.6L3 12l6.6-2.4z"/>
                 </svg>
-                Học có mục tiêu, tiến bộ mỗi ngày
+                Learn with purpose. Improve every day.
             </p>
             <h1 id="hero-title">
-                Học lập trình với<br class="hero__line-break"/>
-                quiz thực chiến
+                Build your skills with<br class="hero__line-break"/>
+                hands-on quizzes
             </h1>
             <p class="hero__description">
-                Hiểu sâu kiến thức, vững vàng tư duy. Thử sức với các bài quiz về C#, SQL Server,
-                Angular và
-                nhiều chủ đề lập trình thiết thực.
+                Deepen your knowledge and sharpen your thinking. Test your skills in C#, SQL Server,
+                Angular, and other practical programming topics.
             </p>
             <form class="search" role="search" (submit)="applySearch($event)">
-                <label class="visually-hidden" for="quiz-search">Tìm kiếm bài quiz</label>
+                <label class="visually-hidden" for="quiz-search">Search quizzes</label>
                 <svg
                         class="search__icon"
                         width="20"
@@ -46,14 +45,14 @@
                         id="quiz-search"
                         type="search"
                         autocomplete="off"
-                        placeholder="Tìm theo chủ đề, từ khóa hoặc tên bài quiz..."
+                        placeholder="Search topics, keywords, or quiz titles…"
                         [formControl]="searchControl"
                 />
                 @if (searchControl.value) {
                     <button
                             class="search__clear"
                             type="button"
-                            aria-label="Xóa từ khóa tìm kiếm"
+                            aria-label="Clear search"
                             (click)="clearSearch()"
                     >
                         <svg
@@ -82,14 +81,14 @@
                 >
                     <path d="M3 5h7l2 2 2-2h7v15h-7l-2 2-2-2H3zM12 7v15"/>
                 </svg>
-                {{ store.totalCatalogCount() }} bài quiz · {{ store.categoryCount() }} chủ đề
+                {{ store.totalCatalogCount() }} quizzes · {{ store.categoryCount() }} topics
             </p>
         </div>
 
     </section>
 
     <section class="filters" aria-labelledby="filter-title">
-        <h2 class="visually-hidden" id="filter-title">Lọc quiz theo chủ đề</h2>
+        <h2 class="visually-hidden" id="filter-title">Filter quizzes by topic</h2>
         <div class="filters__list">
             @for (category of store.categories(); track category.id) {
                 <button
@@ -115,32 +114,32 @@
                 <h2 id="catalog-title">
                     {{
                         store.searchTerm() || store.selectedCategoryId() !== 'all'
-                                ? 'Bài quiz dành cho bạn'
-                                : 'Khám phá các bài quiz'
+                                ? 'Quizzes for you'
+                                : 'Explore quizzes'
                     }}
                 </h2>
-                <p class="catalog__subtitle">Chọn một chủ đề. Bắt đầu từ điều bạn muốn hiểu rõ
-                    hơn.</p>
+                <p class="catalog__subtitle">Choose a topic. Start with something you want to
+                    understand better.</p>
             </div>
             <p class="catalog__count" aria-live="polite" aria-atomic="true">
-                {{ store.totalCount() }} bài quiz
+                {{ store.totalCount() }} quizzes
             </p>
         </div>
         @if (store.searchTerm() || store.selectedCategoryId() !== 'all') {
             <div class="catalog__active-filters">
                 <p>
                     {{
-                        store.searchTerm() ? 'Kết quả cho “' + store.searchTerm() + '”' : 'Đang lọc theo chủ đề'
+                        store.searchTerm() ? 'Results for “' + store.searchTerm() + '”' : 'Filtered by topic'
                     }}
                 </p>
                 <button type="button" (click)="resetFilters()">
-                    Xóa bộ lọc <span aria-hidden="true">×</span>
+                    Clear filters <span aria-hidden="true">×</span>
                 </button>
             </div>
         }
         @if (store.isLoading()) {
             <div class="catalog__loading" role="status" aria-live="polite">
-                <p class="visually-hidden">Đang tải danh sách quiz. Vui lòng chờ trong giây lát.</p>
+                <p class="visually-hidden">Loading quizzes. Please wait a moment.</p>
                 <div class="catalog__grid" aria-hidden="true">
                     @for (item of [1, 2, 3, 4, 5, 6]; track item) {
                         <div class="catalog__skeleton-card">
@@ -155,9 +154,9 @@
             </div>
         } @else if (store.errorMessage(); as errorMessage) {
             <div class="catalog__empty" role="alert">
-                <h3>Không thể tải danh sách quiz</h3>
+                <h3>Could not load quizzes</h3>
                 <p>{{ errorMessage }}</p>
-                <button type="button" (click)="store.refresh()">Thử lại</button>
+                <button type="button" (click)="store.refresh()">Try again</button>
             </div>
         } @else if (store.visibleQuizzes().length > 0) {
             <div class="catalog__grid">
@@ -179,21 +178,21 @@
                     <circle cx="10.5" cy="10.5" r="6.5"/>
                     <path d="m16 16 5 5M8 10.5h5"/>
                 </svg>
-                <h3>Chưa tìm thấy bài quiz phù hợp</h3>
-                <p>Hãy thử một từ khóa khác hoặc xóa bộ lọc để khám phá lại.</p>
-                <button type="button" (click)="resetFilters()">Xem tất cả bài quiz</button>
+                <h3>No matching quizzes</h3>
+                <p>Try another search or clear the filters to explore more quizzes.</p>
+                <button type="button" (click)="resetFilters()">View all quizzes</button>
             </div>
         }
         @if (!store.isLoading() && !store.errorMessage() && store.totalCount() > 0) {
             <div class="pagination">
                 <p>
-                    Hiển thị <strong>{{ store.rangeStart() }}–{{ store.rangeEnd() }}</strong> trong
-                    <strong>{{ store.totalCount() }}</strong> bài quiz
+                    Showing <strong>{{ store.rangeStart() }}–{{ store.rangeEnd() }}</strong> of
+                    <strong>{{ store.totalCount() }}</strong> quizzes
                 </p>
-                <nav aria-label="Phân trang danh sách quiz">
+                <nav aria-label="Quiz pagination">
                     <button
                             type="button"
-                            aria-label="Trang trước"
+                            aria-label="Previous page"
                             [disabled]="store.currentPage() === 1"
                             (click)="store.goToPage(store.currentPage() - 1)"
                     >
@@ -222,7 +221,7 @@
                     }
                     <button
                             type="button"
-                            aria-label="Trang sau"
+                            aria-label="Next page"
                             [disabled]="store.currentPage() === store.totalPages()"
                             (click)="store.goToPage(store.currentPage() + 1)"
                     >

@@ -29,7 +29,7 @@ describe('AuthPage routes', () => {
         const {element, harness, scrollToPosition} = await setup('/login');
         expect(scrollToPosition).toHaveBeenCalledWith([0, 0]);
         expect(element.querySelectorAll('h1')).toHaveLength(1);
-        expect(element.querySelector('h1')?.textContent).toBe('Đăng nhập');
+        expect(element.querySelector('h1')?.textContent).toBe('Log in');
         expect(element.querySelector('[aria-invalid="true"]')).toBeNull();
         expect(element.querySelector('input[type="email"]')).toBeNull();
         const toggle = element.querySelector<HTMLButtonElement>('[aria-controls="password"]')!;
@@ -41,17 +41,19 @@ describe('AuthPage routes', () => {
         harness.detectChanges();
         expect(element.querySelector<HTMLInputElement>('#password')!.type).toBe('password');
         expect(element.querySelector('.guest-button')?.getAttribute('href')).toBe('/');
+        expect(element.querySelector('.support-link')).toBeNull();
+        expect(element.querySelector('.login-footer')?.textContent).toContain('Help');
     });
 
     it('shows associated field errors when an empty registration is submitted', async () => {
         const {element, harness, api} = await setup('/register');
-        expect(element.querySelector('.auth-card .auth-badge')?.textContent).toContain('Nền tảng kiểm tra tri thức lập trình');
-        expect(element.querySelector('h1')?.textContent).toContain('Tạo tài khoản QuizApp');
+        expect(element.querySelector('.auth-card .auth-badge')?.textContent).toContain('Test your programming knowledge');
+        expect(element.querySelector('h1')?.textContent).toContain('Create your QuizApp account');
         element.querySelector<HTMLButtonElement>('button[type="submit"]')!.click();
         await harness.fixture.whenStable();
         harness.detectChanges();
         expect(element.querySelector('#email')?.getAttribute('aria-describedby')).toBe('email-error');
-        expect(element.querySelector('#email-error')?.textContent).toContain('Vui lòng điền');
+        expect(element.querySelector('#email-error')?.textContent).toContain('Please complete this field');
         expect(api.register).not.toHaveBeenCalled();
     });
 
@@ -75,7 +77,7 @@ describe('AuthPage routes', () => {
         harness.detectChanges();
         expect(api.register).toHaveBeenCalledOnce();
         expect(router.url).toBe('/login?returnUrl=%2Fquiz%2Fabc');
-        expect(harness.routeNativeElement!.querySelector('[role="status"]')?.textContent).toContain('Tài khoản đã được tạo');
+        expect(harness.routeNativeElement!.querySelector('[role="status"]')?.textContent).toContain('Your account has been created');
         expect(harness.routeNativeElement!.querySelector<HTMLInputElement>('#password')!.value).toBe('');
     });
 

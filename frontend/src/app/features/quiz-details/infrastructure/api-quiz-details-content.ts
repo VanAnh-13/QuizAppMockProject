@@ -16,7 +16,7 @@ export class ApiQuizDetailsContent implements QuizDetailsContent {
 
         const quiz = quizzes.find((item) => item.id === quizId);
 
-        if (!quiz) throw new Error('Không tìm thấy quiz đang mở.');
+        if (!quiz) throw new Error('This quiz is not available.');
         return {
             imageUrl: resolveQuizImageUrl(
                 quiz.title,
@@ -26,32 +26,32 @@ export class ApiQuizDetailsContent implements QuizDetailsContent {
             description: quiz.description ?? '',
             categoryLabel: 'Quiz',
             metrics: [
-                {icon: 'quiz', label: 'Số câu hỏi', value: `${quiz.questionCount} câu hỏi`},
-                {icon: 'timer', label: 'Thời lượng', value: `${quiz.duration} phút`},
+                {icon: 'quiz', label: 'Questions', value: `${quiz.questionCount} questions`},
+                {icon: 'timer', label: 'Duration', value: `${quiz.duration} minutes`},
                 {
                     icon: 'military_tech',
-                    label: 'Điểm đạt',
-                    value: quiz.passedScore === null ? 'Không quy định' : `${quiz.passedScore}%`,
+                    label: 'Passing score',
+                    value: quiz.passedScore === null ? 'Not specified' : `${quiz.passedScore}%`,
                 },
             ],
             topics: [],
             guidelines: [
                 {
-                    title: 'Lưu tiến độ',
-                    description: 'Đáp án được lưu tự động. Theo dõi thông báo lưu trước khi rời trang.',
+                    title: 'Saving progress',
+                    description: 'Answers are saved automatically. Check the save status before leaving the page.',
                 },
                 {
-                    title: 'Tạm dừng và tiếp tục',
+                    title: 'Pause and resume',
                     description:
-                        'Nút tạm dừng lưu đáp án và dừng đồng hồ sau khi máy chủ xác nhận. Đóng trang không tạm dừng thời gian.',
+                        'Pausing saves your answers and stops the timer once the server confirms. Closing the page does not pause the timer.',
                 },
                 {
-                    title: 'Nộp bài',
+                    title: 'Submit quiz',
                     description:
-                        'Khi hết giờ, hệ thống nộp các đáp án đã lưu thành công. Không thể sửa đáp án sau khi nộp.',
+                        'When time runs out, your saved answers are submitted. Answers cannot be changed after submission.',
                 },
             ],
-            formatFacts: [{label: 'Trạng thái', value: 'Đang mở'}],
+            formatFacts: [{label: 'Status', value: 'Open'}],
         };
     }
 }

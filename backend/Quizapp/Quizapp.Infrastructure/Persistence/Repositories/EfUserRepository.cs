@@ -25,7 +25,8 @@ public sealed class EfUserRepository(QuizAppDbContext db) : IUserRepository
 
         var total = await query.CountAsync(cancellationToken);
 
-        var items = await query.OrderBy(u => u.Username)
+        var items = await query.Include(u => u.Roles)
+            .OrderBy(u => u.Username)
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync(cancellationToken);

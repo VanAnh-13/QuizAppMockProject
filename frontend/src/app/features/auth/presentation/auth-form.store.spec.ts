@@ -63,7 +63,7 @@ describe('AuthFormStore', () => {
         const {store, api} = setup();
         api.register.mockRejectedValueOnce(new HttpErrorResponse({status: 409}));
         expect(await store.submit()).toBe(false);
-        expect(store.error()).toContain('Tên đăng nhập hoặc email đã được sử dụng');
+        expect(store.error()).toContain('This username or email is already in use');
         expect(store.form.controls.email.value).toBe('an@example.com');
         expect(store.form.controls.password.value).toBe('');
         expect(store.busy()).toBe(false);
@@ -93,8 +93,8 @@ describe('AuthFormStore', () => {
     });
 
     it.each([
-        [401, 'Tên đăng nhập hoặc mật khẩu chưa đúng'],
-        [0, 'Không thể kết nối máy chủ'],
+        [401, 'Incorrect username or password'],
+        [0, 'Cannot connect to the server'],
     ])('shows a recoverable login error for HTTP %s', async (status, message) => {
         const {store, api, set} = setup(false);
         api.login.mockRejectedValueOnce(new HttpErrorResponse({status}));
@@ -109,7 +109,7 @@ describe('authReturnUrl', () => {
         expect(authReturnUrl(value)).toBe('/');
     });
 
-    it.each(['/quiz/abc-123', '/quiz/abc-123/attempt', '/quiz/abc-123/attempt?attemptId=attempt-123'])('keeps a quiz destination %s', (value) => {
+    it.each(['/quiz/abc-123', '/quiz/abc-123/attempt', '/quiz/abc-123/attempt?attemptId=attempt-123', '/admin/questions'])('keeps a quiz destination %s', (value) => {
         expect(authReturnUrl(value)).toBe(value);
     });
 

@@ -1,43 +1,43 @@
 ﻿export type SiteInformation = 'about' | 'contact' | 'login' | 'register' | 'terms' | 'privacy' | 'passwordReset';
 
 export const SITE_NAVIGATION = [
-    {id: 'about', label: 'Giới thiệu'},
-    {id: 'contact', label: 'Liên hệ'},
+    {id: 'about', label: 'About'},
+    {id: 'contact', label: 'Contact'},
 ] as const;
 
 export const SITE_INFORMATION: Readonly<
     Record<SiteInformation, { readonly title: string; readonly description: string }>
 > = {
     terms: {
-        title: 'Điều khoản dịch vụ — bản phát triển',
-        description: 'QuizApp đang trong giai đoạn phát triển. Bạn có thể tạo tài khoản để làm quiz và lưu kết quả. Điều khoản chính thức chưa được công bố; xác nhận trên biểu mẫu chỉ áp dụng cho việc trải nghiệm phiên bản này.',
+        title: 'Terms of service — development preview',
+        description: 'QuizApp is under development. You can create an account to take quizzes and save your results. Official terms have not been published; the form acknowledgement applies only to trying this version.',
     },
     privacy: {
-        title: 'Thông tin dữ liệu — bản phát triển',
-        description: 'Biểu mẫu gửi tên đăng nhập, email và hồ sơ bạn cung cấp đến máy chủ QuizApp. Số điện thoại và ngày sinh là tùy chọn. Phiên đăng nhập được lưu trong trình duyệt; chọn ghi nhớ sẽ giữ phiên sau khi đóng trình duyệt cho đến khi hết hạn hoặc đăng xuất. Chính sách bảo mật chính thức chưa được công bố.',
+        title: 'Data information — development preview',
+        description: 'This form sends your username, email, and profile details to the QuizApp server. Phone number and date of birth are optional. Your session is stored in your browser; choosing Remember me keeps it after you close the browser until it expires or you log out. The official privacy policy has not been published.',
     },
     passwordReset: {
-        title: 'Đặt lại mật khẩu',
-        description: 'QuizApp chưa hỗ trợ đặt lại mật khẩu tự động trong phiên bản này. Nếu quên mật khẩu, hãy liên hệ người quản trị đã cung cấp tài khoản cho bạn.',
+        title: 'Reset password',
+        description: 'Automatic password reset is not available in this version. If you forget your password, contact the administrator who provided your account.',
     },
     about: {
-        title: 'Mỗi câu hỏi, một bước tiến',
+        title: 'Every question is a step forward',
         description:
-            'QuizApp giúp bạn củng cố kiến thức lập trình bằng các bài quiz có chủ đề rõ ràng. Khám phá C#, SQL Server, Angular và TypeScript theo nhịp học của bạn. Đây là bản trải nghiệm thiết kế với dữ liệu mẫu.',
+            'Build your programming knowledge with focused quizzes. Explore C#, SQL Server, Angular, and TypeScript at your own pace. This preview includes sample content.',
     },
     contact: {
-        title: 'Liên hệ với QuizApp',
+        title: 'Contact QuizApp',
         description:
-            'Kênh liên hệ chính thức sẽ được công bố khi QuizApp ra mắt. Trong bản trải nghiệm này, bạn có thể khám phá chủ đề và xem nội dung giới thiệu của từng bài quiz.',
+            'Official contact details will be announced when QuizApp launches. In this preview, you can explore topics and read an introduction to each quiz.',
     },
     login: {
-        title: 'Đăng nhập vào QuizApp',
+        title: 'Log in to QuizApp',
         description:
-            'Đăng nhập sẽ có khi QuizApp ra mắt. Hiện tại, bạn có thể khám phá các bài quiz mẫu và xem chi tiết mà không cần tài khoản.',
+            'Log in to take quizzes and keep track of your results. You can also browse quizzes without an account.',
     },
     register: {
-        title: 'Bắt đầu hành trình học tập',
+        title: 'Start your learning journey',
         description:
-            'Tính năng tạo tài khoản chưa có trong bản trải nghiệm này. Bạn vẫn có thể tìm kiếm, chọn chủ đề và khám phá các bài quiz mẫu.',
+            'Create an account to save your progress and results. You can browse topics and explore quizzes before signing up.',
     },
 };

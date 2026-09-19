@@ -7,7 +7,7 @@ These instructions apply to everything under `frontend/`. They extend the reposi
 
 Before touching any CSS, HTML, or visual component, read `frontend/DESIGN.MD`.
 It defines the **Liquid Glass** style and the **Blue Gradient** brand palette — the single source
-of truth for colours, glass tokens, component layers, and prohibited patterns.
+of truth for colors, glass tokens, component layers, and prohibited patterns.
 
 ## Required workflow
 

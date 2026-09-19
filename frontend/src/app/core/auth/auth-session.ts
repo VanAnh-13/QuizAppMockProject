@@ -54,7 +54,7 @@ export class AuthSession {
             !response.userDto?.id ||
             !Number.isFinite(Date.parse(response.expiresAt))
         ) {
-            throw new Error('Phản hồi đăng nhập không hợp lệ.');
+            throw new Error('Invalid login response.');
         }
         this.clear();
         this.session.set(response);

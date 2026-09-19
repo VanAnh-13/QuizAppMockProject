@@ -57,7 +57,7 @@ describe('quizDetailsResolver', () => {
             quizDetailsResolver(route, {} as RouterStateSnapshot),
         );
 
-        expect(result).toEqual({errorMessage: 'Không tìm thấy mã quiz trên đường dẫn.'});
+        expect(result).toEqual({errorMessage: 'The URL does not include a quiz ID.'});
         expect(mockContent.load).not.toHaveBeenCalled();
     });
 
@@ -73,10 +73,10 @@ describe('quizDetailsResolver', () => {
             quizDetailsResolver(route, {} as RouterStateSnapshot),
         );
 
-        expect(result).toEqual({errorMessage: 'Không thể tải chi tiết quiz từ máy chủ. Vui lòng thử lại.'});
+        expect(result).toEqual({errorMessage: 'Could not load quiz details from the server. Please try again.'});
     });
 
-    it.each(['Không tìm thấy quiz đang mở.', 'Server unavailable'])(
+    it.each(['This quiz is not available.', 'Server unavailable'])(
         'shows a failed resolution without fetching again: %s', async (message) => {
             mockContent.load.mockRejectedValue(new Error(message));
             TestBed.configureTestingModule({
@@ -96,11 +96,11 @@ describe('quizDetailsResolver', () => {
             await harness.navigateByUrl('/quiz/missing', QuizDetailsPage);
 
             expect(mockContent.load).toHaveBeenCalledExactlyOnceWith('missing');
-            expect(harness.routeNativeElement?.textContent).toContain('Không thể tải chi tiết quiz từ máy chủ.');
+            expect(harness.routeNativeElement?.textContent).toContain('Could not load quiz details from the server.');
 
             mockContent.load.mockResolvedValue(mockSnapshot);
             const retry = Array.from(harness.routeNativeElement!.querySelectorAll('button'))
-                .find((button) => button.textContent?.trim() === 'Thử lại')!;
+                .find((button) => button.textContent?.trim() === 'Try again')!;
             retry.click();
             await harness.fixture.whenStable();
             harness.detectChanges();
@@ -111,7 +111,7 @@ describe('quizDetailsResolver', () => {
             await harness.navigateByUrl('/quiz/another-missing', QuizDetailsPage);
             expect(mockContent.load).toHaveBeenCalledTimes(3);
             expect(mockContent.load).toHaveBeenLastCalledWith('another-missing');
-            expect(harness.routeNativeElement?.textContent).toContain('Không thể tải chi tiết quiz từ máy chủ.');
+            expect(harness.routeNativeElement?.textContent).toContain('Could not load quiz details from the server.');
         },
     );
 });
