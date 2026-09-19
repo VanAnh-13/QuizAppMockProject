@@ -38,7 +38,7 @@ describe('SiteHeaderComponent', () => {
         expect(mobileAction(fixture, 'Log in').getAttribute('href')).toBe('/login?returnUrl=%2F');
     });
 
-    it('clears the session and emits sessionChanged on mobile logout when confirmed', async () => {
+    it('clears the session, emits sessionChanged, and goes to login on mobile logout', () => {
         const {clear} = configure({id: '1', username: 'learner', fullName: 'Quiz Learner'});
         const fixture = TestBed.createComponent(SiteHeaderComponent);
         fixture.detectChanges();
@@ -46,10 +46,10 @@ describe('SiteHeaderComponent', () => {
         fixture.componentInstance.sessionChanged.subscribe(emitted);
 
         mobileAction(fixture, 'Log out').click();
-        await fixture.whenStable();
 
         expect(clear).toHaveBeenCalledTimes(1);
         expect(emitted).toHaveBeenCalledTimes(1);
+        expect(TestBed.inject(Router).navigateByUrl).toHaveBeenCalledWith('/login');
     });
 
     it('renders user avatar menu and handles logout for signed in user when confirmed', async () => {
@@ -71,6 +71,7 @@ describe('SiteHeaderComponent', () => {
 
         expect(clear).toHaveBeenCalledTimes(1);
         expect(emitted).toHaveBeenCalledTimes(1);
+        expect(TestBed.inject(Router).navigateByUrl).toHaveBeenCalledWith('/login');
     });
 
     it('does not log out when user cancels confirmation', async () => {
@@ -105,7 +106,7 @@ function configure(user: AuthResponse['userDto'] | null) {
         ],
     });
     vi.spyOn(TestBed.inject(Router), 'navigateByUrl').mockResolvedValue(true);
-    return {clear, confirmation};
+    return {clear};
 }
 
 function mobileAction(

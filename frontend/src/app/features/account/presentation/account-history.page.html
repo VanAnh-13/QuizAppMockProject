@@ -1,0 +1,142 @@
+<app-site-header/>
+
+<main class="history" id="main-content" tabindex="-1">
+    <nav class="breadcrumb" aria-label="Đường dẫn">
+        <ol>
+            <li><a routerLink="/settings">Tài khoản</a></li>
+            <li aria-hidden="true"><span class="material-symbols-outlined">chevron_right</span></li>
+            <li aria-current="page">Lịch sử làm bài</li>
+        </ol>
+    </nav>
+
+    <header class="history__heading">
+        <h1>Lịch sử làm bài</h1>
+        <p>Danh sách các lượt làm bài đã hoàn thành của bạn trong hệ thống.</p>
+    </header>
+
+    <section class="history-card" aria-labelledby="history-title">
+        <h2 class="visually-hidden" id="history-title">Bảng lịch sử làm bài</h2>
+
+        @if (store.isLoading()) {
+            <p class="history-state" role="status" aria-live="polite">Đang tải lịch sử làm bài…</p>
+        } @else if (store.errorMessage(); as message) {
+            <div class="history-state" role="alert">
+                <p>{{ message }}</p>
+                <button class="history-state__retry" type="button" (click)="store.load()">
+                    <span class="material-symbols-outlined" aria-hidden="true">refresh</span>
+                    Thử lại
+                </button>
+            </div>
+        } @else if (store.historyRows().length === 0) {
+            <div class="history-state">
+                <span class="material-symbols-outlined history-state__icon" aria-hidden="true">history</span>
+                <p>Bạn chưa hoàn thành lượt làm bài nào.</p>
+                <a class="history-state__cta" routerLink="/">
+                    <span>Khám phá quiz</span>
+                    <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
+                </a>
+            </div>
+        } @else {
+            <div class="history-card__scroll">
+                <table class="history-table">
+                    <caption class="visually-hidden">
+                        Các lượt làm bài đã nộp, kèm thời gian nộp và điểm số
+                    </caption>
+                    <thead>
+                    <tr>
+                        <th scope="col">Tên bài quiz</th>
+                        <th scope="col">Thời gian nộp bài</th>
+                        <th class="history-table__score" scope="col">Điểm số</th>
+                        <th class="history-table__actions" scope="col">Thao tác</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        @for (row of store.historyRows(); track row.id) {
+                            <tr>
+                                <th scope="row">
+                                    <span class="history-table__quiz">
+                                        <span class="history-table__mark material-symbols-outlined"
+                                                aria-hidden="true">quiz</span>
+                                        <span>
+                                            <span class="history-table__title">{{ row.quizTitle }}</span>
+                                            @if (row.requirement !== null) {
+                                                <span class="history-table__status"
+                                                        [class.history-table__status--passed]="row.passed">
+                                                    {{ row.passed ? 'Đạt' : 'Chưa đạt' }}
+                                                    · yêu cầu {{ row.requirement }}%
+                                                </span>
+                                            }
+                                        </span>
+                                    </span>
+                                </th>
+                                <td>
+                                    <span class="history-table__time">
+                                        <span class="material-symbols-outlined" aria-hidden="true">schedule</span>
+                                        {{ row.submittedAt | date: 'HH:mm — dd/MM/yyyy' }}
+                                    </span>
+                                </td>
+                                <td class="history-table__score">
+                                    <span class="history-table__score-badge"
+                                            [class.history-table__score-badge--passed]="row.passed">
+                                        {{ row.score }}%
+                                    </span>
+                                </td>
+                                <td class="history-table__actions">
+                                    <a class="history-table__link"
+                                            [routerLink]="['/quiz', row.quizId]">
+                                        <span>Xem chi tiết</span>
+                                        <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
+                                    </a>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="pagination">
+                <p class="pagination__count">
+                    Hiển thị <strong>{{ store.rangeStart() }} - {{ store.rangeEnd() }}</strong>
+                    của <strong>{{ store.totalCount() }}</strong> lượt làm bài
+                </p>
+                <div class="pagination__controls">
+                    <button
+                            type="button"
+                            [disabled]="!store.hasPreviousPage()"
+                            (click)="store.previousPage()"
+                    >
+                        <span class="material-symbols-outlined"
+                                aria-hidden="true">chevron_left</span>
+                        <span>Trang trước</span>
+                    </button>
+                    <ul class="pagination__pages">
+                        @for (page of store.pageNumbers(); track page) {
+                            <li>
+                                <button
+                                        type="button"
+                                        [class.pagination__page--current]="page === store.currentPage()"
+                                        [attr.aria-current]="page === store.currentPage() ? 'page' : null"
+                                        [attr.aria-label]="'Trang ' + page"
+                                        (click)="store.goToPage(page)"
+                                >
+                                    {{ page }}
+                                </button>
+                            </li>
+                        }
+                    </ul>
+                    <button
+                            type="button"
+                            [disabled]="!store.hasNextPage()"
+                            (click)="store.nextPage()"
+                    >
+                        <span>Trang sau</span>
+                        <span class="material-symbols-outlined"
+                                aria-hidden="true">chevron_right</span>
+                    </button>
+                </div>
+            </div>
+        }
+    </section>
+</main>
+
+<app-site-footer/>

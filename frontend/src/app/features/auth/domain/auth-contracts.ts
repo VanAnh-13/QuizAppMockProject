@@ -44,13 +44,11 @@ export const AUTH_LIMITS = {
 } as const;
 
 export function authReturnUrl(value: string | null): string {
-    if (value && /^\/quiz\/[a-zA-Z0-9-]+(?:\/attempt(?:\?attemptId=[a-zA-Z0-9-]+)?)?$/.test(value)) {
-        return value;
-    }
+    if (!value) return '/';
 
-    if (value && /^\/admin(?:\/[a-zA-Z0-9-]+)*$/.test(value)) {
-        return value;
-    }
-
-    return '/';
+    return /^\/(?:history|settings)$/.test(value) ||
+        /^\/admin(?:\/[a-zA-Z0-9-]+)*$/.test(value) ||
+        /^\/quiz\/[a-zA-Z0-9-]+(?:\/attempt(?:\?attemptId=[a-zA-Z0-9-]+)?)?$/.test(value)
+        ? value
+        : '/';
 }

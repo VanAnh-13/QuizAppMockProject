@@ -16,4 +16,7 @@ public interface IAuthService
     Task ChangePasswordAsync(
         ChangePasswordDto request,
         CancellationToken cancellationToken = default);
+
+    Task<UserDto> GetCurrentUserAsync(
+        CancellationToken cancellationToken = default);
 }

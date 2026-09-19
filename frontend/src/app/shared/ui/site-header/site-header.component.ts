@@ -54,14 +54,6 @@ export class SiteHeaderComponent {
         void this.router.navigateByUrl('/login');
     }
 
-    protected closeMenu(): void {
-        const menu = this.userMenu()?.nativeElement;
-        if (menu) {
-            menu.open = false;
-        }
-        this.isMenuOpen.set(false);
-    }
-
     @HostListener('document:click', ['$event'])
     protected onDocumentClick(event: MouseEvent): void {
         const menu = this.userMenu()?.nativeElement;

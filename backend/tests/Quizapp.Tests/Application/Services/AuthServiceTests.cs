@@ -1,6 +1,8 @@
 using Quizapp.Application.DTOs.Authentication;
 using Quizapp.Application.DTOs.UserManager;
 using Quizapp.Application.Services.Authentication;
+using Quizapp.Application.Services.Common;
+using Quizapp.Domain.Exceptions;
 
 namespace Quizapp.Tests.Application.Services;
 
@@ -26,5 +28,30 @@ public class AuthServiceTests
         Assert.True(user.IsActive);
         Assert.NotEmpty(login.Token);
         Assert.True(login.ExpiresAt > DateTime.UtcNow);
+    }
+
+    [Fact]
+    public async Task Current_user_returns_the_signed_in_profile_with_roles()
+    {
+        using var context = new ServiceTestContext();
+        var expected = context.Users.Rows.Single(user => user.Id == context.CurrentUser.UserId);
+        var service = context.Get<IAuthService>();
+
+        var profile = await service.GetCurrentUserAsync();
+
+        Assert.Equal(expected.Id, profile.Id);
+        Assert.Equal(expected.Username, profile.Username);
+        Assert.Equal(expected.Email, profile.Email);
+        Assert.Equal(ServiceAuthorization.AdministratorRole, Assert.Single(profile.Roles).RoleName);
+    }
+
+    [Fact]
+    public async Task Current_user_requires_an_authenticated_caller()
+    {
+        using var context = new ServiceTestContext();
+        context.CurrentUser.UserId = null;
+        var service = context.Get<IAuthService>();
+
+        await Assert.ThrowsAsync<AuthenticationException>(() => service.GetCurrentUserAsync());
     }
 }

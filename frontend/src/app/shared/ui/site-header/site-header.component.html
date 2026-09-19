@@ -3,8 +3,7 @@
         <app-brand/>
 
         <nav class="header__navigation" aria-label="Main navigation">
-            <a class="header__navigation-link" routerLink="/" fragment="quiz-list">Explore
-                quizzes</a>
+            <a class="header__navigation-link" routerLink="/" fragment="quiz-list">Explore quizzes</a>
             <button class="header__navigation-link" type="button"
                     (click)="information.open('about')">About
             </button>
@@ -28,22 +27,28 @@
                                 <strong>{{ user.fullName || user.username }}</strong>
                                 <span>Signed in</span>
                             </div>
+                            <a class="header__user-link" routerLink="/history">
+                                <span class="material-symbols-outlined" aria-hidden="true">history</span>
+                                Attempt history
+                            </a>
+                            <a class="header__user-link" routerLink="/settings">
+                                <span class="material-symbols-outlined" aria-hidden="true">manage_accounts</span>
+                                Settings &amp; security
+                            </a>
                             <button
                                     class="header__logout-button"
                                     type="button"
                                     data-testid="header-logout"
                                     (click)="logout()"
                             >
-                                <span class="material-symbols-outlined"
-                                        aria-hidden="true">logout</span>
+                                <span class="material-symbols-outlined" aria-hidden="true">logout</span>
                                 Log out
                             </button>
                         </div>
                     </details>
                 } @else {
                     <a class="header__action header__action--text" routerLink="/login"
-                            [queryParams]="{ returnUrl: returnAfterAuth() ?? router.url }">Log
-                        in</a>
+                            [queryParams]="{ returnUrl: returnAfterAuth() ?? router.url }">Log in</a>
                     <a class="header__action header__action--primary" routerLink="/register"
                             [queryParams]="{ returnUrl: returnAfterAuth() ?? router.url }">
                         Sign up
@@ -73,6 +78,8 @@
                                     <span>Signed in</span>
                                 </div>
                             </div>
+                            <a routerLink="/history">Attempt history</a>
+                            <a routerLink="/settings">Settings &amp; security</a>
                             <button type="button" (click)="logout()">Log out</button>
                         } @else {
                             <a routerLink="/login"

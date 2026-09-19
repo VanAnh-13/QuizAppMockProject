@@ -112,4 +112,20 @@ describe('authReturnUrl', () => {
     it.each(['/quiz/abc-123', '/quiz/abc-123/attempt', '/quiz/abc-123/attempt?attemptId=attempt-123', '/admin/questions'])('keeps a quiz destination %s', (value) => {
         expect(authReturnUrl(value)).toBe(value);
     });
+
+    it.each(['/history', '/settings'])('keeps an account destination %s', (value) => {
+        expect(authReturnUrl(value)).toBe(value);
+    });
+
+    it.each(['/history/extra', '/settings?redirect=https://example.com', '/historyx'])('rejects an unsafe account destination %s', (value) => {
+        expect(authReturnUrl(value)).toBe('/');
+    });
+
+    it.each(['/admin', '/admin/questions', '/admin/users'])('keeps an admin destination %s', (value) => {
+        expect(authReturnUrl(value)).toBe(value);
+    });
+
+    it.each(['/admin?redirect=https://example.com', '/administrator', '/admin/questions?next=/login'])('rejects an unsafe admin destination %s', (value) => {
+        expect(authReturnUrl(value)).toBe('/');
+    });
 });

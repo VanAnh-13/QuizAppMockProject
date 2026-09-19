@@ -47,6 +47,14 @@
                             <strong>{{ user.fullName || user.username }}</strong>
                             <span>Signed in</span>
                         </div>
+                        <a class="details-header__user-link" routerLink="/history">
+                            <span class="material-symbols-outlined" aria-hidden="true">history</span>
+                            Attempt history
+                        </a>
+                        <a class="details-header__user-link" routerLink="/settings">
+                            <span class="material-symbols-outlined" aria-hidden="true">manage_accounts</span>
+                            Settings &amp; security
+                        </a>
                         <button
                                 class="details-header__logout-button"
                                 type="button"

@@ -1,0 +1,220 @@
+:host {
+    @apply flex min-h-dvh flex-col;
+    background: transparent;
+}
+
+.history {
+    @apply mx-auto w-full max-w-[1200px] flex-1 px-4 pb-16 pt-6;
+}
+
+.breadcrumb ol {
+    @apply m-0 flex list-none flex-wrap items-center gap-1.5 p-0 text-xs font-medium text-muted;
+}
+
+.breadcrumb a {
+    @apply transition-colors;
+}
+
+.breadcrumb a:hover {
+    color: var(--brand);
+}
+
+.breadcrumb .material-symbols-outlined {
+    font-size: 1rem;
+}
+
+.breadcrumb li[aria-current='page'] {
+    color: var(--brand);
+    @apply font-semibold;
+}
+
+.history__heading {
+    @apply mb-6 mt-4;
+}
+
+.history__heading h1 {
+    @apply m-0 text-2xl font-bold tracking-tight text-ink sm:text-3xl;
+}
+
+.history__heading p {
+    @apply mt-2 text-sm leading-6 text-muted;
+}
+
+.history-card {
+    border: 1px solid var(--glass-border);
+    border-radius: var(--glass-radius);
+    background: var(--glass-surface);
+    backdrop-filter: var(--glass-filter);
+    -webkit-backdrop-filter: var(--glass-filter);
+    box-shadow: var(--glass-shadow);
+    @apply flex flex-col overflow-hidden;
+}
+
+.history-card__scroll {
+    @apply w-full overflow-x-auto;
+}
+
+.history-state {
+    @apply flex flex-col items-center gap-3 px-6 py-14 text-center text-sm text-muted;
+}
+
+.history-state__icon {
+    color: var(--brand);
+    font-size: 2.25rem;
+}
+
+.history-state__retry,
+.history-state__cta {
+    border: 1px solid var(--control-border);
+    background: var(--glass-inset);
+    @apply inline-flex min-h-[44px] items-center gap-1.5 rounded-xl px-4 text-sm font-semibold text-ink transition-colors;
+}
+
+.history-state__retry:hover,
+.history-state__cta:hover {
+    border-color: var(--brand);
+    color: var(--brand);
+}
+
+.history-table {
+    @apply w-full border-collapse text-left text-sm;
+}
+
+.history-table thead tr {
+    border-bottom: 1px solid var(--glass-border);
+    background: var(--glass-inset);
+}
+
+.history-table th,
+.history-table td {
+    @apply px-6 py-4 align-middle font-normal;
+}
+
+.history-table thead th {
+    @apply text-xs font-semibold text-muted;
+}
+
+.history-table tbody tr {
+    border-top: 1px solid var(--glass-border);
+    @apply transition-colors;
+}
+
+.history-table tbody tr:hover {
+    background: var(--glass-hover);
+}
+
+.history-table__quiz {
+    @apply flex items-center gap-3;
+}
+
+.history-table__mark {
+    border: 1px solid var(--glass-border);
+    background: var(--brand-soft);
+    color: var(--brand);
+    @apply flex h-9 w-9 shrink-0 items-center justify-center rounded-xl text-lg;
+}
+
+.history-table__title {
+    @apply block font-semibold text-ink;
+}
+
+.history-table__status {
+    color: var(--warning);
+    @apply mt-0.5 block text-xs font-medium;
+}
+
+.history-table__status--passed {
+    color: var(--success);
+}
+
+.history-table__time {
+    @apply flex items-center gap-1.5 whitespace-nowrap text-xs font-medium text-muted;
+}
+
+.history-table__time .material-symbols-outlined {
+    font-size: 1rem;
+}
+
+.history-table__score {
+    @apply w-36 text-center;
+}
+
+.history-table__score-badge {
+    border: 1px solid var(--glass-border);
+    background: var(--glass-inset);
+    color: var(--ink);
+    @apply inline-flex items-center justify-center whitespace-nowrap rounded-lg px-2.5 py-1 text-xs font-semibold;
+}
+
+.history-table__score-badge--passed {
+    border-color: rgba(4, 120, 87, 0.35);
+    color: var(--success);
+}
+
+.history-table__actions {
+    @apply w-40 text-right;
+}
+
+.history-table__link {
+    color: var(--brand);
+    @apply inline-flex min-h-[40px] items-center gap-1 rounded-lg px-3 text-xs font-semibold transition-colors;
+}
+
+.history-table__link:hover {
+    background: var(--glass-hover);
+}
+
+.history-table__link .material-symbols-outlined {
+    font-size: 1rem;
+}
+
+.pagination {
+    border-top: 1px solid var(--glass-border);
+    @apply flex flex-col items-center justify-between gap-4 px-6 py-4 sm:flex-row;
+}
+
+.pagination__count {
+    @apply m-0 text-xs text-muted;
+}
+
+.pagination__count strong {
+    @apply font-semibold text-ink;
+}
+
+.pagination__controls {
+    @apply flex flex-wrap items-center justify-center gap-1.5 text-xs font-medium;
+}
+
+.pagination__pages {
+    @apply m-0 flex list-none items-center gap-1.5 p-0;
+}
+
+.pagination__controls button {
+    border: 1px solid var(--control-border);
+    background: var(--glass-inset);
+    @apply flex min-h-[36px] items-center gap-1 rounded-lg px-3 text-ink transition-colors;
+}
+
+.pagination__pages button {
+    @apply w-9 justify-center px-0;
+}
+
+.pagination__controls button:hover:not(:disabled) {
+    border-color: var(--brand);
+    color: var(--brand);
+}
+
+.pagination__controls button:disabled {
+    @apply cursor-not-allowed opacity-60;
+}
+
+.pagination__page--current {
+    border-color: var(--brand) !important;
+    background: var(--brand) !important;
+    color: var(--on-brand) !important;
+    @apply font-semibold;
+}
+
+.pagination__controls .material-symbols-outlined {
+    font-size: 1rem;
+}
