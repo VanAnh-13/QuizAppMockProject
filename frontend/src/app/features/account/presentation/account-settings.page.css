@@ -210,7 +210,6 @@ fieldset {
 .field input:focus {
     border-color: var(--brand);
     background: var(--glass-surface);
-    @apply outline-none ring-2 ring-brand/40;
 }
 
 .field input[aria-invalid='true'] {
