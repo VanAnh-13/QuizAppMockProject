@@ -44,7 +44,6 @@ export const SITE_INFORMATION: Readonly<
 
 export const CONTACT_DETAILS = {
     address: 'FPT Building, Duy Tan Street, Cau Giay, Hanoi',
-    email: 'quizapp@fpt.edu.vn',
     workingHours: 'Monday – Friday: 08:00 – 17:00',
     responseHint: 'Within 24 business hours',
 } as const;

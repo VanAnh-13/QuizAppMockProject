@@ -10,6 +10,7 @@ import {ReactiveFormsModule} from '@angular/forms';
 import {CONTACT_DETAILS, CONTACT_FAQS} from '../../../core/config/site-content';
 import {SiteFooterComponent} from '../../../shared/ui/site-footer/site-footer.component';
 import {SiteHeaderComponent} from '../../../shared/ui/site-header/site-header.component';
+import {CONTACT_CONFIG} from '../application/contact-config';
 import {ContactStore} from './contact.store';
 
 @Component({
@@ -24,9 +25,18 @@ export class ContactPage {
     protected readonly store = inject(ContactStore);
     protected readonly details = CONTACT_DETAILS;
     protected readonly faqs = CONTACT_FAQS;
+    private readonly config = inject(CONTACT_CONFIG);
     private readonly element = inject<ElementRef<HTMLElement>>(ElementRef);
     private readonly changeDetector = inject(ChangeDetectorRef);
     private destroyed = false;
+
+    protected get contactEmail(): string | null {
+        const email = this.config.email?.trim();
+        if (!email || !email.includes('@')) {
+            return null;
+        }
+        return email;
+    }
 
     constructor() {
         inject(DestroyRef).onDestroy(() => {

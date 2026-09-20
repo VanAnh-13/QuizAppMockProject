@@ -1,6 +1,7 @@
 import {TestBed} from '@angular/core/testing';
 import {provideRouter} from '@angular/router';
 import {ContactApi} from '../application/contact-api';
+import {CONTACT_CONFIG} from '../application/contact-config';
 import {ContactPage} from './contact.page';
 import {ContactStore} from './contact.store';
 
@@ -22,15 +23,35 @@ describe('ContactPage', () => {
         return {fixture, element: fixture.nativeElement as HTMLElement, send};
     }
 
-    it('renders the contact form, office details, and FAQ disclosures', async () => {
+    it('renders the contact form, office details, and FAQ disclosures without unverified email', async () => {
         const {element} = await render();
 
         expect(element.querySelector('h1')?.textContent).toContain('Contact us');
         expect(element.querySelector('form#contact-form')).toBeTruthy();
-        expect(element.querySelector('a[href="mailto:quizapp@fpt.edu.vn"]')?.textContent).toContain(
-            'quizapp@fpt.edu.vn',
-        );
+        expect(element.querySelector('a[href^="mailto:"]')).toBeNull();
         expect(element.querySelectorAll('details.faq-item').length).toBe(3);
+    });
+
+    it('exposes a verified contact email when configured', async () => {
+        await TestBed.configureTestingModule({
+            imports: [ContactPage],
+            providers: [
+                provideRouter([]),
+                {provide: CONTACT_CONFIG, useValue: {email: 'contact@quizapp.internal'}},
+            ],
+        })
+            .overrideComponent(ContactPage, {
+                set: {providers: [{provide: ContactApi, useValue: {send: vi.fn()}}, ContactStore]},
+            })
+            .compileComponents();
+
+        const fixture = TestBed.createComponent(ContactPage);
+        fixture.detectChanges();
+        const element = fixture.nativeElement as HTMLElement;
+
+        const emailLink = element.querySelector('a[href="mailto:contact@quizapp.internal"]');
+        expect(emailLink).not.toBeNull();
+        expect(emailLink?.textContent).toContain('contact@quizapp.internal');
     });
 
     it('renders decorative ambient glows hidden from assistive technology', async () => {

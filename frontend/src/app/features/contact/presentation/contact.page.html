@@ -207,13 +207,15 @@
                         <span>{{ details.address }}</span>
                     </div>
                 </li>
-                <li class="contact-item">
-                    <span class="contact-list__icon material-symbols-outlined" aria-hidden="true">mail</span>
-                    <div class="contact-item__body">
-                        <span class="contact-list__label">Email</span>
-                        <a [href]="'mailto:' + details.email">{{ details.email }}</a>
-                    </div>
-                </li>
+                @if (contactEmail; as email) {
+                    <li class="contact-item">
+                        <span class="contact-list__icon material-symbols-outlined" aria-hidden="true">mail</span>
+                        <div class="contact-item__body">
+                            <span class="contact-list__label">Email</span>
+                            <a [href]="'mailto:' + email">{{ email }}</a>
+                        </div>
+                    </li>
+                }
                 <li class="contact-item">
                     <span class="contact-list__icon material-symbols-outlined" aria-hidden="true">schedule</span>
                     <div class="contact-item__body">
