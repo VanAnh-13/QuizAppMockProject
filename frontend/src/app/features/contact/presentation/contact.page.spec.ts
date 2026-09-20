@@ -42,14 +42,19 @@ describe('ContactPage', () => {
         });
     });
 
-    it('announces required-field errors after an empty submit', async () => {
+    it('announces required-field errors and focuses the first invalid control after an empty submit', async () => {
         const {fixture, element, send} = await render();
 
+        const fullName = element.querySelector<HTMLInputElement>('#fullName')!;
+        const focusSpy = vi.spyOn(fullName, 'focus');
+
         element.querySelector<HTMLFormElement>('#contact-form')!.requestSubmit();
+        await fixture.whenStable();
         fixture.detectChanges();
 
         expect(send).not.toHaveBeenCalled();
-        expect(element.querySelector('#fullName')?.getAttribute('aria-invalid')).toBe('true');
+        expect(focusSpy).toHaveBeenCalled();
+        expect(fullName.getAttribute('aria-invalid')).toBe('true');
         expect(element.querySelector('#email')?.getAttribute('aria-invalid')).toBe('true');
         expect(element.querySelector('#message')?.getAttribute('aria-invalid')).toBe('true');
         expect(element.textContent).toContain('Full name is required.');

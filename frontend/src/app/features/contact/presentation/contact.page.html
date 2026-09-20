@@ -166,7 +166,7 @@
             </form>
 
             @if (store.error(); as message) {
-                <p class="field-error" role="alert">{{ message }}</p>
+                <p class="field-error" role="alert" tabindex="-1">{{ message }}</p>
             }
 
             @if (store.receipt(); as receipt) {
