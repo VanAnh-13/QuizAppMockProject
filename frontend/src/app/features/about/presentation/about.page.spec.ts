@@ -38,4 +38,21 @@ describe('AboutPage', () => {
             expect(glow.getAttribute('aria-hidden')).toBe('true');
         });
     });
+
+    it('renders learning pillar icons with aria-hidden="true"', async () => {
+        await TestBed.configureTestingModule({
+            imports: [AboutPage],
+            providers: [provideRouter([])],
+        }).compileComponents();
+
+        const fixture = TestBed.createComponent(AboutPage);
+        fixture.detectChanges();
+        const element = fixture.nativeElement as HTMLElement;
+
+        const pillarIcons = element.querySelectorAll('.pillar-node__icon span');
+        expect(pillarIcons.length).toBe(4);
+        pillarIcons.forEach(icon => {
+            expect(icon.getAttribute('aria-hidden')).toBe('true');
+        });
+    });
 });
