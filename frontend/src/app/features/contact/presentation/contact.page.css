@@ -287,8 +287,6 @@
 .success-notice {
     border: 1px solid rgba(16, 185, 129, 0.35);
     background: rgba(16, 185, 129, 0.08);
-    backdrop-filter: var(--glass-filter);
-    -webkit-backdrop-filter: var(--glass-filter);
     box-shadow: 0 8px 24px rgba(16, 185, 129, 0.12);
     @apply mt-5 flex items-start gap-3.5 rounded-2xl p-4 text-sm text-ink;
 }
