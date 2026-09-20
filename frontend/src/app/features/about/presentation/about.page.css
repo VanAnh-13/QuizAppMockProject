@@ -1,0 +1,469 @@
+:host {
+    @apply flex min-h-dvh flex-col;
+    background: transparent;
+    overflow-x: clip;
+}
+
+.about {
+    @apply relative mx-auto w-full max-w-[1200px] flex-1 px-4 pb-20 pt-8;
+    overflow-x: clip;
+}
+
+/* Ambient glow effects */
+.ambient-glow {
+    position: absolute;
+    pointer-events: none;
+    border-radius: 9999px;
+    filter: blur(40px);
+    transform: translate3d(0, 0, 0);
+    opacity: 0.4;
+    z-index: 0;
+}
+
+.ambient-glow--top-left {
+    top: 2rem;
+    left: 5%;
+    width: min(380px, 80vw);
+    height: min(380px, 80vw);
+    background: radial-gradient(circle, rgba(56, 189, 248, 0.35) 0%, rgba(37, 99, 235, 0.15) 60%, transparent 80%);
+}
+
+.ambient-glow--center-right {
+    top: 38%;
+    right: 3%;
+    width: min(420px, 80vw);
+    height: min(420px, 80vw);
+    background: radial-gradient(circle, rgba(37, 99, 235, 0.25) 0%, rgba(56, 189, 248, 0.15) 60%, transparent 80%);
+}
+
+/* Common Section Badges */
+.hero-badge,
+.section-badge {
+    border: 1px solid var(--glass-border);
+    background: var(--glass-surface);
+    backdrop-filter: var(--glass-filter);
+    -webkit-backdrop-filter: var(--glass-filter);
+    color: var(--brand);
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.08);
+    @apply inline-flex items-center gap-1.5 rounded-full px-3.5 py-1 text-xs font-semibold uppercase tracking-wider;
+}
+
+.hero-badge__icon,
+.section-badge .material-symbols-outlined {
+    font-size: 1rem;
+    color: var(--brand);
+}
+
+/* Hero Section */
+.about-hero {
+    @apply relative z-10 mx-auto mb-16 max-w-4xl text-center;
+}
+
+.hero-title {
+    @apply mt-4 text-4xl font-extrabold tracking-tight text-ink md:text-5xl lg:text-6xl;
+    line-height: 1.15;
+}
+
+.hero-title__highlight {
+    background: var(--brand-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+}
+
+.hero-subtitle {
+    @apply mx-auto mt-5 max-w-2xl text-base leading-relaxed text-muted md:text-lg;
+}
+
+/* Metric highlights */
+.hero-metrics {
+    @apply mt-10 grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4;
+}
+
+.metric-card {
+    border: 1px solid var(--glass-border);
+    background: var(--glass-surface);
+    backdrop-filter: var(--glass-filter);
+    -webkit-backdrop-filter: var(--glass-filter);
+    box-shadow: var(--glass-shadow);
+    border-radius: calc(var(--glass-radius) - 6px);
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    @apply flex items-center gap-3 p-3.5 text-left md:flex-col md:items-start md:p-4;
+}
+
+.metric-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(37, 99, 235, 0.35);
+    box-shadow: 0 14px 28px rgba(37, 99, 235, 0.12);
+}
+
+.metric-card__icon-wrap {
+    background: var(--brand-soft);
+    color: var(--brand);
+    border: 1px solid rgba(37, 99, 235, 0.15);
+    @apply flex size-10 shrink-0 items-center justify-center rounded-xl md:mb-1;
+}
+
+.metric-card__icon-wrap .material-symbols-outlined {
+    font-size: 1.3rem;
+}
+
+.metric-card__info {
+    @apply flex flex-col;
+}
+
+.metric-card__value {
+    @apply text-lg font-bold tracking-tight text-ink sm:text-xl;
+}
+
+.metric-card__label {
+    @apply text-xs font-medium text-muted;
+}
+
+.about-hero__rule {
+    background: var(--brand-gradient);
+    @apply mx-auto mt-10 h-1 w-20 rounded-full opacity-80;
+}
+
+/* Glass Card Surfaces */
+.mission-card,
+.feature-card,
+.value-card,
+.learning-pillars-card,
+.about-cta {
+    border: 1px solid var(--glass-border);
+    border-radius: var(--glass-radius);
+    box-shadow: var(--glass-shadow);
+    position: relative;
+    z-index: 10;
+}
+
+/* Mission Section */
+.mission-card {
+    background: var(--glass-surface);
+    backdrop-filter: var(--glass-filter);
+    -webkit-backdrop-filter: var(--glass-filter);
+    @apply mb-16 grid items-stretch gap-8 p-6 md:p-10 lg:grid-cols-12;
+}
+
+.mission-card__copy {
+    @apply flex flex-col justify-center lg:col-span-7;
+}
+
+.mission-card__copy h2 {
+    @apply mt-3 text-3xl font-bold tracking-tight text-ink;
+}
+
+.mission-card__lead {
+    @apply mt-3 text-base font-medium leading-relaxed text-ink;
+}
+
+.mission-card__copy > p {
+    @apply mt-2 text-sm leading-6 text-muted;
+}
+
+/* Mission Quote */
+.mission-quote {
+    border-left: 4px solid var(--brand);
+    background: var(--glass-inset);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    @apply mt-6 flex gap-3.5 rounded-2xl p-4;
+}
+
+.mission-quote__mark {
+    background: var(--brand-soft);
+    color: var(--brand);
+    @apply flex size-8 shrink-0 items-center justify-center rounded-lg;
+}
+
+.mission-quote__mark .material-symbols-outlined {
+    font-size: 1.2rem;
+}
+
+.mission-quote__content p {
+    @apply m-0 text-sm font-semibold italic text-ink;
+}
+
+.mission-quote__content footer {
+    @apply mt-1 text-xs text-muted;
+}
+
+/* Learning Pillars Visual Card */
+.mission-card__visual {
+    @apply flex lg:col-span-5;
+}
+
+.learning-pillars-card {
+    background: var(--glass-inset);
+    border: 1px solid var(--glass-border);
+    @apply flex w-full flex-col justify-between overflow-hidden p-5;
+}
+
+.learning-pillars-card__header {
+    border-bottom: 1px solid var(--glass-border);
+    @apply mb-4 flex flex-wrap items-center justify-between gap-2 pb-3.5;
+}
+
+.learning-pillars-card__title {
+    color: var(--ink);
+    @apply flex items-center gap-2 text-sm font-bold;
+}
+
+.learning-pillars-card__title .material-symbols-outlined {
+    color: var(--brand);
+    font-size: 1.25rem;
+}
+
+.learning-pillars-card__badge {
+    background: var(--brand-soft);
+    color: var(--brand);
+    border: 1px solid rgba(37, 99, 235, 0.15);
+    @apply rounded-full px-2.5 py-0.5 text-[11px] font-semibold;
+}
+
+.pillar-list {
+    @apply flex flex-col gap-2.5;
+}
+
+.pillar-node {
+    border: 1px solid var(--glass-border);
+    background: var(--glass-raised);
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.03);
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    @apply flex items-center gap-3 rounded-xl p-3;
+}
+
+.pillar-node:hover {
+    transform: translateX(4px);
+    border-color: rgba(37, 99, 235, 0.3);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.08);
+}
+
+.pillar-node__icon {
+    background: var(--brand-soft);
+    color: var(--brand);
+    border: 1px solid rgba(37, 99, 235, 0.15);
+    @apply flex size-9 shrink-0 items-center justify-center rounded-lg;
+}
+
+.pillar-node__icon .material-symbols-outlined {
+    font-size: 1.15rem;
+}
+
+.pillar-node__info strong {
+    @apply block text-xs font-bold text-ink;
+}
+
+.pillar-node__info p {
+    @apply m-0 text-[11px] leading-4 text-muted;
+}
+
+/* Features Section */
+.features {
+    @apply mb-20;
+}
+
+.features header,
+.values-section header {
+    @apply mx-auto mb-10 max-w-2xl text-center;
+}
+
+.features header h2,
+.values-section header h2 {
+    @apply mt-3 text-3xl font-bold tracking-tight text-ink;
+}
+
+.features header p,
+.values-section header p {
+    @apply mt-2 text-base text-muted;
+}
+
+.features__grid {
+    @apply grid gap-6 md:grid-cols-3;
+}
+
+.feature-card {
+    background: var(--glass-surface);
+    backdrop-filter: var(--glass-filter);
+    -webkit-backdrop-filter: var(--glass-filter);
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    @apply flex flex-col justify-between overflow-hidden p-6 sm:p-7;
+}
+
+.feature-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(37, 99, 235, 0.4);
+    box-shadow: 0 16px 36px rgba(30, 64, 175, 0.12);
+}
+
+.feature-card__index {
+    @apply absolute right-5 top-5 font-mono text-2xl font-black text-ink/10 select-none;
+}
+
+.feature-card__icon-box {
+    border: 1px solid rgba(37, 99, 235, 0.2);
+    background: var(--brand-soft);
+    color: var(--brand);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.1);
+    @apply mb-5 flex size-12 items-center justify-center rounded-2xl;
+}
+
+.feature-card__icon {
+    font-size: 1.6rem;
+}
+
+.feature-card h3 {
+    @apply m-0 text-xl font-bold tracking-tight text-ink;
+}
+
+.feature-card p {
+    @apply mt-3 text-sm leading-6 text-muted;
+}
+
+.feature-card__tags {
+    border-top: 1px solid var(--glass-border);
+    @apply mt-6 flex flex-wrap gap-1.5 pt-4;
+}
+
+.feature-card__tags span {
+    background: var(--glass-inset);
+    border: 1px solid var(--glass-border);
+    color: var(--muted);
+    @apply rounded-md px-2 py-0.5 text-[11px] font-semibold;
+}
+
+/* Guiding Values Section */
+.values-section {
+    @apply mb-20;
+}
+
+.values-grid {
+    @apply grid gap-6 sm:grid-cols-2 lg:grid-cols-4;
+}
+
+.value-card {
+    background: var(--glass-surface);
+    backdrop-filter: var(--glass-filter);
+    -webkit-backdrop-filter: var(--glass-filter);
+    transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+    @apply flex flex-col p-6;
+}
+
+.value-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(37, 99, 235, 0.35);
+    box-shadow: 0 14px 28px rgba(30, 64, 175, 0.1);
+}
+
+.value-card__icon {
+    background: var(--brand-soft);
+    color: var(--brand);
+    border: 1px solid rgba(37, 99, 235, 0.15);
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.08);
+    @apply mb-4 flex size-11 items-center justify-center rounded-xl;
+}
+
+.value-card__icon .material-symbols-outlined {
+    font-size: 1.35rem;
+}
+
+.value-card h3 {
+    @apply m-0 text-base font-bold tracking-tight text-ink;
+}
+
+.value-card p {
+    @apply mt-2 text-xs leading-5 text-muted;
+}
+
+/* Call To Action Card */
+.about-cta {
+    background: var(--glass-surface);
+    backdrop-filter: var(--glass-filter);
+    -webkit-backdrop-filter: var(--glass-filter);
+    border: 1px solid var(--glass-border);
+    overflow: hidden;
+    @apply relative mx-auto max-w-4xl p-8 text-center sm:p-12;
+}
+
+.about-cta__glow {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) translateZ(0);
+    width: 320px;
+    height: 180px;
+    background: radial-gradient(circle, rgba(37, 99, 235, 0.2) 0%, transparent 70%);
+    filter: blur(25px);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.about-cta__content {
+    @apply relative z-10 mx-auto max-w-2xl;
+}
+
+.about-cta__content h2 {
+    @apply text-2xl font-extrabold tracking-tight text-ink sm:text-3xl;
+}
+
+.about-cta__content p {
+    @apply mt-3 text-sm leading-6 text-muted sm:text-base;
+}
+
+.about-cta__actions {
+    @apply mt-6 flex flex-wrap items-center justify-center gap-4;
+}
+
+/* Button styles matching app design system */
+.primary-button {
+    background: var(--brand-gradient);
+    color: var(--on-brand);
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+    text-decoration: none;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold;
+}
+
+.primary-button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 20px rgba(37, 99, 235, 0.45);
+    opacity: 0.95;
+}
+
+.primary-button .material-symbols-outlined {
+    font-size: 1.15rem;
+}
+
+.secondary-button {
+    border: 1px solid var(--glass-border);
+    background: var(--glass-raised);
+    color: var(--ink);
+    box-shadow: var(--glass-shadow);
+    transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+    text-decoration: none;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-5 py-2.5 text-sm font-bold;
+}
+
+.secondary-button:hover {
+    transform: translateY(-1px);
+    background: var(--glass-hover);
+    border-color: rgba(37, 99, 235, 0.35);
+    color: var(--brand);
+}
+
+.secondary-button .material-symbols-outlined {
+    font-size: 1.15rem;
+}
+
+/* Responsive adjustments */
+@media (min-width: 48rem) {
+    .about {
+        @apply px-6;
+    }
+}
+
+@media (min-width: 64rem) {
+    .about {
+        @apply px-8;
+    }
+}

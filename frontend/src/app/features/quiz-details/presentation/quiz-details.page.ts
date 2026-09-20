@@ -9,7 +9,7 @@ import {
     viewChild,
 } from '@angular/core';
 import {DatePipe, NgOptimizedImage, NgTemplateOutlet} from '@angular/common';
-import {ActivatedRoute, Router, RouterLink} from '@angular/router';
+import {ActivatedRoute, Router, RouterLink, RouterLinkActive} from '@angular/router';
 import {ATTEMPT_API, AttemptResult} from '../../quiz-attempt/application/attempt-api';
 import {apiErrorMessage} from '../../../core/api/api-error';
 import {AuthSession} from '../../../core/auth/auth-session';
@@ -25,14 +25,6 @@ interface InfoMessage {
 }
 
 const INFO_MESSAGES = {
-    about: {
-        title: 'About QuizApp',
-        message: 'More about QuizApp will be available in a future update.',
-    },
-    contact: {
-        title: 'Contact',
-        message: 'Support contact details are not available in this preview.',
-    },
     notifications: {
         title: 'Notifications',
         message: 'You have no new notifications.',
@@ -45,7 +37,7 @@ const INFO_MESSAGES = {
 
 @Component({
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [DatePipe, RouterLink, ModalDirective, NgTemplateOutlet, NgOptimizedImage],
+    imports: [DatePipe, RouterLink, RouterLinkActive, ModalDirective, NgTemplateOutlet, NgOptimizedImage],
     providers: [provideQuizDetails()],
     selector: 'app-quiz-details-page',
     styleUrls: [

@@ -12,6 +12,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Quizapp.Api.Controllers;
+using Quizapp.Application.Abstractions.Messaging;
 using Quizapp.Application.Abstractions.Persistence;
 using Quizapp.Domain.Entities;
 using Quizapp.Infrastructure.Authentication;
@@ -42,7 +43,9 @@ internal sealed class QuizappApiFactory : WebApplicationFactory<AuthController>
     public MemoryUsers Users { get; } = new();
     public MemoryQuizzes Quizzes { get; } = new();
     public MemoryQuizAttempts Attempts { get; } = new();
+    public MemoryContactMessages ContactMessages { get; } = new();
     public TimeProvider Clock { get; set; } = TimeProvider.System;
+    public IEmailSender? EmailSender { get; set; }
     public string EnvironmentName { get; set; } = "Testing";
     public int? HttpsPort { get; set; }
 
@@ -59,6 +62,7 @@ internal sealed class QuizappApiFactory : WebApplicationFactory<AuthController>
         builder.UseSetting($"{JwtOptions.SectionName}:Issuer", _jwt.Issuer);
         builder.UseSetting($"{JwtOptions.SectionName}:Audience", _jwt.Audience);
         builder.UseSetting($"{JwtOptions.SectionName}:SigningKey", _jwt.SigningKey);
+        builder.UseSetting($"{ContactOptions.SectionName}:InboxAddress", "contact@levananh.dev");
         builder.ConfigureTestServices(services =>
         {
             services.AddSingleton(Clock);
@@ -66,10 +70,14 @@ internal sealed class QuizappApiFactory : WebApplicationFactory<AuthController>
             services.AddScoped<IUserRepository>(_ => Users);
             services.RemoveAll<IUnitOfWork>();
             services.AddScoped<IUnitOfWork, MemoryUnitOfWork>();
+            services.RemoveAll<IContactMessageRepository>();
+            services.AddSingleton<IContactMessageRepository>(ContactMessages);
             services.RemoveAll<IQuizRepository>();
             services.AddScoped<IQuizRepository>(_ => Quizzes);
             services.RemoveAll<IQuizAttemptRepository>();
             services.AddScoped<IQuizAttemptRepository>(_ => Attempts);
+            services.RemoveAll<IEmailSender>();
+            services.AddSingleton(EmailSender ?? new NoOpEmailSender());
         });
     }
 

@@ -4,7 +4,7 @@ public class QuizAppException : Exception
 {
     public string? ErrorCode { get; }
 
-    protected QuizAppException(string message, string? errorCode = null)
+    public QuizAppException(string message, string? errorCode = null)
         : base(message)
     {
         ErrorCode = errorCode;

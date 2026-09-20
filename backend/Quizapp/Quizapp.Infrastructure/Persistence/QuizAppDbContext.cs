@@ -25,6 +25,8 @@ public class QuizAppDbContext(DbContextOptions<QuizAppDbContext> options)
 
     public DbSet<UserAnswer> UserAnswers => Set<UserAnswer>();
 
+    public DbSet<ContactMessage> ContactMessages => Set<ContactMessage>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
@@ -36,5 +38,6 @@ public class QuizAppDbContext(DbContextOptions<QuizAppDbContext> options)
         modelBuilder.ApplyConfiguration(new AnswerConfiguration());
         modelBuilder.ApplyConfiguration(new QuizAttemptConfiguration());
         modelBuilder.ApplyConfiguration(new UserAnswerConfiguration());
+        modelBuilder.ApplyConfiguration(new ContactMessageConfiguration());
     }
 }

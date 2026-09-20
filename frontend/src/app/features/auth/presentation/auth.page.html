@@ -149,9 +149,9 @@
             <footer class="login-footer">
                 <span>QuizApp © {{ year }}</span>
                 <div>
-                    <button type="button" (click)="information.open('contact')">
+                    <a routerLink="/contact">
                         Help &amp; support
-                    </button>
+                    </a>
                     <button
                             type="button"
                             (click)="information.open('terms')">
@@ -173,8 +173,8 @@
         <span>© {{ year }} QuizApp. Learn every day. Grow with every step.</span>
         <nav aria-label="Footer navigation">
             <a routerLink="/">Explore quizzes</a>
-            <button type="button" (click)="information.open('about')">About</button>
-            <button type="button" (click)="information.open('contact')">Contact</button>
+            <a routerLink="/about">About</a>
+            <a routerLink="/contact">Contact</a>
         </nav>
     </footer>
 }

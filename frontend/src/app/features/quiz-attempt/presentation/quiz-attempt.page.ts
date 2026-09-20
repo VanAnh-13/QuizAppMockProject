@@ -49,6 +49,18 @@ export class QuizAttemptPage implements OnDestroy {
                 this.closeLeaveConfirmation();
             }
         });
+
+        let previousQuestionNumber: number | null = null;
+        effect(() => {
+            const currentNumber = this.store.currentQuestionNumber();
+            if (previousQuestionNumber !== null && previousQuestionNumber !== currentNumber) {
+                if (typeof document !== 'undefined') {
+                    const card = document.getElementById('question-content');
+                    card?.scrollIntoView?.({behavior: 'smooth', block: 'start'});
+                }
+            }
+            previousQuestionNumber = currentNumber;
+        });
     }
 
     protected async load(): Promise<void> {

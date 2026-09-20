@@ -1,9 +1,11 @@
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Quizapp.Application.Abstractions.Messaging;
 using Quizapp.Application.Factories.QuizManager.Questions;
 using Quizapp.Application.Services.Authentication;
 using Quizapp.Application.Services.Common;
+using Quizapp.Application.Services.Contact;
 using Quizapp.Application.Services.QuestionManager;
 using Quizapp.Application.Services.QuizManager;
 using Quizapp.Application.Services.QuizTaking;
@@ -19,6 +21,7 @@ public static class DependencyInjection
     public static IServiceCollection AddApplication(this IServiceCollection services)
     {
         services.AddValidatorsFromAssemblyContaining<CreateQuizDtoValidator>();
+        services.AddOptions<ContactOptions>();
         services.TryAddSingleton(TimeProvider.System);
         services.TryAddScoped<ServiceAuthorization>();
         services.TryAddScoped<UserProvisioning>();
@@ -29,6 +32,7 @@ public static class DependencyInjection
         services.TryAddScoped<IQuizService, QuizService>();
         services.TryAddScoped<IQuizAttemptService, QuizAttemptService>();
         services.TryAddScoped<IPublicQuizCatalogService, PublicQuizCatalogService>();
+        services.TryAddScoped<IContactService, ContactService>();
         services.TryAddEnumerable(ServiceDescriptor.Scoped<IQuestionCreationStrategy, SingleChoiceQuestionStrategy>());
 
         services.TryAddEnumerable(ServiceDescriptor

@@ -4,12 +4,8 @@
 
         <nav class="header__navigation" aria-label="Main navigation">
             <a class="header__navigation-link" routerLink="/" fragment="quiz-list">Explore quizzes</a>
-            <button class="header__navigation-link" type="button"
-                    (click)="information.open('about')">About
-            </button>
-            <button class="header__navigation-link" type="button"
-                    (click)="information.open('contact')">Contact
-            </button>
+            <a class="header__navigation-link" routerLink="/about" routerLinkActive="header__navigation-link--active" ariaCurrentWhenActive="page">About</a>
+            <a class="header__navigation-link" routerLink="/contact" routerLinkActive="header__navigation-link--active" ariaCurrentWhenActive="page">Contact</a>
         </nav>
 
         <div class="header__trailing">
@@ -65,8 +61,8 @@
                 <div class="header__mobile-panel">
                     <nav aria-label="Mobile navigation">
                         <a routerLink="/" fragment="quiz-list">Explore quizzes</a>
-                        <button type="button" (click)="information.open('about')">About</button>
-                        <button type="button" (click)="information.open('contact')">Contact</button>
+                        <a routerLink="/about">About</a>
+                        <a routerLink="/contact">Contact</a>
                     </nav>
                     <div class="header__mobile-actions">
                         @if (session.user(); as user) {
@@ -100,5 +96,3 @@
 @if (isMenuOpen()) {
     <div class="header__page-backdrop" (click)="closeMenu()" aria-hidden="true"></div>
 }
-
-<app-site-info-dialog #information dialogId="header-information"/>

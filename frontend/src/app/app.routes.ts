@@ -25,6 +25,18 @@ export const routes: Routes = [
             ),
     },
     {
+        path: 'about',
+        title: 'About — QuizApp',
+        loadComponent: () =>
+            import('./features/about/presentation/about.page').then((m) => m.AboutPage),
+    },
+    {
+        path: 'contact',
+        title: 'Contact — QuizApp',
+        loadComponent: () =>
+            import('./features/contact/presentation/contact.page').then((m) => m.ContactPage),
+    },
+    {
         path: 'history',
         title: 'Lịch sử làm bài — QuizApp',
         canActivate: [requireAuthGuard],

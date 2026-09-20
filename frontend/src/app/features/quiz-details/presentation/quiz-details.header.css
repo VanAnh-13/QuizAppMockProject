@@ -55,7 +55,12 @@
     @apply border-b-2 border-transparent px-0 py-2 text-muted transition-colors hover:text-ink;
 }
 
-.details-header__navigation a {
+.details-header__navigation a:hover,
+.details-header__navigation button:hover {
+    @apply text-ink;
+}
+
+.details-header__navigation a.details-header__navigation-link--active {
     border-color: var(--brand);
     @apply font-semibold text-ink;
 }

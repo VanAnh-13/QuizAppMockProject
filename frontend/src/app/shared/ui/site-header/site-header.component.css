@@ -14,6 +14,11 @@
     backdrop-filter: var(--glass-filter);
     -webkit-backdrop-filter: var(--glass-filter);
     box-shadow: var(--glass-shadow);
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    will-change: transform;
 }
 
 .header__inner {
@@ -52,7 +57,7 @@
 }
 
 .header__navigation-link--active::after {
-    background: #a855f7;
+    background: var(--brand-gradient);
     box-shadow: var(--glass-shadow);
 }
 

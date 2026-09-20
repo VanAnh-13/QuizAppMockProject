@@ -19,7 +19,7 @@ public class SampleQuizDataSeederTests(SqlServerFixture database) : IClassFixtur
         var catalog = await new EfQuizRepository(verificationContext)
             .GetActiveListAsync(1, 100, null, CancellationToken.None);
 
-        Assert.Equal(10, catalog.TotalCount);
+        Assert.Equal(30, catalog.TotalCount);
         Assert.All(catalog.Items, quiz => Assert.NotEmpty(quiz.QuizQuestions));
         Assert.Contains(catalog.Items, quiz => quiz.Title.Contains("C#", StringComparison.Ordinal));
         Assert.Contains(catalog.Items, quiz => quiz.Title.Contains("SQL", StringComparison.Ordinal));

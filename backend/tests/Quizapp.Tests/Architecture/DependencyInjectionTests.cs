@@ -4,6 +4,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Quizapp.Application;
 using Quizapp.Application.Abstractions.Authentication;
+using Quizapp.Application.Abstractions.Messaging;
 using Quizapp.Application.Abstractions.Persistence;
 using Quizapp.Application.DTOs.QuizManager.Quizzes;
 using Quizapp.Application.Factories.QuizManager.Questions;
@@ -34,8 +35,10 @@ public class DependencyInjectionTests
         services.TryAddSingleton<IQuestionRepository, MemoryQuestions>();
         services.TryAddSingleton<IQuizAttemptRepository, MemoryQuizAttempts>();
         services.TryAddSingleton<IUnitOfWork, MemoryUnitOfWork>();
+        services.TryAddSingleton<IContactMessageRepository, MemoryContactMessages>();
         services.TryAddSingleton<IPasswordService, NullPasswordService>();
         services.TryAddSingleton<ITokenService, NullTokenService>();
+        services.TryAddSingleton<IEmailSender, NullEmailSender>();
     }
 
     [Fact]
@@ -221,4 +224,15 @@ file sealed class NullTokenService : ITokenService
 {
     public AccessToken Create(Quizapp.Domain.Entities.User user) =>
         new(string.Empty, DateTime.MinValue);
+}
+
+file sealed class NullEmailSender : IEmailSender
+{
+    public Task SendAsync(
+        string to,
+        string subject,
+        string body,
+        string? replyTo = null,
+        CancellationToken cancellationToken = default) =>
+        Task.CompletedTask;
 }

@@ -186,11 +186,17 @@
     </main>
 } @else if (!store.isLoading() && store.currentQuestion(); as question) {
     @if (store.saveStatus(); as status) {
-        <p class="attempt-status" role="status">{{ status }}</p>
+        <p class="attempt-status" role="status">
+            <span class="material-symbols-outlined attempt-status__icon" [class.attempt-status__icon--spin]="store.isSaving()" aria-hidden="true">
+                {{ store.isSaving() ? 'sync' : 'edit_note' }}
+            </span>
+            <span>{{ status }}</span>
+        </p>
     }
     @if (store.isPaused()) {
         <p class="attempt-status attempt-status--paused" role="status">
-            Your quiz is paused. Select “Resume quiz” to continue.
+            <span class="material-symbols-outlined attempt-status__icon" aria-hidden="true">pause_circle</span>
+            <span>Your quiz is paused. Select “Resume quiz” to continue.</span>
         </p>
     }
     <main class="attempt-workspace">
