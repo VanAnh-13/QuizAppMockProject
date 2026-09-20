@@ -5,6 +5,7 @@ using System.Text;
 using System.Security.Claims;
 using Quizapp.Api.ExceptionHandlers;
 using Quizapp.Application;
+using Quizapp.Application.Abstractions.Messaging;
 using Quizapp.Application.Abstractions.Persistence;
 using Quizapp.Infrastructure;
 using Quizapp.Infrastructure.Authentication;
@@ -85,7 +86,10 @@ builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 builder.Services.AddOpenApi();
 builder.Services.AddApplication();
-builder.Services.AddInfrastructure(builder.Configuration.GetConnectionString("DefaultConnection"));
+builder.Services.Configure<ContactOptions>(builder.Configuration.GetSection(ContactOptions.SectionName));
+builder.Services.AddInfrastructure(
+    builder.Configuration.GetConnectionString("DefaultConnection"),
+    builder.Configuration);
 
 var app = builder.Build();
 

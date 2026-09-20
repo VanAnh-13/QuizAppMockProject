@@ -12,8 +12,9 @@
     position: absolute;
     pointer-events: none;
     border-radius: 9999px;
-    filter: blur(80px);
-    opacity: 0.45;
+    filter: blur(40px);
+    transform: translate3d(0, 0, 0);
+    opacity: 0.4;
     z-index: 0;
 }
 
@@ -386,11 +387,11 @@
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%) translateZ(0);
     width: 320px;
     height: 180px;
     background: radial-gradient(circle, rgba(37, 99, 235, 0.2) 0%, transparent 70%);
-    filter: blur(50px);
+    filter: blur(25px);
     pointer-events: none;
     z-index: 0;
 }

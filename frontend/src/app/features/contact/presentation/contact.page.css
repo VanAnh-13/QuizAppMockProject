@@ -12,8 +12,9 @@
     position: absolute;
     pointer-events: none;
     border-radius: 9999px;
-    filter: blur(80px);
-    opacity: 0.45;
+    filter: blur(40px);
+    transform: translate3d(0, 0, 0);
+    opacity: 0.4;
     z-index: 0;
 }
 

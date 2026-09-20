@@ -1,17 +1,25 @@
 import {TestBed} from '@angular/core/testing';
 import {provideRouter} from '@angular/router';
+import {ContactApi} from '../application/contact-api';
 import {ContactPage} from './contact.page';
+import {ContactStore} from './contact.store';
 
 describe('ContactPage', () => {
-    async function render() {
+    async function render(send = vi.fn().mockResolvedValue({
+        id: 'feedback-123', receivedAt: '2026-09-20T00:00:00Z', confirmationEmailSent: true,
+    })) {
         await TestBed.configureTestingModule({
             imports: [ContactPage],
             providers: [provideRouter([])],
-        }).compileComponents();
+        })
+            .overrideComponent(ContactPage, {
+                set: {providers: [{provide: ContactApi, useValue: {send}}, ContactStore]},
+            })
+            .compileComponents();
 
         const fixture = TestBed.createComponent(ContactPage);
         fixture.detectChanges();
-        return {fixture, element: fixture.nativeElement as HTMLElement};
+        return {fixture, element: fixture.nativeElement as HTMLElement, send};
     }
 
     it('renders the contact form, office details, and FAQ disclosures', async () => {
@@ -26,11 +34,12 @@ describe('ContactPage', () => {
     });
 
     it('announces required-field errors after an empty submit', async () => {
-        const {fixture, element} = await render();
+        const {fixture, element, send} = await render();
 
         element.querySelector<HTMLFormElement>('#contact-form')!.requestSubmit();
         fixture.detectChanges();
 
+        expect(send).not.toHaveBeenCalled();
         expect(element.querySelector('#fullName')?.getAttribute('aria-invalid')).toBe('true');
         expect(element.querySelector('#email')?.getAttribute('aria-invalid')).toBe('true');
         expect(element.querySelector('#message')?.getAttribute('aria-invalid')).toBe('true');
@@ -39,21 +48,33 @@ describe('ContactPage', () => {
     });
 
     it('shows a success notice after a valid submission', async () => {
-        const {fixture, element} = await render();
-        const page = fixture.componentInstance;
+        const {fixture, element, send} = await render();
 
-        page.form.setValue({
+        setInput(element, '#fullName', 'Nguyen Van An');
+        setInput(element, '#email', 'an@example.com');
+        setInput(element, '#subject', 'Quiz feedback');
+        setInput(element, '#message', 'The Angular quiz helped me prepare for the exam.');
+        element.querySelector<HTMLFormElement>('#contact-form')!.requestSubmit();
+        await fixture.whenStable();
+        fixture.detectChanges();
+
+        expect(send).toHaveBeenCalledExactlyOnceWith({
             fullName: 'Nguyen Van An',
             email: 'an@example.com',
             subject: 'Quiz feedback',
             message: 'The Angular quiz helped me prepare for the exam.',
         });
-        element.querySelector<HTMLFormElement>('#contact-form')!.requestSubmit();
-        fixture.detectChanges();
-
         expect(element.querySelector('[role="status"]')?.textContent).toContain(
             'Thank you for your feedback!',
         );
-        expect(page.form.value.fullName).toBe('');
+        expect(element.textContent).toContain('A confirmation email has been sent');
+        expect(element.textContent).toContain('feedback-123');
+        expect(element.querySelector<HTMLInputElement>('#fullName')?.value).toBe('');
     });
 });
+
+function setInput(element: HTMLElement, selector: string, value: string): void {
+    const input = element.querySelector<HTMLInputElement | HTMLTextAreaElement>(selector)!;
+    input.value = value;
+    input.dispatchEvent(new Event('input'));
+}

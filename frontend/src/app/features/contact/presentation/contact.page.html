@@ -26,7 +26,7 @@
                 </div>
                 <div class="quick-card__text">
                     <span class="quick-card__title">Quick Response</span>
-                    <span class="quick-card__desc">Within 24 business hours</span>
+                    <span class="quick-card__desc">{{ details.responseHint }}</span>
                 </div>
             </div>
             <div class="quick-card">
@@ -64,7 +64,7 @@
                 <p>Fill in the form and we will reply to the inbox you provide.</p>
             </header>
 
-            <form id="contact-form" class="fields" [formGroup]="form" (ngSubmit)="submit()"
+            <form id="contact-form" class="fields" [formGroup]="store.form" (ngSubmit)="submit()"
                     novalidate>
                 <div class="field">
                     <label for="fullName">
@@ -79,11 +79,11 @@
                                 formControlName="fullName"
                                 autocomplete="name"
                                 placeholder="For example: Nguyen Van An"
-                                [attr.aria-invalid]="fieldError('fullName') ? 'true' : null"
-                                [attr.aria-describedby]="fieldError('fullName') ? 'fullName-error' : null"
+                                [attr.aria-invalid]="store.fieldError('fullName') ? 'true' : null"
+                                [attr.aria-describedby]="store.fieldError('fullName') ? 'fullName-error' : null"
                         />
                     </div>
-                    @if (fieldError('fullName'); as message) {
+                    @if (store.fieldError('fullName'); as message) {
                         <p class="field-error" id="fullName-error">
                             <span class="material-symbols-outlined" aria-hidden="true">error</span>
                             {{ message }}
@@ -104,11 +104,11 @@
                                 formControlName="email"
                                 autocomplete="email"
                                 placeholder="you@example.com"
-                                [attr.aria-invalid]="fieldError('email') ? 'true' : null"
-                                [attr.aria-describedby]="fieldError('email') ? 'email-error' : null"
+                                [attr.aria-invalid]="store.fieldError('email') ? 'true' : null"
+                                [attr.aria-describedby]="store.fieldError('email') ? 'email-error' : null"
                         />
                     </div>
-                    @if (fieldError('email'); as message) {
+                    @if (store.fieldError('email'); as message) {
                         <p class="field-error" id="email-error">
                             <span class="material-symbols-outlined" aria-hidden="true">error</span>
                             {{ message }}
@@ -141,11 +141,11 @@
                                 formControlName="message"
                                 rows="5"
                                 placeholder="Write your feedback or questions in detail…"
-                                [attr.aria-invalid]="fieldError('message') ? 'true' : null"
-                                [attr.aria-describedby]="fieldError('message') ? 'message-error' : null"
+                                [attr.aria-invalid]="store.fieldError('message') ? 'true' : null"
+                                [attr.aria-describedby]="store.fieldError('message') ? 'message-error' : null"
                         ></textarea>
                     </div>
-                    @if (fieldError('message'); as message) {
+                    @if (store.fieldError('message'); as message) {
                         <p class="field-error" id="message-error">
                             <span class="material-symbols-outlined" aria-hidden="true">error</span>
                             {{ message }}
@@ -154,9 +154,9 @@
                 </div>
 
                 <div class="form-actions">
-                    <button class="primary-button" type="submit">
+                    <button class="primary-button" type="submit" [disabled]="store.busy()">
                         <span class="material-symbols-outlined" aria-hidden="true">send</span>
-                        Send feedback
+                        {{ store.busy() ? 'Sending…' : 'Send feedback' }}
                     </button>
                     <p class="form-hint">
                         <span class="material-symbols-outlined" aria-hidden="true">schedule</span>
@@ -165,7 +165,11 @@
                 </div>
             </form>
 
-            @if (submitted()) {
+            @if (store.error(); as message) {
+                <p class="field-error" role="alert">{{ message }}</p>
+            }
+
+            @if (store.receipt(); as receipt) {
                 <div class="success-notice" role="status">
                     <div class="success-notice__icon-wrap">
                         <span class="material-symbols-outlined"
@@ -173,8 +177,13 @@
                     </div>
                     <div class="success-notice__body">
                         <p class="success-notice__title">Thank you for your feedback!</p>
-                        <p>Your message was recorded in this preview. Please check your inbox
-                            soon.</p>
+                        <p>Your message has been saved. Reference: {{ receipt.id }}</p>
+                        @if (receipt.confirmationEmailSent) {
+                            <p>A confirmation email has been sent to the address you provided.</p>
+                        } @else {
+                            <p>We could not send a confirmation email. Your message is saved;
+                                you do not need to submit it again.</p>
+                        }
                     </div>
                 </div>
             }
@@ -195,21 +204,21 @@
                     <span class="contact-list__icon material-symbols-outlined" aria-hidden="true">location_on</span>
                     <div class="contact-item__body">
                         <span class="contact-list__label">Office address</span>
-                        <span>FPT Building, Duy Tan Street, Cau Giay, Hanoi</span>
+                        <span>{{ details.address }}</span>
                     </div>
                 </li>
                 <li class="contact-item">
                     <span class="contact-list__icon material-symbols-outlined" aria-hidden="true">mail</span>
                     <div class="contact-item__body">
                         <span class="contact-list__label">Email</span>
-                        <a href="mailto:quizapp@fpt.edu.vn">quizapp&#64;fpt.edu.vn</a>
+                        <a [href]="'mailto:' + details.email">{{ details.email }}</a>
                     </div>
                 </li>
                 <li class="contact-item">
                     <span class="contact-list__icon material-symbols-outlined" aria-hidden="true">schedule</span>
                     <div class="contact-item__body">
                         <span class="contact-list__label">Working hours</span>
-                        <span>Monday – Friday: 08:00 – 17:00</span>
+                        <span>{{ details.workingHours }}</span>
                     </div>
                 </li>
             </ul>

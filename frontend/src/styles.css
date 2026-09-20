@@ -29,18 +29,34 @@
     }
 
     html {
-        @apply scroll-smooth;
+        /* Route restoration must not animate through the previous page's scroll position. */
+        scroll-behavior: auto;
+        scrollbar-gutter: stable;
         background: var(--canvas);
     }
 
     body {
         @apply m-0 min-h-screen font-sans antialiased;
+        background: transparent;
+        color: var(--ink);
+        isolation: isolate;
+    }
+
+    body::before {
+        content: '';
+        position: fixed;
+        inset: 0;
+        z-index: -1;
         background: radial-gradient(ellipse at 10% 5%, #bfdbfe 0, transparent 50%),
         radial-gradient(ellipse at 95% 25%, #bae6fd 0, transparent 45%),
         radial-gradient(ellipse at 50% 85%, #dbeafe 0, transparent 50%),
         var(--canvas);
-        background-attachment: fixed;
-        color: var(--ink);
+        pointer-events: none;
+        transform: translate3d(0, 0, 0);
+        -webkit-transform: translate3d(0, 0, 0);
+        backface-visibility: hidden;
+        -webkit-backface-visibility: hidden;
+        will-change: transform;
     }
 
     button,
@@ -93,7 +109,6 @@
     }
 }
 
-
 .glass-card,
 .glass-pill {
     background: var(--glass-surface);
@@ -102,11 +117,22 @@
     backdrop-filter: var(--glass-filter);
     -webkit-backdrop-filter: var(--glass-filter);
     border-radius: var(--glass-radius);
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
 }
 
 :where(button, a, input, textarea, summary):focus-visible {
     outline: 2px solid var(--brand);
     outline-offset: 4px;
+}
+
+:where(main, section, article) {
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
 }
 
 :where(main, section, article, aside, form) {

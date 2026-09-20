@@ -13,6 +13,10 @@
     backdrop-filter: var(--glass-filter);
     -webkit-backdrop-filter: var(--glass-filter);
     text-align: center;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
     animation: modalPopIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
 }
 

@@ -1,4 +1,4 @@
-﻿export type SiteInformation = 'about' | 'contact' | 'login' | 'register' | 'terms' | 'privacy' | 'passwordReset';
+export type SiteInformation = 'about' | 'contact' | 'login' | 'register' | 'terms' | 'privacy' | 'passwordReset';
 
 export const SITE_NAVIGATION = [
     {path: '/about', label: 'About'},
@@ -41,3 +41,25 @@ export const SITE_INFORMATION: Readonly<
             'Create an account to save your progress and results. You can browse topics and explore quizzes before signing up.',
     },
 };
+
+export const CONTACT_DETAILS = {
+    address: 'FPT Building, Duy Tan Street, Cau Giay, Hanoi',
+    email: 'quizapp@fpt.edu.vn',
+    workingHours: 'Monday – Friday: 08:00 – 17:00',
+    responseHint: 'Within 24 business hours',
+} as const;
+
+export const CONTACT_FAQS = [
+    {
+        question: 'Do I need to sign in to take a quiz?',
+        answer: 'You can browse sample quizzes without an account. Signing in lets you save progress, review scores, and keep your attempt history.',
+    },
+    {
+        question: 'How do I reset my password?',
+        answer: 'Automatic password reset is not available in this version. If you forget your password, contact the administrator who provided your account.',
+    },
+    {
+        question: 'Are quizzes timed?',
+        answer: 'Each published quiz uses the time limit stored with that quiz. Saved answers remain available if you pause and resume the same attempt.',
+    },
+] as const;

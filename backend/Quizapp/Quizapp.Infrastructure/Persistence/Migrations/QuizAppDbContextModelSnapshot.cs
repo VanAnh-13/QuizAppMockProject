@@ -49,6 +49,61 @@ namespace Quizapp.Infrastructure.Persistence.Migrations
                     b.ToTable("Answers");
                 });
 
+            modelBuilder.Entity("Quizapp.Domain.Entities.ContactMessage", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("ConfirmationErrorCode")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("ConfirmationStatus")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("FullName")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
+
+                    b.Property<string>("NotificationErrorCode")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<int>("NotificationStatus")
+                        .HasColumnType("int");
+
+                    b.Property<DateTimeOffset>("ReceivedAt")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("Subject")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ReceivedAt");
+
+                    b.ToTable("ContactMessages", t =>
+                        {
+                            t.HasCheckConstraint("CK_ContactMessages_ConfirmationStatus", "[ConfirmationStatus] IN (0, 1, 2)");
+
+                            t.HasCheckConstraint("CK_ContactMessages_NotificationStatus", "[NotificationStatus] IN (0, 1, 2)");
+                        });
+                });
+
             modelBuilder.Entity("Quizapp.Domain.Entities.Question", b =>
                 {
                     b.Property<Guid>("Id")

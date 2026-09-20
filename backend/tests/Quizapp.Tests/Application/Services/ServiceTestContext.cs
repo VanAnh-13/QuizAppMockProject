@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Quizapp.Application;
 using Quizapp.Application.Abstractions.Authentication;
+using Quizapp.Application.Abstractions.Messaging;
 using Quizapp.Application.Abstractions.Persistence;
 using Quizapp.Application.DTOs.Common;
 using Quizapp.Application.Services.Common;
@@ -46,8 +47,10 @@ internal sealed class ServiceTestContext : IDisposable
         Services.AddSingleton<IQuestionRepository>(Questions);
         Services.AddSingleton<IQuizAttemptRepository, MemoryQuizAttempts>();
         Services.AddSingleton<IUnitOfWork, MemoryUnitOfWork>();
+        Services.AddSingleton<IContactMessageRepository, MemoryContactMessages>();
         Services.AddSingleton<IPasswordService, IdentityPasswordService>();
         Services.AddSingleton<ITokenService, JwtTokenService>();
+        Services.AddSingleton<IEmailSender, NoOpEmailSender>();
 
         Services.Configure<JwtOptions>(options =>
         {
@@ -56,6 +59,11 @@ internal sealed class ServiceTestContext : IDisposable
 
             options.SigningKey =
                 Convert.ToBase64String(System.Security.Cryptography.RandomNumberGenerator.GetBytes(32));
+        });
+
+        Services.Configure<ContactOptions>(options =>
+        {
+            options.InboxAddress = "contact@levananh.dev";
         });
     }
 
@@ -247,4 +255,15 @@ internal sealed class MemoryRoles(MemoryUsers users)
 
         return Task.FromResult(users.Rows.Any(user => user.Roles.Any(role => role.Id == roleId)));
     }
+}
+
+internal sealed class NoOpEmailSender : IEmailSender
+{
+    public Task SendAsync(
+        string to,
+        string subject,
+        string body,
+        string? replyTo = null,
+        CancellationToken cancellationToken = default) =>
+        Task.CompletedTask;
 }
