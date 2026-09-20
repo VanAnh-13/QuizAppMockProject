@@ -20,6 +20,7 @@ const FORBIDDEN_COLOR_PATTERNS = [
     {pattern: /#6756cd/i, label: 'prohibited purple #6756cd'},
     {pattern: /#4338ca/i, label: 'prohibited indigo #4338ca'},
     {pattern: /#6366f1/i, label: 'prohibited indigo #6366f1'},
+    {pattern: /rgba?\s*\(\s*99\s*,\s*102\s*,\s*241/i, label: 'prohibited indigo rgb(99, 102, 241)'},
     {pattern: /#7060da/i, label: 'prohibited purple #7060da'},
     {pattern: /#eeebff/i, label: 'prohibited soft purple #eeebff'},
     {pattern: /\b(text|bg|border|ring)-(indigo|violet|purple)-\d+\b/, label: 'Tailwind purple/indigo/violet class'},
