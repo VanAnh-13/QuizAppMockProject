@@ -197,6 +197,7 @@
 
 .field input,
 .field textarea {
+    font: inherit;
     border: 1px solid var(--glass-border);
     background: var(--glass-raised);
     color: var(--ink);
