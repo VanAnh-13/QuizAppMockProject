@@ -21,4 +21,21 @@ describe('AboutPage', () => {
         expect(element.querySelectorAll('.author-card').length).toBe(0);
         expect(element.textContent).not.toContain('Lê Văn Anh');
     });
+
+    it('renders decorative ambient glows hidden from assistive technology', async () => {
+        await TestBed.configureTestingModule({
+            imports: [AboutPage],
+            providers: [provideRouter([])],
+        }).compileComponents();
+
+        const fixture = TestBed.createComponent(AboutPage);
+        fixture.detectChanges();
+        const element = fixture.nativeElement as HTMLElement;
+
+        const glows = element.querySelectorAll('.ambient-glow');
+        expect(glows.length).toBe(2);
+        glows.forEach(glow => {
+            expect(glow.getAttribute('aria-hidden')).toBe('true');
+        });
+    });
 });

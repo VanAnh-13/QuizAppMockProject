@@ -1,10 +1,12 @@
 :host {
     @apply flex min-h-dvh flex-col;
     background: transparent;
+    overflow-x: clip;
 }
 
 .contact {
     @apply relative mx-auto w-full max-w-[1200px] flex-1 px-4 pb-20 pt-8;
+    overflow-x: clip;
 }
 
 /* Ambient glow effects */
@@ -21,16 +23,16 @@
 .ambient-glow--top-left {
     top: 2rem;
     left: 5%;
-    width: 380px;
-    height: 380px;
+    width: min(380px, 80vw);
+    height: min(380px, 80vw);
     background: radial-gradient(circle, rgba(56, 189, 248, 0.35) 0%, rgba(37, 99, 235, 0.15) 60%, transparent 80%);
 }
 
 .ambient-glow--center-right {
     top: 40%;
     right: 4%;
-    width: 400px;
-    height: 400px;
+    width: min(400px, 80vw);
+    height: min(400px, 80vw);
     background: radial-gradient(circle, rgba(37, 99, 235, 0.25) 0%, rgba(56, 189, 248, 0.15) 60%, transparent 80%);
 }
 

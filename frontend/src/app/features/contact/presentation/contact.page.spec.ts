@@ -33,6 +33,15 @@ describe('ContactPage', () => {
         expect(element.querySelectorAll('details.faq-item').length).toBe(3);
     });
 
+    it('renders decorative ambient glows hidden from assistive technology', async () => {
+        const {element} = await render();
+        const glows = element.querySelectorAll('.ambient-glow');
+        expect(glows.length).toBe(2);
+        glows.forEach(glow => {
+            expect(glow.getAttribute('aria-hidden')).toBe('true');
+        });
+    });
+
     it('announces required-field errors after an empty submit', async () => {
         const {fixture, element, send} = await render();
 
