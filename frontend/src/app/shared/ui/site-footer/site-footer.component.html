@@ -10,7 +10,7 @@
         <nav aria-label="Footer navigation">
             <a routerLink="/" fragment="quiz-list">Explore quizzes</a>
             @for (item of navItems; track item.path) {
-                <a [routerLink]="item.path" routerLinkActive="active">{{ item.label }}</a>
+                <a [routerLink]="item.path" routerLinkActive="active" ariaCurrentWhenActive="page">{{ item.label }}</a>
             }
         </nav>
     </div>

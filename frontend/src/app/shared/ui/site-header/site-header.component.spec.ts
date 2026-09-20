@@ -1,4 +1,4 @@
-import {signal} from '@angular/core';
+import {Component, signal} from '@angular/core';
 import {ComponentFixture, TestBed} from '@angular/core/testing';
 import {provideRouter, Router} from '@angular/router';
 import {ApiClient} from '../../../core/api/api-client';
@@ -115,6 +115,47 @@ describe('SiteHeaderComponent', () => {
 
         expect(menu!.open).toBe(false);
         expect(fixture.nativeElement.querySelector('.header__page-backdrop')).toBeNull();
+    });
+
+    it('sets aria-current="page" on the active About and Contact navigation links', async () => {
+        @Component({template: ''})
+        class BlankComponent {}
+
+        TestBed.configureTestingModule({
+            imports: [SiteHeaderComponent],
+            providers: [
+                {provide: ApiClient, useValue: {post: vi.fn()}},
+                {provide: AuthSession, useValue: {user: signal(null), clear: vi.fn()}},
+                {provide: ConfirmationService, useValue: new MockConfirmationService()},
+                provideRouter([
+                    {path: 'about', component: BlankComponent},
+                    {path: 'contact', component: BlankComponent},
+                ]),
+            ],
+        });
+
+        const router = TestBed.inject(Router);
+        const fixture = TestBed.createComponent(SiteHeaderComponent);
+        fixture.detectChanges();
+
+        await router.navigateByUrl('/about');
+        fixture.detectChanges();
+
+        const aboutLink = (fixture.nativeElement as HTMLElement).querySelector<HTMLAnchorElement>(
+            'a[routerLink="/about"]',
+        );
+        const contactLink = (fixture.nativeElement as HTMLElement).querySelector<HTMLAnchorElement>(
+            'a[routerLink="/contact"]',
+        );
+
+        expect(aboutLink?.getAttribute('aria-current')).toBe('page');
+        expect(contactLink?.getAttribute('aria-current')).toBeNull();
+
+        await router.navigateByUrl('/contact');
+        fixture.detectChanges();
+
+        expect(aboutLink?.getAttribute('aria-current')).toBeNull();
+        expect(contactLink?.getAttribute('aria-current')).toBe('page');
     });
 });
 
