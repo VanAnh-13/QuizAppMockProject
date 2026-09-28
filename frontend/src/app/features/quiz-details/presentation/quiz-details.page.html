@@ -331,11 +331,13 @@
                 </div>
                 <div class="history-stat-card">
                     <span class="history-stat-card__label">Best score</span>
-                    <strong class="history-stat-card__value history-stat-card__value--accent">{{ bestScore() }}%</strong>
+                    <strong class="history-stat-card__value" [class.history-stat-card__value--passed]="hasPassed()" [class.history-stat-card__value--accent]="!hasPassed()">{{ bestScore() }}%</strong>
                 </div>
                 <div class="history-stat-card">
                     <span class="history-stat-card__label">Status</span>
-                    <strong class="history-stat-card__value" [class.history-stat-card__value--passed]="hasPassed()">
+                    <strong class="history-stat-card__value"
+                            [class.history-stat-card__value--passed]="hasPassed()"
+                            [class.history-stat-card__value--warning]="!hasPassed()">
                         {{ hasPassed() ? 'Passed' : 'Needs practice' }}
                     </strong>
                 </div>
@@ -351,7 +353,10 @@
                                 </span>
                                 <span>{{ isSinglePassed() ? 'Passed requirement' : 'Keep practicing' }}</span>
                             </span>
-                            <span class="history-single-card__date">{{ single.submittedAt | date: 'dd/MM/yyyy HH:mm' }}</span>
+                            <span class="history-single-card__date">
+                                <span class="material-symbols-outlined history-mini-icon" aria-hidden="true">schedule</span>
+                                {{ single.submittedAt | date: 'dd/MM/yyyy HH:mm' }}
+                            </span>
                         </div>
                         <div class="history-single-card__score-wrap">
                             <span class="history-single-card__score" [class.history-single-card__score--passed]="isSinglePassed()">
@@ -435,6 +440,7 @@
                                     <span
                                             class="history-item__status"
                                             [class.history-item__status--passed]="attempt.score >= attempt.passedScore"
+                                            [class.history-item__status--warning]="attempt.score < attempt.passedScore"
                                     >
                                         {{ attempt.score >= attempt.passedScore ? 'Passed' : 'Needs practice' }}
                                     </span>
@@ -446,7 +452,7 @@
             </div>
         }
         <div class="details-dialog__footer">
-            <button class="details-dialog__action-btn history-action-close" type="button" autofocus (click)="closeHistory()">Close</button>
+            <button class="history-action-close" type="button" autofocus (click)="closeHistory()">Close</button>
             <a class="history-action-start" [routerLink]="['/quiz', quizId(), 'attempt']" (click)="closeHistory()">
                 <span>{{ hasPassed() ? 'Retake quiz' : 'Try again' }}</span>
                 <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
@@ -456,7 +462,7 @@
 }
 
 @if (activeInfo(); as info) {
-    <dialog class="details-dialog" appModal (modalDismissed)="closeInfo()"
+    <dialog class="details-dialog details-dialog--info" appModal (modalDismissed)="closeInfo()"
             aria-labelledby="info-title">
         <span class="details-dialog__icon material-symbols-outlined" aria-hidden="true">info</span>
         <h2 id="info-title">{{ info.title }}</h2>
