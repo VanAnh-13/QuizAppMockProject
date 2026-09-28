@@ -360,6 +360,7 @@ describe('QuizDetailsPage', () => {
         expect(history).toHaveBeenCalledWith(quizId);
         expect(element.querySelector('#attempt-history')).not.toBeNull();
         expect(element.querySelector('.history-list')?.textContent).toContain('80 / 100');
+        expect(element.querySelector('.history-action-start')).not.toBeNull();
     });
 
     it('redirects anonymous user to login with quiz history return URL when history=true query parameter is present', async () => {
@@ -374,6 +375,44 @@ describe('QuizDetailsPage', () => {
             queryParams: {returnUrl: `/quiz/${quizId}?history=true`},
         });
         expect(history).not.toHaveBeenCalled();
+    });
+
+    it('does not render start action in history dialog when quiz details fails to resolve as available', async () => {
+        TestBed.inject(AuthSession).set({
+            token: 'test-token',
+            expiresAt: new Date(Date.now() + 60_000).toISOString(),
+            userDto: {id: 'learner-id', username: 'learner', fullName: null},
+        });
+        load.mockRejectedValue(new Error('This quiz is not available.'));
+        const route = TestBed.inject(ActivatedRoute);
+        (route as unknown as {queryParamMap: unknown}).queryParamMap = of(convertToParamMap({history: 'true'}));
+
+        const fixture = await createFixture();
+        const element = fixture.nativeElement as HTMLElement;
+
+        expect(element.querySelector('#attempt-history')).not.toBeNull();
+        expect(element.querySelector('.history-action-start')).toBeNull();
+        expect(element.querySelector('.history-action-close')).not.toBeNull();
+    });
+
+    it('does not render start action in empty history state when quiz details fails to resolve as available', async () => {
+        TestBed.inject(AuthSession).set({
+            token: 'test-token',
+            expiresAt: new Date(Date.now() + 60_000).toISOString(),
+            userDto: {id: 'learner-id', username: 'learner', fullName: null},
+        });
+        load.mockRejectedValue(new Error('This quiz is not available.'));
+        history.mockResolvedValue([]);
+        const route = TestBed.inject(ActivatedRoute);
+        (route as unknown as {queryParamMap: unknown}).queryParamMap = of(convertToParamMap({history: 'true'}));
+
+        const fixture = await createFixture();
+        const element = fixture.nativeElement as HTMLElement;
+
+        expect(element.querySelector('#attempt-history')).not.toBeNull();
+        expect(element.querySelector('.history-empty__cta')).toBeNull();
+        expect(element.querySelector('.history-action-start')).toBeNull();
+        expect(element.querySelector('.history-action-close')).not.toBeNull();
     });
 
     it('displays actual quiz passing score from snapshot when learner has no history instead of defaulting to 70', async () => {

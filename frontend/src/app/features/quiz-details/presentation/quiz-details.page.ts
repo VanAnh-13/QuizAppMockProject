@@ -72,6 +72,7 @@ export class QuizDetailsPage {
     protected readonly formatFacts = signal<QuizDetailsSnapshot['formatFacts']>([]);
     protected readonly isLoading = signal(true);
     protected readonly errorMessage = signal<string | null>(null);
+    protected readonly isAvailable = computed(() => !this.isLoading() && this.errorMessage() === null);
     protected readonly activeInfo = signal<InfoMessage | null>(null);
     protected readonly historyDialogOpen = signal(false);
     protected readonly history = signal<readonly AttemptResult[]>([]);

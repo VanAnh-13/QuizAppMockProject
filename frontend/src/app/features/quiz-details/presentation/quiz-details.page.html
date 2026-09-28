@@ -318,10 +318,12 @@
                 <span class="history-empty__icon material-symbols-outlined" aria-hidden="true">history_edu</span>
                 <h3>No attempts yet</h3>
                 <p>You haven't completed any attempts for this quiz yet. Take the quiz to see your progress here.</p>
-                <a class="history-empty__cta" [routerLink]="['/quiz', quizId(), 'attempt']" (click)="closeHistory()">
-                    <span>Start quiz now</span>
-                    <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
-                </a>
+                @if (isAvailable()) {
+                    <a class="history-empty__cta" [routerLink]="['/quiz', quizId(), 'attempt']" (click)="closeHistory()">
+                        <span>Start quiz now</span>
+                        <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
+                    </a>
+                }
             </div>
         } @else {
             <div class="history-stats">
@@ -463,10 +465,12 @@
         }
         <div class="details-dialog__footer">
             <button class="history-action-close" type="button" autofocus (click)="closeHistory()">Close</button>
-            <a class="history-action-start" [routerLink]="['/quiz', quizId(), 'attempt']" (click)="closeHistory()">
-                <span>{{ hasPassed() || !hasThreshold() ? 'Retake quiz' : 'Try again' }}</span>
-                <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
-            </a>
+            @if (isAvailable()) {
+                <a class="history-action-start" [routerLink]="['/quiz', quizId(), 'attempt']" (click)="closeHistory()">
+                    <span>{{ hasPassed() || !hasThreshold() ? 'Retake quiz' : 'Try again' }}</span>
+                    <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
+                </a>
+            }
         </div>
     </dialog>
 }
