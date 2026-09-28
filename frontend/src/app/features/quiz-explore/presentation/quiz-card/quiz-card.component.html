@@ -79,8 +79,8 @@
         <button
                 class="quiz-card__detail"
                 type="button"
+                tabindex="-1"
                 [attr.aria-label]="'View details: ' + quiz().title"
-                (click)="detailRequested.emit(quiz())"
         >
             View details
             <svg
