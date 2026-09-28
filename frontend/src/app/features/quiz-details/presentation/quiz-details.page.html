@@ -309,7 +309,7 @@
                 <span class="material-symbols-outlined" aria-hidden="true">error_outline</span>
                 <p>{{ error }}</p>
                 <div class="history-error__actions">
-                    <a class="history-link-login" routerLink="/login" [queryParams]="{returnUrl: quizUrl()}">Log in</a>
+                    <a class="history-link-login" routerLink="/login" [queryParams]="{returnUrl: quizHistoryUrl()}">Log in</a>
                     <button class="history-retry-btn" type="button" (click)="loadHistory()">Try again</button>
                 </div>
             </div>

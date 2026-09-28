@@ -122,7 +122,7 @@ describe('QuizDetailsPage', () => {
         element.querySelector<HTMLButtonElement>(`.quiz-details__actions--${layout} .history-button`)!.click();
         await fixture.whenStable();
 
-        expect(navigate).toHaveBeenCalledWith(['/login'], {queryParams: {returnUrl: `/quiz/${quizId}`}});
+        expect(navigate).toHaveBeenCalledWith(['/login'], {queryParams: {returnUrl: `/quiz/${quizId}?history=true`}});
         expect(history).not.toHaveBeenCalled();
         expect(element.querySelector('#attempt-history')).toBeNull();
     });
@@ -300,7 +300,7 @@ describe('QuizDetailsPage', () => {
         fixture.detectChanges();
 
         expect(element.querySelector('#attempt-history a')?.getAttribute('href')).toBe(
-            `/login?returnUrl=${encodeURIComponent(`/quiz/${quizId}`)}`,
+            `/login?returnUrl=${encodeURIComponent(`/quiz/${quizId}?history=true`)}`,
         );
     });
     it('renders the sidebar after the content column in DOM order for correct mobile stacking', async () => {
@@ -360,6 +360,20 @@ describe('QuizDetailsPage', () => {
         expect(history).toHaveBeenCalledWith(quizId);
         expect(element.querySelector('#attempt-history')).not.toBeNull();
         expect(element.querySelector('.history-list')?.textContent).toContain('80 / 100');
+    });
+
+    it('redirects anonymous user to login with quiz history return URL when history=true query parameter is present', async () => {
+        const router = TestBed.inject(Router);
+        const navigate = vi.spyOn(router, 'navigate').mockResolvedValue(true);
+        const route = TestBed.inject(ActivatedRoute);
+        (route as unknown as {queryParamMap: unknown}).queryParamMap = of(convertToParamMap({history: 'true'}));
+
+        await createFixture();
+
+        expect(navigate).toHaveBeenCalledWith(['/login'], {
+            queryParams: {returnUrl: `/quiz/${quizId}?history=true`},
+        });
+        expect(history).not.toHaveBeenCalled();
     });
 
     it('displays actual quiz passing score from snapshot when learner has no history instead of defaulting to 70', async () => {

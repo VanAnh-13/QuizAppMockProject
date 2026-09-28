@@ -61,6 +61,7 @@ export class QuizDetailsPage {
 
     protected readonly quizId = signal('');
     protected readonly quizUrl = computed(() => `/quiz/${encodeURIComponent(this.quizId())}`);
+    protected readonly quizHistoryUrl = computed(() => `${this.quizUrl()}?history=true`);
     protected readonly title = signal('');
     protected readonly imageUrl = signal<string | null>(null);
     protected readonly description = signal('');
@@ -249,7 +250,7 @@ export class QuizDetailsPage {
 
     protected async openHistory(): Promise<void> {
         if (!this.session.token()) {
-            await this.router.navigate(['/login'], {queryParams: {returnUrl: this.quizUrl()}});
+            await this.router.navigate(['/login'], {queryParams: {returnUrl: this.quizHistoryUrl()}});
             return;
         }
 
