@@ -6,6 +6,7 @@ export interface QuizDetailsSnapshot {
     readonly title: string;
     readonly description: string;
     readonly categoryLabel: string;
+    readonly passedScore?: number | null;
     readonly metrics: readonly QuizMetric[];
     readonly topics: readonly QuizTopic[];
     readonly guidelines: readonly QuizGuideline[];

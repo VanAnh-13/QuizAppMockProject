@@ -241,6 +241,12 @@
     color: var(--success);
 }
 
+.history-single-card__badge--no-threshold {
+    background: var(--brand-soft);
+    border-color: rgba(37, 99, 235, 0.2);
+    color: var(--brand);
+}
+
 .history-single-card__date {
     font-size: 0.75rem;
     color: var(--muted);

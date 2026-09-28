@@ -295,7 +295,7 @@
             </span>
             <div class="details-dialog__titles">
                 <h2 id="history-title">Attempt history</h2>
-                <p class="details-dialog__subtitle">{{ title() }} • Passing score: {{ passingScoreValue() }}%</p>
+                <p class="details-dialog__subtitle">{{ title() }} • Passing score: {{ passingScoreValue() !== null ? (passingScoreValue() + '%') : 'Not specified' }}</p>
             </div>
         </div>
 
@@ -337,8 +337,8 @@
                     <span class="history-stat-card__label">Status</span>
                     <strong class="history-stat-card__value"
                             [class.history-stat-card__value--passed]="hasPassed()"
-                            [class.history-stat-card__value--warning]="!hasPassed()">
-                        {{ hasPassed() ? 'Passed' : 'Needs practice' }}
+                            [class.history-stat-card__value--warning]="hasThreshold() && !hasPassed()">
+                        {{ !hasThreshold() ? 'Completed' : (hasPassed() ? 'Passed' : 'Needs practice') }}
                     </strong>
                 </div>
             </div>
@@ -347,11 +347,15 @@
                 <div class="history-single-card">
                     <div class="history-single-card__header">
                         <div class="history-single-card__meta">
-                            <span class="history-single-card__badge" [class.history-single-card__badge--passed]="isSinglePassed()">
+                            <span class="history-single-card__badge"
+                                  [class.history-single-card__badge--passed]="isSinglePassed()"
+                                  [class.history-single-card__badge--no-threshold]="singlePassingThreshold() === null">
                                 <span class="material-symbols-outlined" aria-hidden="true">
-                                    {{ isSinglePassed() ? 'check_circle' : 'trending_up' }}
+                                    {{ singlePassingThreshold() === null ? 'task_alt' : (isSinglePassed() ? 'check_circle' : 'trending_up') }}
                                 </span>
-                                <span>{{ isSinglePassed() ? 'Passed requirement' : 'Keep practicing' }}</span>
+                                <span>
+                                    {{ singlePassingThreshold() === null ? 'Attempt completed' : (isSinglePassed() ? 'Passed requirement' : 'Keep practicing') }}
+                                </span>
                             </span>
                             <span class="history-single-card__date">
                                 <span class="material-symbols-outlined history-mini-icon" aria-hidden="true">schedule</span>
@@ -369,9 +373,11 @@
                     <div class="history-progress-wrap" aria-label="Score progress">
                         <div class="history-progress-labels">
                             <span>0%</span>
-                            <span class="history-progress-target" [style.left.%]="passingScoreValue()">
-                                Pass: {{ passingScoreValue() }}%
-                            </span>
+                            @if (singlePassingThreshold(); as target) {
+                                <span class="history-progress-target" [style.left.%]="target">
+                                    Pass: {{ target }}%
+                                </span>
+                            }
                             <span>100%</span>
                         </div>
                         <div class="history-progress-track">
@@ -380,7 +386,9 @@
                                     [style.width.%]="single.score"
                                     [class.history-progress-bar--passed]="isSinglePassed()"
                             ></div>
-                            <div class="history-progress-marker" [style.left.%]="passingScoreValue()" title="Passing threshold"></div>
+                            @if (singlePassingThreshold(); as target) {
+                                <div class="history-progress-marker" [style.left.%]="target" title="Passing threshold"></div>
+                            }
                         </div>
                     </div>
                 </div>
@@ -389,7 +397,9 @@
                     <div class="history-chart__header">
                         <div class="history-chart__heading">
                             <span class="history-chart__title">Score progression</span>
-                            <span class="history-chart__target">Goal: {{ passingScoreValue() }}%</span>
+                            @if (passingScoreValue(); as target) {
+                                <span class="history-chart__target">Goal: {{ target }}%</span>
+                            }
                         </div>
                         <span class="history-chart__scale">Scale: 0 – 100%</span>
                     </div>
@@ -454,7 +464,7 @@
         <div class="details-dialog__footer">
             <button class="history-action-close" type="button" autofocus (click)="closeHistory()">Close</button>
             <a class="history-action-start" [routerLink]="['/quiz', quizId(), 'attempt']" (click)="closeHistory()">
-                <span>{{ hasPassed() ? 'Retake quiz' : 'Try again' }}</span>
+                <span>{{ hasPassed() || !hasThreshold() ? 'Retake quiz' : 'Try again' }}</span>
                 <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
             </a>
         </div>

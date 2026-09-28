@@ -76,36 +76,47 @@ export class QuizDetailsPage {
     protected readonly history = signal<readonly AttemptResult[]>([]);
     protected readonly historyLoading = signal(false);
     protected readonly historyError = signal<string | null>(null);
+    protected readonly quizPassedScore = signal<number | null | undefined>(undefined);
 
     protected readonly bestScore = computed(() => {
         const attempts = this.history();
         if (attempts.length === 0) return null;
         return Math.max(...attempts.map((a) => a.score));
     });
+    protected readonly passingScoreValue = computed<number | null>(() => {
+        const first = this.history().find((a) => a.passedScore !== null);
+        if (first && first.passedScore !== null) return first.passedScore;
+        const fromQuiz = this.quizPassedScore();
+        if (fromQuiz !== undefined) return fromQuiz;
+        return null;
+    });
+    protected readonly hasThreshold = computed(() => {
+        return this.passingScoreValue() !== null;
+    });
     protected readonly hasPassed = computed(() => {
-        return this.history().some((a) => a.passedScore !== null && a.score >= a.passedScore);
+        const target = this.passingScoreValue();
+        if (target === null) return false;
+        return this.history().some((a) => {
+            const threshold = a.passedScore ?? target;
+            return threshold !== null && a.score >= threshold;
+        });
     });
     protected readonly chronologicalHistory = computed(() => {
         return [...this.history()].reverse();
     });
-    protected readonly passingScoreValue = computed(() => {
-        const first = this.history().find((a) => a.passedScore !== null);
-        if (first && first.passedScore !== null) return first.passedScore;
-        const fact = this.formatFacts().find((f) => f.label.toLowerCase().includes('pass') || f.value.includes('%'));
-        if (fact) {
-            const match = /(\d+)/.exec(fact.value);
-            if (match) return Number(match[1]);
-        }
-        return 70;
-    });
     protected readonly singleAttempt = computed(() => {
         return this.history().length === 1 ? this.history()[0] : null;
+    });
+    protected readonly singlePassingThreshold = computed<number | null>(() => {
+        const single = this.singleAttempt();
+        if (!single) return null;
+        return single.passedScore ?? this.passingScoreValue();
     });
     protected readonly isSinglePassed = computed(() => {
         const single = this.singleAttempt();
         if (!single) return false;
-        const target = single.passedScore ?? this.passingScoreValue();
-        return single.score >= target;
+        const target = this.singlePassingThreshold();
+        return target !== null && single.score >= target;
     });
 
     constructor() {
@@ -153,6 +164,27 @@ export class QuizDetailsPage {
         this.topics.set(snapshot.topics);
         this.guidelines.set(snapshot.guidelines);
         this.formatFacts.set(snapshot.formatFacts);
+
+        if (snapshot.passedScore !== undefined) {
+            this.quizPassedScore.set(snapshot.passedScore);
+        } else {
+            const passMetric = snapshot.metrics?.find((m) => m.label.toLowerCase().includes('pass'));
+            if (passMetric) {
+                const match = /(\d+)/.exec(passMetric.value);
+                this.quizPassedScore.set(match ? Number(match[1]) : null);
+            } else {
+                const passFact = snapshot.formatFacts?.find(
+                    (f) => f.label.toLowerCase().includes('pass') || f.value.includes('%'),
+                );
+                if (passFact) {
+                    const match = /(\d+)/.exec(passFact.value);
+                    this.quizPassedScore.set(match ? Number(match[1]) : null);
+                } else {
+                    this.quizPassedScore.set(null);
+                }
+            }
+        }
+
         this.errorMessage.set(null);
         this.isLoading.set(false);
     }

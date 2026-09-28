@@ -25,6 +25,7 @@ describe('ApiQuizDetailsContent', () => {
 
         expect(list).toHaveBeenCalledWith('public/quizzes');
         expect(details.title).toBe('Angular forms');
+        expect(details.passedScore).toBe(75);
         expect(details.metrics.map((metric) => metric.value)).toEqual(['4 questions', '25 minutes', '75%']);
     });
 
@@ -63,5 +64,29 @@ describe('ApiQuizDetailsContent', () => {
         );
 
         expect(details.imageUrl).toBe('https://images.example.com/custom-angular.webp');
+    });
+
+    it('carries null passedScore in snapshot when quiz has no passing threshold', async () => {
+        const list = vi.fn().mockResolvedValue([
+            {
+                id: '10000000-0000-0000-0000-000000000003',
+                title: 'General knowledge',
+                description: 'General quiz',
+                duration: 10,
+                passedScore: null,
+                questionCount: 5,
+                updatedAt: '2026-09-12T00:00:00Z',
+            },
+        ]);
+        TestBed.configureTestingModule({
+            providers: [ApiQuizDetailsContent, {provide: ApiClient, useValue: {list}}],
+        });
+
+        const details = await TestBed.inject(ApiQuizDetailsContent).load(
+            '10000000-0000-0000-0000-000000000003',
+        );
+
+        expect(details.passedScore).toBeNull();
+        expect(details.metrics.find((m) => m.label === 'Passing score')?.value).toBe('Not specified');
     });
 });

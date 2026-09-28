@@ -361,4 +361,77 @@ describe('QuizDetailsPage', () => {
         expect(element.querySelector('#attempt-history')).not.toBeNull();
         expect(element.querySelector('.history-list')?.textContent).toContain('80 / 100');
     });
+
+    it('displays actual quiz passing score from snapshot when learner has no history instead of defaulting to 70', async () => {
+        TestBed.inject(AuthSession).set({
+            token: 'test-token',
+            expiresAt: new Date(Date.now() + 60_000).toISOString(),
+            userDto: {id: 'learner-id', username: 'learner', fullName: null},
+        });
+        load.mockResolvedValue({
+            title: 'Advanced TypeScript',
+            description: 'Types practice',
+            categoryLabel: 'Quiz',
+            passedScore: 85,
+            metrics: [{icon: 'military_tech', label: 'Passing score', value: '85%'}],
+            topics: [],
+            guidelines: [],
+            formatFacts: [{label: 'Status', value: 'Open'}],
+        });
+        history.mockResolvedValue([]);
+        const route = TestBed.inject(ActivatedRoute);
+        (route as unknown as {queryParamMap: unknown}).queryParamMap = of(convertToParamMap({history: 'true'}));
+        const fixture = await createFixture();
+        const element = fixture.nativeElement as HTMLElement;
+
+        const subtitle = element.querySelector('.details-dialog__subtitle');
+        expect(subtitle?.textContent).toContain('Passing score: 85%');
+        expect(subtitle?.textContent).not.toContain('70%');
+    });
+
+    it('does not invent a 70% threshold or classify single attempt as failing when quiz and attempt have no passing threshold', async () => {
+        TestBed.inject(AuthSession).set({
+            token: 'test-token',
+            expiresAt: new Date(Date.now() + 60_000).toISOString(),
+            userDto: {id: 'learner-id', username: 'learner', fullName: null},
+        });
+        load.mockResolvedValue({
+            title: 'Survey Quiz',
+            description: 'No pass criteria',
+            categoryLabel: 'Quiz',
+            passedScore: null,
+            metrics: [{icon: 'military_tech', label: 'Passing score', value: 'Not specified'}],
+            topics: [],
+            guidelines: [],
+            formatFacts: [{label: 'Status', value: 'Open'}],
+        });
+        history.mockResolvedValue([
+            {
+                id: '40000000-0000-0000-0000-000000000002',
+                quizId,
+                quizTitle: 'Survey Quiz',
+                submittedAt: '2026-09-12T08:00:00Z',
+                score: 55,
+                passedScore: null,
+            },
+        ]);
+        const route = TestBed.inject(ActivatedRoute);
+        (route as unknown as {queryParamMap: unknown}).queryParamMap = of(convertToParamMap({history: 'true'}));
+        const fixture = await createFixture();
+        const element = fixture.nativeElement as HTMLElement;
+
+        const subtitle = element.querySelector('.details-dialog__subtitle');
+        expect(subtitle?.textContent).toContain('Passing score: Not specified');
+        expect(subtitle?.textContent).not.toContain('70%');
+
+        const singleBadge = element.querySelector('.history-single-card__badge');
+        expect(singleBadge?.textContent).toContain('Attempt completed');
+        expect(singleBadge?.textContent).not.toContain('Keep practicing');
+
+        const targetLabel = element.querySelector('.history-progress-target');
+        expect(targetLabel).toBeNull();
+
+        const statusValue = element.querySelectorAll('.history-stat-card__value')[2];
+        expect(statusValue?.textContent?.trim()).toBe('Completed');
+    });
 });
