@@ -119,7 +119,7 @@ describe('AccountSettingsPage', () => {
 
         expect(changePassword).not.toHaveBeenCalled();
         expect(element.querySelector('#confirmNewPassword-error')?.textContent).toContain(
-            'Mật khẩu xác nhận chưa khớp.',
+            'Confirmation password does not match.',
         );
         expect(
             element.querySelector('#confirmNewPassword')?.getAttribute('aria-invalid'),
@@ -143,7 +143,7 @@ describe('AccountSettingsPage', () => {
         expect(clear).toHaveBeenCalled();
 
         const success = element.querySelector('[role="status"]');
-        expect(success?.textContent).toContain('Mật khẩu đã được cập nhật');
+        expect(success?.textContent).toContain('Password has been updated');
         expect(success?.querySelector('a')?.getAttribute('href')).toBe('/login');
     });
 
@@ -159,7 +159,7 @@ describe('AccountSettingsPage', () => {
         });
 
         expect(element.querySelector('[role="alert"]')?.textContent).toContain(
-            'Mật khẩu hiện tại chưa đúng',
+            'Current password is incorrect',
         );
         expect(element.querySelector<HTMLInputElement>('#currentPassword')!.value).toBe('');
     });

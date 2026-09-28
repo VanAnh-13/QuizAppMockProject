@@ -83,7 +83,7 @@ export class AccountHistoryStore {
 
             this.entries.set([]);
             this.errorMessage.set(
-                apiErrorMessage(error, 'Không thể tải lịch sử làm bài. Vui lòng thử lại.'),
+                apiErrorMessage(error, 'Could not load your attempt history. Please try again.'),
             );
         } finally {
             if (version === this.loadVersion) this.isLoading.set(false);

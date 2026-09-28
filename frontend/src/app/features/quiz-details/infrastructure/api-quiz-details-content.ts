@@ -25,6 +25,7 @@ export class ApiQuizDetailsContent implements QuizDetailsContent {
             title: quiz.title,
             description: quiz.description ?? '',
             categoryLabel: 'Quiz',
+            passedScore: quiz.passedScore,
             metrics: [
                 {icon: 'quiz', label: 'Questions', value: `${quiz.questionCount} questions`},
                 {icon: 'timer', label: 'Duration', value: `${quiz.duration} minutes`},

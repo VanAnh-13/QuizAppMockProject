@@ -48,7 +48,7 @@ export function authReturnUrl(value: string | null): string {
 
     return /^\/(?:history|settings)$/.test(value) ||
         /^\/admin(?:\/[a-zA-Z0-9-]+)*$/.test(value) ||
-        /^\/quiz\/[a-zA-Z0-9-]+(?:\/attempt(?:\?attemptId=[a-zA-Z0-9-]+)?)?$/.test(value)
+        /^\/quiz\/[a-zA-Z0-9-]+(?:(?:\?history=true)|(?:\/attempt(?:\?attemptId=[a-zA-Z0-9-]+)?))?$/.test(value)
         ? value
         : '/';
 }

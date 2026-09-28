@@ -77,7 +77,7 @@ describe('ApiAccount', () => {
         async (payload) => {
             const {account} = setup(payload);
 
-            await expect(account.profile()).rejects.toThrow('Dữ liệu hồ sơ không hợp lệ.');
+            await expect(account.profile()).rejects.toThrow('Invalid profile data.');
         },
     );
 

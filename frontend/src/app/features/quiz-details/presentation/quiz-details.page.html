@@ -283,53 +283,200 @@
 </footer>
 
 @if (historyDialogOpen()) {
-    <dialog id="attempt-history" class="details-dialog" appModal (modalDismissed)="closeHistory()"
+    <dialog id="attempt-history" class="details-dialog details-dialog--history" appModal (modalDismissed)="closeHistory()"
             aria-labelledby="history-title">
-        <span class="details-dialog__icon material-symbols-outlined" aria-hidden="true">
-            history
-        </span>
-        <h2 id="history-title">Attempt history</h2>
+        <button class="details-dialog__close" type="button" aria-label="Close dialog" (click)="closeHistory()">
+            <span class="material-symbols-outlined" aria-hidden="true">close</span>
+        </button>
+
+        <div class="details-dialog__header">
+            <span class="details-dialog__icon material-symbols-outlined" aria-hidden="true">
+                history
+            </span>
+            <div class="details-dialog__titles">
+                <h2 id="history-title">Attempt history</h2>
+                <p class="details-dialog__subtitle">{{ title() }} • Passing score: {{ passingScoreValue() !== null ? (passingScoreValue() + '%') : 'Not specified' }}</p>
+            </div>
+        </div>
+
         @if (historyLoading()) {
-            <p role="status">Loading attempt history…</p>
+            <div class="history-loading" role="status">
+                <div class="history-spinner" aria-hidden="true"></div>
+                <p>Loading attempt history…</p>
+            </div>
         } @else if (historyError(); as error) {
-            <p role="alert">{{ error }}</p>
-            <a routerLink="/login" [queryParams]="{returnUrl: quizUrl()}">Log in</a>
-            <button type="button" (click)="loadHistory()">Try again</button>
-        } @else if (history().length === 0) {
-            <p>You have not attempted this quiz yet.</p>
-        } @else {
-            <div class="history-chart" aria-label="Score chart">
-                <div class="history-chart__bars">
-                    @for (attempt of history(); track attempt.id) {
-                        <div class="history-chart__col">
-                            <span class="history-chart__val">{{ attempt.score }}%</span>
-                            <div class="history-chart__bar-wrap">
-                                <div
-                                        class="history-chart__bar"
-                                        [style.height.%]="attempt.score"
-                                        [class.history-chart__bar--passed]="attempt.passedScore !== null && attempt.score >= attempt.passedScore"
-                                ></div>
-                            </div>
-                            <span class="history-chart__idx">Attempt {{ history().length - $index }}</span>
-                        </div>
-                    }
+            <div class="history-error" role="alert">
+                <span class="material-symbols-outlined" aria-hidden="true">error_outline</span>
+                <p>{{ error }}</p>
+                <div class="history-error__actions">
+                    <a class="history-link-login" routerLink="/login" [queryParams]="{returnUrl: quizHistoryUrl()}">Log in</a>
+                    <button class="history-retry-btn" type="button" (click)="loadHistory()">Try again</button>
                 </div>
             </div>
-            <ul class="history-list">
-                @for (attempt of history(); track attempt.id) {
-                    <li>
-                        <strong>{{ attempt.score }} / 100</strong>
-                        <span>{{ attempt.submittedAt | date: 'dd/MM/yyyy HH:mm' }}</span>
-                    </li>
+        } @else if (history().length === 0) {
+            <div class="history-empty">
+                <span class="history-empty__icon material-symbols-outlined" aria-hidden="true">history_edu</span>
+                <h3>No attempts yet</h3>
+                <p>You haven't completed any attempts for this quiz yet. Take the quiz to see your progress here.</p>
+                @if (isAvailable()) {
+                    <a class="history-empty__cta" [routerLink]="['/quiz', quizId(), 'attempt']" (click)="closeHistory()">
+                        <span>Start quiz now</span>
+                        <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
+                    </a>
                 }
-            </ul>
+            </div>
+        } @else {
+            <div class="history-stats">
+                <div class="history-stat-card">
+                    <span class="history-stat-card__label">Total attempts</span>
+                    <strong class="history-stat-card__value">{{ history().length }}</strong>
+                </div>
+                <div class="history-stat-card">
+                    <span class="history-stat-card__label">Best score</span>
+                    <strong class="history-stat-card__value" [class.history-stat-card__value--passed]="hasPassed()" [class.history-stat-card__value--accent]="!hasPassed()">{{ bestScore() }}%</strong>
+                </div>
+                <div class="history-stat-card">
+                    <span class="history-stat-card__label">Status</span>
+                    <strong class="history-stat-card__value"
+                            [class.history-stat-card__value--passed]="hasPassed()"
+                            [class.history-stat-card__value--warning]="hasThreshold() && !hasPassed()">
+                        {{ !hasThreshold() ? 'Completed' : (hasPassed() ? 'Passed' : 'Needs practice') }}
+                    </strong>
+                </div>
+            </div>
+
+            @if (singleAttempt(); as single) {
+                <div class="history-single-card">
+                    <div class="history-single-card__header">
+                        <div class="history-single-card__meta">
+                            <span class="history-single-card__badge"
+                                  [class.history-single-card__badge--passed]="isSinglePassed()"
+                                  [class.history-single-card__badge--no-threshold]="singlePassingThreshold() === null">
+                                <span class="material-symbols-outlined" aria-hidden="true">
+                                    {{ singlePassingThreshold() === null ? 'task_alt' : (isSinglePassed() ? 'check_circle' : 'trending_up') }}
+                                </span>
+                                <span>
+                                    {{ singlePassingThreshold() === null ? 'Attempt completed' : (isSinglePassed() ? 'Passed requirement' : 'Keep practicing') }}
+                                </span>
+                            </span>
+                            <span class="history-single-card__date">
+                                <span class="material-symbols-outlined history-mini-icon" aria-hidden="true">schedule</span>
+                                {{ single.submittedAt | date: 'dd/MM/yyyy HH:mm' }}
+                            </span>
+                        </div>
+                        <div class="history-single-card__score-wrap">
+                            <span class="history-single-card__score" [class.history-single-card__score--passed]="isSinglePassed()">
+                                {{ single.score }}%
+                            </span>
+                            <span class="history-single-card__points">{{ single.score }} / 100</span>
+                        </div>
+                    </div>
+
+                    <div class="history-progress-wrap" aria-label="Score progress">
+                        <div class="history-progress-labels">
+                            <span>0%</span>
+                            @if (singlePassingThreshold(); as target) {
+                                <span class="history-progress-target" [style.left.%]="target">
+                                    Pass: {{ target }}%
+                                </span>
+                            }
+                            <span>100%</span>
+                        </div>
+                        <div class="history-progress-track">
+                            <div
+                                    class="history-progress-bar"
+                                    [style.width.%]="single.score"
+                                    [class.history-progress-bar--passed]="isSinglePassed()"
+                            ></div>
+                            @if (singlePassingThreshold(); as target) {
+                                <div class="history-progress-marker" [style.left.%]="target" title="Passing threshold"></div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            } @else {
+                <div class="history-chart" aria-label="Score chart">
+                    <div class="history-chart__header">
+                        <div class="history-chart__heading">
+                            <span class="history-chart__title">Score progression</span>
+                            @if (passingScoreValue(); as target) {
+                                <span class="history-chart__target">Goal: {{ target }}%</span>
+                            }
+                        </div>
+                        <span class="history-chart__scale">Scale: 0 – 100%</span>
+                    </div>
+                    <div class="history-chart__bars">
+                        @for (attempt of chronologicalHistory(); track attempt.id) {
+                            <div class="history-chart__col">
+                                <span class="history-chart__val" [class.history-chart__val--passed]="attempt.passedScore !== null && attempt.score >= attempt.passedScore">
+                                    {{ attempt.score }}%
+                                </span>
+                                <div class="history-chart__bar-wrap">
+                                    <div
+                                            class="history-chart__bar"
+                                            [style.height.%]="attempt.score"
+                                            [class.history-chart__bar--passed]="attempt.passedScore !== null && attempt.score >= attempt.passedScore"
+                                    ></div>
+                                </div>
+                                <span class="history-chart__idx">Attempt {{ $index + 1 }}</span>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+
+            <div class="history-list-section">
+                <div class="history-list-header">
+                    <h3 class="history-list-heading">Attempt log</h3>
+                    <span class="history-list-count">{{ history().length }} {{ history().length === 1 ? 'attempt' : 'attempts' }}</span>
+                </div>
+                <ul class="history-list">
+                    @for (attempt of history(); track attempt.id) {
+                        <li class="history-item">
+                            <div class="history-item__left">
+                                <span
+                                        class="history-item__badge material-symbols-outlined"
+                                        [class.history-item__badge--passed]="attempt.passedScore !== null && attempt.score >= attempt.passedScore"
+                                        aria-hidden="true"
+                                >
+                                    {{ attempt.passedScore !== null && attempt.score >= attempt.passedScore ? 'check_circle' : 'schedule' }}
+                                </span>
+                                <div>
+                                    <strong class="history-item__attempt">Attempt {{ history().length - $index }}</strong>
+                                    <span class="history-item__time">{{ attempt.submittedAt | date: 'dd/MM/yyyy HH:mm' }}</span>
+                                </div>
+                            </div>
+                            <div class="history-item__right">
+                                <span class="history-item__score">{{ attempt.score }} / 100</span>
+                                @if (attempt.passedScore !== null) {
+                                    <span
+                                            class="history-item__status"
+                                            [class.history-item__status--passed]="attempt.score >= attempt.passedScore"
+                                            [class.history-item__status--warning]="attempt.score < attempt.passedScore"
+                                    >
+                                        {{ attempt.score >= attempt.passedScore ? 'Passed' : 'Needs practice' }}
+                                    </span>
+                                }
+                            </div>
+                        </li>
+                    }
+                </ul>
+            </div>
         }
-        <button type="button" autofocus (click)="closeHistory()">Got it</button>
+        <div class="details-dialog__footer">
+            <button class="history-action-close" type="button" autofocus (click)="closeHistory()">Close</button>
+            @if (isAvailable()) {
+                <a class="history-action-start" [routerLink]="['/quiz', quizId(), 'attempt']" (click)="closeHistory()">
+                    <span>{{ hasPassed() || !hasThreshold() ? 'Retake quiz' : 'Try again' }}</span>
+                    <span class="material-symbols-outlined" aria-hidden="true">arrow_forward</span>
+                </a>
+            }
+        </div>
     </dialog>
 }
 
 @if (activeInfo(); as info) {
-    <dialog class="details-dialog" appModal (modalDismissed)="closeInfo()"
+    <dialog class="details-dialog details-dialog--info" appModal (modalDismissed)="closeInfo()"
             aria-labelledby="info-title">
         <span class="details-dialog__icon material-symbols-outlined" aria-hidden="true">info</span>
         <h2 id="info-title">{{ info.title }}</h2>

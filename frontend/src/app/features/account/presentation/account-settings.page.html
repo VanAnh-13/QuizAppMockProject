@@ -1,29 +1,29 @@
 <app-site-header/>
 
 <main class="settings" id="main-content" tabindex="-1">
-    <nav class="breadcrumb" aria-label="Đường dẫn">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
         <ol>
-            <li>Tài khoản</li>
+            <li>Account</li>
             <li aria-hidden="true"><span class="material-symbols-outlined">chevron_right</span></li>
-            <li aria-current="page">Cài đặt &amp; Bảo mật</li>
+            <li aria-current="page">Settings &amp; security</li>
         </ol>
     </nav>
 
     <header class="settings__heading">
-        <h1>Cài đặt tài khoản &amp; Bảo mật</h1>
-        <p>Xem thông tin định danh cá nhân và cập nhật mật khẩu xác thực của bạn.</p>
+        <h1>Account settings &amp; security</h1>
+        <p>View your personal profile details and update your password.</p>
     </header>
 
     <div class="settings__layout">
         <section class="profile-card" aria-labelledby="profile-title">
             @if (store.isLoading()) {
-                <p class="settings-state" role="status" aria-live="polite">Đang tải thông tin hồ sơ…</p>
+                <p class="settings-state" role="status" aria-live="polite">Loading profile details…</p>
             } @else if (store.loadError(); as message) {
                 <div class="settings-state" role="alert">
                     <p>{{ message }}</p>
                     <button class="settings-state__retry" type="button" (click)="store.load()">
                         <span class="material-symbols-outlined" aria-hidden="true">refresh</span>
-                        Thử lại
+                        Try again
                     </button>
                 </div>
             } @else if (store.profile(); as profile) {
@@ -36,38 +36,38 @@
                 </div>
 
                 <div class="profile-card__section-heading">
-                    <h3>Thông tin hồ sơ</h3>
+                    <h3>Profile information</h3>
                     <span class="profile-card__readonly">
                         <span class="material-symbols-outlined" aria-hidden="true">lock</span>
-                        Chế độ chỉ đọc
+                        Read-only mode
                     </span>
                 </div>
 
                 <dl class="profile-fields">
                     <div class="profile-field">
-                        <dt>Họ và tên</dt>
-                        <dd>{{ profile.fullName || 'Chưa cập nhật' }}</dd>
+                        <dt>Full name</dt>
+                        <dd>{{ profile.fullName || 'Not updated' }}</dd>
                     </div>
                     <div class="profile-field">
-                        <dt>Tên đăng nhập</dt>
+                        <dt>Username</dt>
                         <dd class="profile-field__mono">{{ profile.username }}</dd>
                     </div>
                     <div class="profile-field">
-                        <dt>Địa chỉ email</dt>
+                        <dt>Email address</dt>
                         <dd>{{ profile.email }}</dd>
                     </div>
                     <div class="profile-field">
-                        <dt>Số điện thoại</dt>
-                        <dd>{{ profile.phoneNumber || 'Chưa cập nhật' }}</dd>
+                        <dt>Phone number</dt>
+                        <dd>{{ profile.phoneNumber || 'Not updated' }}</dd>
                     </div>
                     <div class="profile-field">
-                        <dt>Ngày sinh</dt>
+                        <dt>Date of birth</dt>
                         <dd>
-                            {{ profile.dateOfBirth ? (profile.dateOfBirth | date: 'dd/MM/yyyy') : 'Chưa cập nhật' }}
+                            {{ profile.dateOfBirth ? (profile.dateOfBirth | date: 'dd/MM/yyyy') : 'Not updated' }}
                         </dd>
                     </div>
                     <div class="profile-field">
-                        <dt>Vai trò người dùng</dt>
+                        <dt>User roles</dt>
                         <dd>
                             @if (store.activeRoles().length === 0) {
                                 <span>No active roles</span>
@@ -84,8 +84,8 @@
 
                 <p class="profile-card__note">
                     <span class="material-symbols-outlined" aria-hidden="true">info</span>
-                    Thông tin hồ sơ chỉ có thể được cập nhật bởi bộ phận quản trị. Vui lòng liên hệ hỗ trợ
-                    học viên nếu cần thay đổi.
+                    Profile information can only be updated by administrators. Please contact student support
+                    if you need to make changes.
                 </p>
             }
         </section>
@@ -94,18 +94,18 @@
             <div class="password-card__heading">
                 <span class="password-card__icon material-symbols-outlined" aria-hidden="true">key</span>
                 <div>
-                    <h2 id="password-title">Đổi mật khẩu</h2>
-                    <p>Đặt lại mật khẩu định kỳ giúp bảo vệ tài khoản và kết quả học tập của bạn.</p>
+                    <h2 id="password-title">Change password</h2>
+                    <p>Regularly updating your password helps protect your account and learning progress.</p>
                 </div>
             </div>
 
             <form [formGroup]="store.form" (ngSubmit)="submit()" [attr.aria-busy]="store.busy()" novalidate>
                 <fieldset [disabled]="store.busy()">
-                    <legend class="visually-hidden">Thông tin đổi mật khẩu</legend>
+                    <legend class="visually-hidden">Change password form</legend>
 
                     <div class="field">
                         <label for="currentPassword">
-                            Mật khẩu hiện tại <span class="required" aria-hidden="true">*</span>
+                            Current password <span class="required" aria-hidden="true">*</span>
                         </label>
                         <div class="field__input">
                             <input
@@ -113,7 +113,7 @@
                                     formControlName="currentPassword"
                                     [type]="visiblePasswords().has('currentPassword') ? 'text' : 'password'"
                                     autocomplete="current-password"
-                                    placeholder="Nhập mật khẩu bạn đang sử dụng"
+                                    placeholder="Enter your current password"
                                     required
                                     [attr.aria-invalid]="store.fieldError('currentPassword') ? 'true' : null"
                                     [attr.aria-describedby]="store.fieldError('currentPassword') ? 'currentPassword-error' : null"
@@ -121,7 +121,7 @@
                             <button
                                     class="password-toggle"
                                     type="button"
-                                    [attr.aria-label]="(visiblePasswords().has('currentPassword') ? 'Ẩn ' : 'Hiện ') + 'mật khẩu hiện tại'"
+                                    [attr.aria-label]="(visiblePasswords().has('currentPassword') ? 'Hide ' : 'Show ') + 'current password'"
                                     [attr.aria-pressed]="visiblePasswords().has('currentPassword')"
                                     aria-controls="currentPassword"
                                     (click)="togglePassword('currentPassword')"
@@ -139,9 +139,9 @@
                     <div class="field">
                         <div class="field__label-row">
                             <label for="newPassword">
-                                Mật khẩu mới <span class="required" aria-hidden="true">*</span>
+                                New password <span class="required" aria-hidden="true">*</span>
                             </label>
-                            <span class="field__hint">Tối thiểu 8 ký tự</span>
+                            <span class="field__hint">At least 8 characters</span>
                         </div>
                         <div class="field__input">
                             <input
@@ -149,7 +149,7 @@
                                     formControlName="newPassword"
                                     [type]="visiblePasswords().has('newPassword') ? 'text' : 'password'"
                                     autocomplete="new-password"
-                                    placeholder="Tối thiểu 8 ký tự"
+                                    placeholder="At least 8 characters"
                                     required
                                     minlength="8"
                                     [attr.aria-invalid]="store.fieldError('newPassword') ? 'true' : null"
@@ -158,7 +158,7 @@
                             <button
                                     class="password-toggle"
                                     type="button"
-                                    [attr.aria-label]="(visiblePasswords().has('newPassword') ? 'Ẩn ' : 'Hiện ') + 'mật khẩu mới'"
+                                    [attr.aria-label]="(visiblePasswords().has('newPassword') ? 'Hide ' : 'Show ') + 'new password'"
                                     [attr.aria-pressed]="visiblePasswords().has('newPassword')"
                                     aria-controls="newPassword"
                                     (click)="togglePassword('newPassword')"
@@ -175,7 +175,7 @@
 
                     <div class="field">
                         <label for="confirmNewPassword">
-                            Xác nhận mật khẩu mới <span class="required" aria-hidden="true">*</span>
+                            Confirm new password <span class="required" aria-hidden="true">*</span>
                         </label>
                         <div class="field__input">
                             <input
@@ -183,7 +183,7 @@
                                     formControlName="confirmNewPassword"
                                     [type]="visiblePasswords().has('confirmNewPassword') ? 'text' : 'password'"
                                     autocomplete="new-password"
-                                    placeholder="Nhập lại chính xác mật khẩu mới"
+                                    placeholder="Re-enter your new password"
                                     required
                                     minlength="8"
                                     [attr.aria-invalid]="store.fieldError('confirmNewPassword') ? 'true' : null"
@@ -192,7 +192,7 @@
                             <button
                                     class="password-toggle"
                                     type="button"
-                                    [attr.aria-label]="(visiblePasswords().has('confirmNewPassword') ? 'Ẩn ' : 'Hiện ') + 'xác nhận mật khẩu mới'"
+                                    [attr.aria-label]="(visiblePasswords().has('confirmNewPassword') ? 'Hide ' : 'Show ') + 'confirm new password'"
                                     [attr.aria-pressed]="visiblePasswords().has('confirmNewPassword')"
                                     aria-controls="confirmNewPassword"
                                     (click)="togglePassword('confirmNewPassword')"
@@ -210,16 +210,16 @@
                     <p class="notice">
                         <span class="material-symbols-outlined" aria-hidden="true">info</span>
                         <span>
-                            <strong>Lưu ý:</strong> Sau khi đổi mật khẩu thành công, phiên hiện tại sẽ kết thúc
-                            và bạn cần đăng nhập lại.
+                            <strong>Note:</strong> After changing your password, your current session will end
+                            and you will need to sign in again.
                         </span>
                     </p>
 
                     @if (store.succeeded()) {
                         <p class="success-notice" role="status" tabindex="-1">
                             <span class="material-symbols-outlined" aria-hidden="true">check_circle</span>
-                            Mật khẩu đã được cập nhật. Vui lòng
-                            <a routerLink="/login">đăng nhập lại</a>.
+                            Password has been updated. Please
+                            <a routerLink="/login">sign in again</a>.
                         </p>
                     }
 
@@ -227,21 +227,21 @@
                         <p class="error-notice" role="alert" tabindex="-1">
                             {{ message }}
                             @if (store.requiresSignIn()) {
-                                <a routerLink="/login">Đăng nhập lại</a>
+                                <a routerLink="/login">Sign in again</a>
                             }
                         </p>
                     }
 
                     <button class="primary-button" type="submit" [disabled]="store.busy()">
                         <span class="material-symbols-outlined" aria-hidden="true">lock_reset</span>
-                        {{ store.busy() ? 'Đang xử lý…' : 'Đổi mật khẩu' }}
+                        {{ store.busy() ? 'Processing…' : 'Change password' }}
                     </button>
                 </fieldset>
             </form>
 
             <p class="password-card__tip">
                 <span class="material-symbols-outlined" aria-hidden="true">check</span>
-                Mật khẩu không nên trùng với tên đăng nhập hoặc ngày sinh của bạn.
+                Password should not match your username or date of birth.
             </p>
         </section>
     </div>

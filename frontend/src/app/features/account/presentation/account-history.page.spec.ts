@@ -61,7 +61,7 @@ describe('AccountHistoryPage', () => {
             'C# Căn bản & Nền tảng .NET',
         );
         expect(rows[0]!.querySelector('.history-table__score-badge')?.textContent).toContain('82,5%');
-        expect(rows[0]!.querySelector('.history-table__link')?.getAttribute('href')).toBe('/quiz/quiz-1');
+        expect(rows[0]!.querySelector('.history-table__link')?.getAttribute('href')).toBe('/quiz/quiz-1?history=true');
     });
 
     it('marks a passing attempt apart from a failing one', async () => {
@@ -70,8 +70,8 @@ describe('AccountHistoryPage', () => {
         );
         const rows = element.querySelectorAll('tbody tr');
 
-        expect(rows[0]!.querySelector('.history-table__status')?.textContent).toContain('Đạt');
-        expect(rows[1]!.querySelector('.history-table__status')?.textContent).toContain('Chưa đạt');
+        expect(rows[0]!.querySelector('.history-table__status')?.textContent).toContain('Passed');
+        expect(rows[1]!.querySelector('.history-table__status')?.textContent).toContain('Needs improvement');
         expect(rows[1]!.querySelector('.history-table__score-badge--passed')).toBeNull();
     });
 
@@ -109,7 +109,7 @@ describe('AccountHistoryPage', () => {
 
         expect(element.querySelector('table')).toBeNull();
         expect(element.querySelector('.history-state')?.textContent).toContain(
-            'Bạn chưa hoàn thành lượt làm bài nào.',
+            "You haven't completed any quiz attempts yet.",
         );
         expect(element.querySelector('.history-state__cta')?.getAttribute('href')).toBe('/');
     });
@@ -119,7 +119,7 @@ describe('AccountHistoryPage', () => {
         const {fixture, element} = await setup(history);
 
         const alert = element.querySelector('[role="alert"]');
-        expect(alert?.textContent).toContain('Không thể tải lịch sử làm bài');
+        expect(alert?.textContent).toContain('Could not load your attempt history');
 
         history.mockResolvedValue({items: entries, totalCount: 2, pageNumber: 1, pageSize: 2});
         element.querySelector<HTMLButtonElement>('.history-state__retry')!.click();
