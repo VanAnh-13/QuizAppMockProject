@@ -88,6 +88,25 @@ export class QuizDetailsPage {
     protected readonly chronologicalHistory = computed(() => {
         return [...this.history()].reverse();
     });
+    protected readonly passingScoreValue = computed(() => {
+        const first = this.history().find((a) => a.passedScore !== null);
+        if (first && first.passedScore !== null) return first.passedScore;
+        const fact = this.formatFacts().find((f) => f.label.toLowerCase().includes('pass') || f.value.includes('%'));
+        if (fact) {
+            const match = /(\d+)/.exec(fact.value);
+            if (match) return Number(match[1]);
+        }
+        return 70;
+    });
+    protected readonly singleAttempt = computed(() => {
+        return this.history().length === 1 ? this.history()[0] : null;
+    });
+    protected readonly isSinglePassed = computed(() => {
+        const single = this.singleAttempt();
+        if (!single) return false;
+        const target = single.passedScore ?? this.passingScoreValue();
+        return single.score >= target;
+    });
 
     constructor() {
         this.route.paramMap.subscribe((params) => {
