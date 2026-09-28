@@ -16,11 +16,11 @@ frontend/build/
 .idea/
 .vs/
 .codex/
+.agents/
 *.user
 *.suo
 *.DotSettings.user
 .vscode/
-.idea/
 
 # Local secrets
 .env

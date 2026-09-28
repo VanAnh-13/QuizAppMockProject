@@ -74,7 +74,7 @@ export class AccountSettingsStore {
             if (version !== this.loadVersion) return;
             this.profile.set(null);
             this.loadError.set(
-                apiErrorMessage(error, 'Không thể tải thông tin hồ sơ. Vui lòng thử lại.'),
+                apiErrorMessage(error, 'Could not load your profile details. Please try again.'),
             );
         } finally {
             if (version === this.loadVersion) this.isLoading.set(false);
@@ -86,19 +86,19 @@ export class AccountSettingsStore {
 
         if (!control.touched) return null;
 
-        if (control.hasError('required')) return 'Vui lòng điền thông tin này.';
+        if (control.hasError('required')) return 'This field is required.';
 
         if (control.hasError('minlength'))
-            return `Mật khẩu cần ít nhất ${AUTH_LIMITS.passwordMin} ký tự.`;
+            return `Password must be at least ${AUTH_LIMITS.passwordMin} characters.`;
 
         if (control.hasError('maxlength'))
-            return `Tối đa ${control.getError('maxlength').requiredLength} ký tự.`;
+            return `Maximum ${control.getError('maxlength').requiredLength} characters.`;
 
         if (name === 'newPassword' && this.form.hasError('passwordReused'))
-            return 'Mật khẩu mới phải khác mật khẩu hiện tại.';
+            return 'New password must be different from current password.';
 
         if (name === 'confirmNewPassword' && this.form.hasError('passwordMismatch'))
-            return 'Mật khẩu xác nhận chưa khớp.';
+            return 'Confirmation password does not match.';
 
         return null;
     }
@@ -133,8 +133,8 @@ export class AccountSettingsStore {
 
             this.error.set(
                 unauthorized
-                    ? 'Mật khẩu hiện tại chưa đúng, hoặc phiên đăng nhập đã kết thúc. Vui lòng đăng nhập lại và thử lại.'
-                    : apiErrorMessage(error, 'Không thể đổi mật khẩu. Vui lòng kiểm tra thông tin và thử lại.'),
+                    ? 'Current password is incorrect or your session has expired. Please log in again.'
+                    : apiErrorMessage(error, 'Could not change password. Please check your information and try again.'),
             );
 
             return false;

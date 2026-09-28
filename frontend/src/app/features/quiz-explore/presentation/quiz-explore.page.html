@@ -213,7 +213,7 @@
                                 type="button"
                                 [class.pagination__page--active]="store.currentPage() === pageNumber"
                                 [attr.aria-current]="store.currentPage() === pageNumber ? 'page' : null"
-                                [attr.aria-label]="'Trang ' + pageNumber"
+                                [attr.aria-label]="'Page ' + pageNumber"
                                 (click)="store.goToPage(pageNumber)"
                         >
                             {{ pageNumber }}

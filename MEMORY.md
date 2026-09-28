@@ -11,7 +11,7 @@
 |------------------------------|------------------------------|---------------------------------------------------------------------|
 | **Frontend Framework**       | Angular                      | `22.1.0` (standalone components, signals, `OnPush`, zero NgModules) |
 | **Frontend Language**        | TypeScript                   | `~6.0.2` (strict mode, `isolatedModules`, `target: ES2022`)         |
-| **Frontend Styling**         | Tailwind CSS + CSS Variables | Tailwind `3.4.17`, custom LyQuiz Glass design tokens                |
+| **Frontend Styling**         | Tailwind CSS + CSS Variables | Tailwind `3.4.17`, custom Liquid Glass design tokens                |
 | **Frontend Test Runner**     | Vitest + jsdom               | Vitest `4.0.8`, `@angular/build` integration                        |
 | **Frontend Package Manager** | pnpm                         | `11.16.0` (run with `pnpm.cmd` on Windows)                          |
 | **Backend Framework**        | ASP.NET Core                 | `.NET 10` C# solution                                               |
@@ -45,7 +45,7 @@ d:/Homeworks/angular/quiz_app/
 │   │   └── shared/                  # Reusable state types & UI components
 │   │       ├── state/               # AsyncState discriminated union
 │   │       └── ui/                  # async-content, toast, confirmation, dialog, brand, headers
-│   ├── DESIGN.MD                    # LyQuiz Glass design system specification
+│   ├── DESIGN.MD                    # Liquid Glass design system specification
 │   └── AGENTS.md                    # Frontend-specific agent instructions
 ├── AGENTS.md                 # Repository-level agent rules & skill gates
 ├── MEMORY.md                 # This file (persistent agent context)
@@ -65,7 +65,7 @@ d:/Homeworks/angular/quiz_app/
 
 ---
 
-## 3. Design System — LyQuiz Glass (`frontend/DESIGN.MD`)
+## 3. Design System — Liquid Glass (`frontend/DESIGN.MD`)
 
 ### Color Palette (Blue Gradient)
 

@@ -57,7 +57,13 @@ describe('QuizDetailsPage', () => {
             imports: [QuizDetailsPage],
             providers: [
                 provideRouter([]),
-                {provide: ActivatedRoute, useValue: {paramMap: of(convertToParamMap({quizId}))}},
+                {
+                    provide: ActivatedRoute,
+                    useValue: {
+                        paramMap: of(convertToParamMap({quizId})),
+                        queryParamMap: of(convertToParamMap({})),
+                    },
+                },
                 {provide: ConfirmationService, useClass: MockConfirmationService},
             ],
         })
@@ -338,5 +344,21 @@ describe('QuizDetailsPage', () => {
         dialog.dispatchEvent(new Event('cancel'));
         fixture.detectChanges();
         expect(element.querySelector('.details-dialog')).toBeNull();
+    });
+
+    it('automatically opens attempt history when history=true query parameter is present', async () => {
+        TestBed.inject(AuthSession).set({
+            token: 'test-token',
+            expiresAt: new Date(Date.now() + 60_000).toISOString(),
+            userDto: {id: 'learner-id', username: 'learner', fullName: null},
+        });
+        const route = TestBed.inject(ActivatedRoute);
+        (route as unknown as {queryParamMap: unknown}).queryParamMap = of(convertToParamMap({history: 'true'}));
+        const fixture = await createFixture();
+        const element = fixture.nativeElement as HTMLElement;
+
+        expect(history).toHaveBeenCalledWith(quizId);
+        expect(element.querySelector('#attempt-history')).not.toBeNull();
+        expect(element.querySelector('.history-list')?.textContent).toContain('80 / 100');
     });
 });

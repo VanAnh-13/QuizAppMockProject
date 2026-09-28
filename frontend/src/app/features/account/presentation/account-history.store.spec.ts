@@ -197,7 +197,7 @@ describe('AccountHistoryStore', () => {
 
         expect(store.historyRows()).toEqual([]);
         expect(store.errorMessage()).toBe(
-            'Không thể tải lịch sử làm bài. Vui lòng thử lại.',
+            'Could not load your attempt history. Please try again.',
         );
         expect(store.isLoading()).toBe(false);
     });

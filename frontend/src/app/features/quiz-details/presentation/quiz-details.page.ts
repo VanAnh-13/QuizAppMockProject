@@ -77,6 +77,18 @@ export class QuizDetailsPage {
     protected readonly historyLoading = signal(false);
     protected readonly historyError = signal<string | null>(null);
 
+    protected readonly bestScore = computed(() => {
+        const attempts = this.history();
+        if (attempts.length === 0) return null;
+        return Math.max(...attempts.map((a) => a.score));
+    });
+    protected readonly hasPassed = computed(() => {
+        return this.history().some((a) => a.passedScore !== null && a.score >= a.passedScore);
+    });
+    protected readonly chronologicalHistory = computed(() => {
+        return [...this.history()].reverse();
+    });
+
     constructor() {
         this.route.paramMap.subscribe((params) => {
             this.quizId.set(params.get('quizId') ?? '');
@@ -92,6 +104,13 @@ export class QuizDetailsPage {
                 const resolved = data['snapshot'] as QuizDetailsResolution | undefined;
                 if (resolved) {
                     this.applyResolution(resolved);
+                }
+            });
+        }
+        if (this.route.queryParamMap) {
+            this.route.queryParamMap.subscribe((queryParams) => {
+                if (queryParams.get('history') === 'true' || queryParams.get('view') === 'history') {
+                    void this.openHistory();
                 }
             });
         }

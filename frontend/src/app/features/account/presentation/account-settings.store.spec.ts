@@ -67,7 +67,7 @@ describe('AccountSettingsStore', () => {
         await store.load();
 
         expect(store.profile()).toBeNull();
-        expect(store.loadError()).toBe('Không thể tải thông tin hồ sơ. Vui lòng thử lại.');
+        expect(store.loadError()).toBe('Could not load your profile details. Please try again.');
     });
 
     it('sends the change to the API and requires a fresh sign-in on success', async () => {
@@ -102,7 +102,7 @@ describe('AccountSettingsStore', () => {
 
         expect(await store.submit()).toBe(false);
         expect(api.changePassword).not.toHaveBeenCalled();
-        expect(store.fieldError('confirmNewPassword')).toBe('Mật khẩu xác nhận chưa khớp.');
+        expect(store.fieldError('confirmNewPassword')).toBe('Confirmation password does not match.');
     });
 
     it('rejects reusing the current password', async () => {
@@ -111,7 +111,7 @@ describe('AccountSettingsStore', () => {
 
         expect(await store.submit()).toBe(false);
         expect(api.changePassword).not.toHaveBeenCalled();
-        expect(store.fieldError('newPassword')).toBe('Mật khẩu mới phải khác mật khẩu hiện tại.');
+        expect(store.fieldError('newPassword')).toBe('New password must be different from current password.');
     });
 
     it('rejects a new password shorter than the minimum length', async () => {
@@ -120,7 +120,7 @@ describe('AccountSettingsStore', () => {
 
         expect(await store.submit()).toBe(false);
         expect(api.changePassword).not.toHaveBeenCalled();
-        expect(store.fieldError('newPassword')).toBe('Mật khẩu cần ít nhất 8 ký tự.');
+        expect(store.fieldError('newPassword')).toBe('Password must be at least 8 characters.');
     });
 
     it('reports missing required fields', async () => {
@@ -128,7 +128,7 @@ describe('AccountSettingsStore', () => {
 
         expect(await store.submit()).toBe(false);
         expect(api.changePassword).not.toHaveBeenCalled();
-        expect(store.fieldError('currentPassword')).toBe('Vui lòng điền thông tin này.');
+        expect(store.fieldError('currentPassword')).toBe('This field is required.');
     });
 
     it('explains that a 401 ends the session', async () => {
@@ -138,7 +138,7 @@ describe('AccountSettingsStore', () => {
         expect(await store.submit()).toBe(false);
         expect(store.succeeded()).toBe(false);
         expect(store.requiresSignIn()).toBe(true);
-        expect(store.error()).toContain('Mật khẩu hiện tại chưa đúng');
+        expect(store.error()).toContain('Current password is incorrect');
     });
 
     it('keeps the session for a server error', async () => {
@@ -148,7 +148,7 @@ describe('AccountSettingsStore', () => {
         expect(await store.submit()).toBe(false);
         expect(store.requiresSignIn()).toBe(false);
         expect(store.error()).toBe(
-            'Không thể đổi mật khẩu. Vui lòng kiểm tra thông tin và thử lại.',
+            'Could not change password. Please check your information and try again.',
         );
     });
 });

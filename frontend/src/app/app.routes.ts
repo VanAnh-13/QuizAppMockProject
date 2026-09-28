@@ -38,7 +38,7 @@ export const routes: Routes = [
     },
     {
         path: 'history',
-        title: 'Lịch sử làm bài — QuizApp',
+        title: 'Attempt history — QuizApp',
         canActivate: [requireAuthGuard],
         loadComponent: () =>
             import('./features/account/presentation/account-history.page').then(
@@ -47,7 +47,7 @@ export const routes: Routes = [
     },
     {
         path: 'settings',
-        title: 'Cài đặt tài khoản & Bảo mật — QuizApp',
+        title: 'Account settings & security — QuizApp',
         canActivate: [requireAuthGuard],
         loadComponent: () =>
             import('./features/account/presentation/account-settings.page').then(

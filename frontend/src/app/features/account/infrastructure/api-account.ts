@@ -37,7 +37,7 @@ function validateProfile(profile: ProfilePayload): AccountProfile {
         typeof profile.username !== 'string' ||
         typeof profile.email !== 'string'
     ) {
-        throw new Error('Dữ liệu hồ sơ không hợp lệ.');
+        throw new Error('Invalid profile data.');
     }
 
     return {
