@@ -1,4 +1,5 @@
-﻿allowBuilds:
+nodeLinker: hoisted
+allowBuilds:
   '@parcel/watcher': true
   esbuild: true
   lmdb: true
