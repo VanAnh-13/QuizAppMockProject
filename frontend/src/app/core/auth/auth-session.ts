@@ -12,6 +12,24 @@ export interface AuthResponse {
 
 const SESSION_KEY = 'quizapp.session';
 
+function tokenRoles(token: string): readonly string[] {
+    try {
+        const payload = token.split('.')[1];
+        if (!payload) return [];
+        const json = JSON.parse(atob(payload.replace(/-/g, '+').replace(/_/g, '/'))) as Record<string, unknown>;
+        // noinspection HttpUrlsUsage
+        const roleClaimType = 'http://schemas.microsoft.com/ws/2008/06/identity/claims/role';
+        const value = json['role'] ?? json[roleClaimType];
+        return Array.isArray(value)
+            ? value.filter((role): role is string => typeof role === 'string')
+            : typeof value === 'string'
+              ? [value]
+              : [];
+    } catch {
+        return [];
+    }
+}
+
 @Injectable({providedIn: 'root'})
 export class AuthSession {
     private rememberedValue: string | null = null;
@@ -46,6 +64,11 @@ export class AuthSession {
         }
 
         return session.token;
+    }
+
+    isAdmin(): boolean {
+        const token = this.token();
+        return !!token && tokenRoles(token).includes('Admin');
     }
 
     set(response: AuthResponse, remember = false): void {

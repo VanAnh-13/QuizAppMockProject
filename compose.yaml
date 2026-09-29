@@ -1,7 +1,88 @@
-﻿services:
-  quizapp:
-    image: quizapp
+# =============================================================================
+# Quizapp — Docker Compose (full stack)
+#
+# Services:
+#   db            SQL Server 2022 — persistent data volume
+#   quizapp-api   .NET 10 backend API
+#   quizapp-web   Angular frontend served by nginx
+#
+# Usage:
+#   cp .env.example .env        # edit credentials and secrets
+#   docker compose up -d --build
+#   docker compose logs -f
+# =============================================================================
+
+services:
+  # ---------------------------------------------------------------------------
+  # Database — SQL Server 2022
+  # ---------------------------------------------------------------------------
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: quizapp-db
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: ${SA_PASSWORD:?Set SA_PASSWORD in .env}
+      MSSQL_PID: Developer
+    ports:
+      - "${DB_PORT:-1433}:1433"
+    volumes:
+      - sqlserver-data:/var/opt/mssql
+    healthcheck:
+      test: >
+        /opt/mssql-tools2/bin/sqlcmd
+        -S localhost -U sa -P "$${MSSQL_SA_PASSWORD}"
+        -Q "SELECT 1" -b -o /dev/null || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+    restart: unless-stopped
+
+  # ---------------------------------------------------------------------------
+  # Backend — .NET 10 API
+  # ---------------------------------------------------------------------------
+  quizapp-api:
+    image: quizapp-api
+    container_name: quizapp-api
     build:
       context: ./backend
       dockerfile: Quizapp/Quizapp.Api/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Development}
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__DefaultConnection: >-
+        Server=db,1433;
+        Database=${DB_NAME:-Quizapp};
+        User Id=sa;
+        Password=${SA_PASSWORD:?Set SA_PASSWORD in .env};
+        Encrypt=True;
+        TrustServerCertificate=True
+      Jwt__Issuer: ${JWT_ISSUER:-quizapp-api}
+      Jwt__Audience: ${JWT_AUDIENCE:-quizapp-client}
+      Jwt__SigningKey: ${JWT_SIGNING_KEY:?Set JWT_SIGNING_KEY in .env}
+      Jwt__LifetimeMinutes: ${JWT_LIFETIME_MINUTES:-60}
+      SampleData__Enabled: ${SAMPLE_DATA_ENABLED:-true}
+    ports:
+      - "${API_PORT:-5269}:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
 
+  # ---------------------------------------------------------------------------
+  # Frontend — Angular + nginx
+  # ---------------------------------------------------------------------------
+  quizapp-web:
+    image: quizapp-web
+    container_name: quizapp-web
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "${WEB_PORT:-4200}:80"
+    depends_on:
+      - quizapp-api
+    restart: unless-stopped
+
+volumes:
+  sqlserver-data:

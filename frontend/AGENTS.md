@@ -67,12 +67,14 @@ frontend source file, including HTML, CSS, and TypeScript.
 
 ## Verification
 
-After invoking the required testing skill, run the checks appropriate to the change. For source
-changes, the minimum verification is:
+After invoking the required testing skill, run frontend checks with Node and pnpm inside WSL,
+not through `pnpm.cmd` on the Windows host. See the WSL invocation and pnpm shim fallback in
+[`../HARNESS.md`](../HARNESS.md#frontend-agent-runtime-wsl). For source changes, the minimum
+verification (from `frontend/` in WSL) is:
 
-```powershell
-pnpm.cmd test --watch=false
-pnpm.cmd build
+```bash
+pnpm test --watch=false
+pnpm build
 git diff --check
 ```
 

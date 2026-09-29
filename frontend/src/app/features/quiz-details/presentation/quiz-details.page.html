@@ -56,6 +56,12 @@
                             <span class="material-symbols-outlined" aria-hidden="true">manage_accounts</span>
                             Settings &amp; security
                         </a>
+                        @if (session.isAdmin()) {
+                            <a class="details-header__user-link" routerLink="/admin/quizzes">
+                                <span class="material-symbols-outlined" aria-hidden="true">admin_panel_settings</span>
+                                Admin dashboard
+                            </a>
+                        }
                         <button
                                 class="details-header__logout-button"
                                 type="button"
