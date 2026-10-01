@@ -2,9 +2,10 @@
 # Quizapp — Docker Compose (full stack)
 #
 # Services:
-#   db            SQL Server 2022 — persistent data volume
-#   quizapp-api   .NET 10 backend API
-#   quizapp-web   Angular frontend served by nginx
+#   db                  SQL Server 2022 — persistent data volume
+#   quizapp-migration   Applies EF Core database migrations (runs to completion)
+#   quizapp-api         .NET 10 backend API
+#   quizapp-web         Angular frontend served by nginx
 #
 # Usage:
 #   cp .env.example .env        # edit credentials and secrets
@@ -39,6 +40,34 @@ services:
     restart: unless-stopped
 
   # ---------------------------------------------------------------------------
+  # Database Migration — Applies EF Core migrations before API startup
+  # ---------------------------------------------------------------------------
+  quizapp-migration:
+    image: quizapp-api
+    container_name: quizapp-migration
+    build:
+      context: ./backend
+      dockerfile: Quizapp/Quizapp.Api/Dockerfile
+    command: ["--migrate"]
+    environment:
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Development}
+      ConnectionStrings__DefaultConnection: >-
+        Server=db,1433;
+        Database=${DB_NAME:-Quizapp};
+        User Id=sa;
+        Password=${SA_PASSWORD:?Set SA_PASSWORD in .env};
+        Encrypt=True;
+        TrustServerCertificate=True
+      Jwt__Issuer: ${JWT_ISSUER:-quizapp-api}
+      Jwt__Audience: ${JWT_AUDIENCE:-quizapp-client}
+      Jwt__SigningKey: ${JWT_SIGNING_KEY:?Set JWT_SIGNING_KEY in .env}
+      Jwt__LifetimeMinutes: ${JWT_LIFETIME_MINUTES:-60}
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: "no"
+
+  # ---------------------------------------------------------------------------
   # Backend — .NET 10 API
   # ---------------------------------------------------------------------------
   quizapp-api:
@@ -67,6 +96,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      quizapp-migration:
+        condition: service_completed_successfully
     restart: unless-stopped
 
   # ---------------------------------------------------------------------------
