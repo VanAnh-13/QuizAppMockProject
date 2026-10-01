@@ -24,7 +24,7 @@ Controllers and application services implement authentication, user/role managem
 - [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0)
 - A SQL Server instance for business endpoints, database migrations, and persistence tests (database-independent tests do not need one)
 - [EF Core CLI **10.0.11**](https://learn.microsoft.com/en-us/ef/core/cli/dotnet) for migration commands
-- Optional: Docker with Docker Compose for building the container image
+- Docker with Docker Compose for the full-stack container setup (optional for local .NET development)
 
 ## Project Structure
 
@@ -189,13 +189,19 @@ dotnet test "$Tests" --filter 'FullyQualifiedName~RequestValidationTests'
 
 ## Docker
 
-The repository includes a multi-stage Linux Dockerfile (`Quizapp/Quizapp.Api/Dockerfile`) and a full-stack Compose configuration. From the repository root:
+The repository includes a multi-stage Linux Dockerfile (`Quizapp/Quizapp.Api/Dockerfile`) and a full-stack Compose configuration. Install Docker with Compose, start Docker, and run from the repository root:
 
 ```powershell
 Copy-Item '.env.example' '.env'
-# Set SA_PASSWORD and JWT_SIGNING_KEY in .env before starting.
+```
+
+Keep an existing `.env` when updating your checkout. Before starting, edit `.env` to replace `SA_PASSWORD` with a valid SQL Server administrator password and `JWT_SIGNING_KEY` with a random signing key of at least 32 bytes. The template includes a PowerShell command to generate the signing key.
+
+```powershell
 docker compose up -d --build
 ```
+
+Compose supplies the API and migration service with a SQL Server connection string targeting `db:1433`, using `DB_NAME` and `SA_PASSWORD` from `.env`. It defaults to `ASPNETCORE_ENVIRONMENT=Development` and `SAMPLE_DATA_ENABLED=true`; sample data is seeded only in Development. The published host ports default to 1433 for SQL Server, 5269 for the API, and 4200 for the frontend, and can be changed with `DB_PORT`, `API_PORT`, and `WEB_PORT`.
 
 Startup proceeds in this order:
 
@@ -236,6 +242,6 @@ Review the generated schema changes before applying.
 | Swagger is missing                                    | Use a Development launch profile and navigate to `/swagger`, not `/`                                                              |
 | API fails before startup with JWT configuration error | Check `Jwt__Issuer`, `Jwt__Audience`, `Jwt__SigningKey`, and `Jwt__LifetimeMinutes`                                               |
 | SQL Server connection fails                           | Check server name, credentials, network access, certificate settings, and the `ConnectionStrings__DefaultConnection` env variable |
-| Database tables missing                               | Run `dotnet ef database update` — startup does not migrate automatically                                                          |
+| Database tables missing                               | For Compose, inspect `docker compose logs quizapp-migration`; for local setup, run `dotnet ef database update`                                                          |
 | Persistence tests skipped                             | Set `QUIZAPP_TEST_SQLSERVER_CONNECTION_STRING` for a dedicated test instance                                                      |
 | HTTPS certificate errors                              | Trust the .NET dev certificate (`dotnet dev-certs https --trust`) or use the HTTP launch profile                                  |
