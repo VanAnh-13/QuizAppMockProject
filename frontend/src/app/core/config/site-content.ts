@@ -1,4 +1,4 @@
-export type SiteInformation = 'about' | 'contact' | 'login' | 'register' | 'terms' | 'privacy' | 'passwordReset';
+export type SiteInformation = 'about' | 'contact' | 'login' | 'register' | 'terms' | 'privacy';
 
 export const SITE_NAVIGATION = [
     {path: '/about', label: 'About'},
@@ -15,10 +15,6 @@ export const SITE_INFORMATION: Readonly<
     privacy: {
         title: 'Data information — development preview',
         description: 'This form sends your username, email, and profile details to the QuizApp server. Phone number and date of birth are optional. Your session is stored in your browser; choosing Remember me keeps it after you close the browser until it expires or you log out. The official privacy policy has not been published.',
-    },
-    passwordReset: {
-        title: 'Reset password',
-        description: 'Automatic password reset is not available in this version. If you forget your password, contact the administrator who provided your account.',
     },
     about: {
         title: 'Every question is a step forward',

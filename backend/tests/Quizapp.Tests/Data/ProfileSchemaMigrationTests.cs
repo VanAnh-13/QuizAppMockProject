@@ -43,6 +43,10 @@ public class ProfileSchemaMigrationTests(SqlServerFixture fixture) : IClassFixtu
         Assert.Null(savedUser.PhoneNumber);
         Assert.Null(savedUser.DateOfBirth);
         Assert.Null(savedUser.Avatar);
+        Assert.Null(savedUser.PasswordResetTokenHash);
+        Assert.Null(savedUser.PasswordResetExpiresAt);
+        Assert.Null(savedUser.PasswordResetRequestedAt);
+        Assert.Null(savedUser.PasswordResetSecurityStamp);
         var savedQuiz = await context.Quizzes.SingleAsync(value => value.Id == quiz.Id);
         Assert.Equal(quiz.Title, savedQuiz.Title);
         Assert.Null(savedQuiz.PassedScore);

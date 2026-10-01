@@ -55,6 +55,7 @@ internal sealed class QuizappApiFactory : WebApplicationFactory<AuthController>
     {
         builder.UseEnvironment(EnvironmentName);
         builder.UseSetting("SampleData:Enabled", "false");
+        builder.UseSetting("PasswordReset:FrontendUrl", "https://quizapp.test/reset-password");
         if (HttpsPort is not null)
             builder.UseSetting("HTTPS_PORT", HttpsPort.Value.ToString());
 

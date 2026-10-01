@@ -21,6 +21,10 @@ public class User
     }
 
     public Guid SecurityStamp { get; set; } = Guid.NewGuid();
+    public string? PasswordResetTokenHash { get; set; }
+    public DateTimeOffset? PasswordResetExpiresAt { get; set; }
+    public DateTimeOffset? PasswordResetRequestedAt { get; set; }
+    public Guid? PasswordResetSecurityStamp { get; set; }
     public DateTime CreateAt { get; init; }
     public DateTime UpdateAt { get; set; }
     public ICollection<QuizAttempt> QuizAttempts { get; init; } = new List<QuizAttempt>();

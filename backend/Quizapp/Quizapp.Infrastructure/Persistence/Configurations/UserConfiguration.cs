@@ -12,6 +12,10 @@ internal sealed class UserConfiguration : IEntityTypeConfiguration<User>
     {
         entry.HasKey(user => user.Id);
 
+        entry.Property(user => user.PasswordResetTokenHash)
+            .HasMaxLength(FieldLimits.PasswordResetHashLength)
+            .IsUnicode(false);
+
         entry.Property(user => user.FullName)
             .HasMaxLength(FieldLimits.FullNameLength);
 

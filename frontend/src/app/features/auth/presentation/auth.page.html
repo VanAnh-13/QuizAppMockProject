@@ -18,6 +18,9 @@
                 <p class="notice" role="status">Your account has been created. Log in to
                     continue.</p>
             }
+            @if (passwordReset) {
+                <p class="notice" role="status">Your password has been reset. Log in with your new password.</p>
+            }
             <form [formGroup]="store.form" (ngSubmit)="submit()" [attr.aria-busy]="store.busy()"
                     novalidate>
                 <fieldset [disabled]="store.busy()">
@@ -105,12 +108,7 @@
                                         formControlName="remember"/>
                                 Remember me
                             </label>
-                            <button
-                                    type="button"
-                                    class="text-link"
-                                    (click)="information.open('passwordReset')">
-                                Reset password?
-                            </button>
+                            <a class="text-link" routerLink="/forgot-password">Forgot password?</a>
                         </div>
                     }
                     @if (store.error(); as message) {

@@ -53,6 +53,7 @@ public sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logge
 
     private static int MapStatusCode(Exception exception) => exception switch
     {
+        QuizAppException { ErrorCode: "PASSWORD_RESET_BUSY" } => StatusCodes.Status503ServiceUnavailable,
         NotFoundException => StatusCodes.Status404NotFound,
         ConflictException => StatusCodes.Status409Conflict,
         ValidationException => StatusCodes.Status422UnprocessableEntity,

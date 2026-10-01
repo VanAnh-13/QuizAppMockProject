@@ -6,6 +6,8 @@ using System.Security.Claims;
 using Quizapp.Api.ExceptionHandlers;
 using Quizapp.Application;
 using Quizapp.Application.Abstractions.Messaging;
+using Quizapp.Application.Abstractions.Authentication;
+using System.Threading.RateLimiting;
 using Quizapp.Application.Abstractions.Persistence;
 using Quizapp.Infrastructure;
 using Quizapp.Infrastructure.Authentication;
@@ -14,6 +16,41 @@ using Quizapp.Infrastructure.Persistence;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
+
+builder.Services.AddOptions<PasswordResetOptions>()
+    .Bind(builder.Configuration.GetSection(PasswordResetOptions.SectionName))
+    .Validate(options => string.IsNullOrWhiteSpace(options.FrontendUrl)
+        || (Uri.TryCreate(options.FrontendUrl, UriKind.Absolute, out var url)
+            && string.IsNullOrEmpty(url.Query) && string.IsNullOrEmpty(url.Fragment)
+            && string.IsNullOrEmpty(url.UserInfo)
+            && (url.Scheme == Uri.UriSchemeHttps
+                || (builder.Environment.IsDevelopment() && url.Scheme == Uri.UriSchemeHttp && url.IsLoopback))),
+        "PasswordReset:FrontendUrl must be an HTTPS URL without a query or fragment; local HTTP is allowed in Development.")
+    .ValidateOnStart();
+
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    foreach (var (name, limit) in new[] { ("forgot-password", 5), ("reset-password", 10) })
+        options.AddPolicy(name, context => RateLimitPartition.GetFixedWindowLimiter(
+            context.Connection.RemoteIpAddress?.ToString() ?? "unknown",
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = limit,
+                Window = TimeSpan.FromMinutes(15),
+                QueueLimit = 0,
+                AutoReplenishment = true
+            }));
+    options.OnRejected = async (context, cancellationToken) =>
+    {
+        if (context.Lease.TryGetMetadata(MetadataName.RetryAfter, out var retryAfter))
+            context.HttpContext.Response.Headers.RetryAfter = Math.Ceiling(retryAfter.TotalSeconds).ToString();
+        await context.HttpContext.Response.WriteAsJsonAsync(new
+        {
+            error = "RATE_LIMITED", message = "Too many requests. Please try again later."
+        }, cancellationToken);
+    };
+});
 
 const string angularDevelopmentCorsPolicy = "AngularDevelopmentClient";
 
@@ -114,6 +151,7 @@ else
     app.UseHttpsRedirection();
 
 app.UseAuthentication();
+app.UseRateLimiter();
 app.UseAuthorization();
 app.MapControllers();
 

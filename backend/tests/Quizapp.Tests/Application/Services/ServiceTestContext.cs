@@ -51,6 +51,8 @@ internal sealed class ServiceTestContext : IDisposable
         Services.AddSingleton<IPasswordService, IdentityPasswordService>();
         Services.AddSingleton<ITokenService, JwtTokenService>();
         Services.AddSingleton<IEmailSender, NoOpEmailSender>();
+        Services.AddSingleton<IPasswordResetQueue, MemoryPasswordResetQueue>();
+        Services.Configure<PasswordResetOptions>(options => options.FrontendUrl = "https://quizapp.test/reset-password");
 
         Services.Configure<JwtOptions>(options =>
         {
@@ -205,6 +207,47 @@ internal abstract class MemoryRepository<T>(Func<T, Guid> id, Func<T, string> te
 
 internal sealed class MemoryUsers() : MemoryRepository<User>(user => user.Id, user => user.Username), IUserRepository
 {
+    public Task<User?> GetByEmailAsync(string email, CancellationToken cancellationToken) =>
+        Task.FromResult(Rows.SingleOrDefault(user => string.Equals(user.Email, email, StringComparison.OrdinalIgnoreCase)));
+
+    public Task<bool> TryIssuePasswordResetAsync(Guid userId, Guid securityStamp, string tokenHash,
+        DateTimeOffset requestedAt, DateTimeOffset expiresAt, DateTimeOffset cooldownBefore,
+        CancellationToken cancellationToken)
+    {
+        lock (Rows)
+        {
+            var user = Rows.SingleOrDefault(user => user.Id == userId);
+            if (user is null || !user.IsActive || user.SecurityStamp != securityStamp
+                || user.PasswordResetRequestedAt > cooldownBefore)
+                return Task.FromResult(false);
+            user.PasswordResetTokenHash = tokenHash;
+            user.PasswordResetSecurityStamp = securityStamp;
+            user.PasswordResetRequestedAt = requestedAt;
+            user.PasswordResetExpiresAt = expiresAt;
+            return Task.FromResult(true);
+        }
+    }
+
+    public Task<bool> TryResetPasswordAsync(Guid userId, Guid securityStamp, string tokenHash,
+        string passwordHash, Guid newSecurityStamp, DateTimeOffset now, CancellationToken cancellationToken)
+    {
+        lock (Rows)
+        {
+            var user = Rows.SingleOrDefault(user => user.Id == userId);
+            if (user is null || !user.IsActive || user.SecurityStamp != securityStamp
+                || user.PasswordResetSecurityStamp != securityStamp || user.PasswordResetTokenHash != tokenHash
+                || user.PasswordResetExpiresAt is null || user.PasswordResetExpiresAt <= now)
+                return Task.FromResult(false);
+            user.Password = passwordHash;
+            user.SecurityStamp = newSecurityStamp;
+            user.UpdateAt = now.UtcDateTime;
+            user.PasswordResetTokenHash = null;
+            user.PasswordResetExpiresAt = null;
+            user.PasswordResetSecurityStamp = null;
+            return Task.FromResult(true);
+        }
+    }
+
     public Task<User?> GetByUsernameAsync(string username, CancellationToken cancellationToken)
     {
         cancellationToken.ThrowIfCancellationRequested();

@@ -155,7 +155,7 @@ describe('AuthSession expiration', () => {
         controller.verify();
     });
 
-    it.each(['login', 'register', 'login?source=quiz', 'register?source=quiz'])(
+    it.each(['login', 'register', 'forgot-password', 'reset-password', 'login?source=quiz', 'register?source=quiz'])(
         'omits the bearer token for public auth route %s and preserves the session on 401', (route) => {
             TestBed.configureTestingModule({
                 providers: [

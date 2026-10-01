@@ -10,7 +10,7 @@ The backend currently provides:
 - DTOs for authentication, user and role management, quiz management, quiz taking, and attempt history.
 - DTOs initialized directly with object initializers; see [DTO construction](docs/dto-construction.md).
 - FluentValidation validators registered through dependency injection.
-- Role creation in `RoleService` and a question factory with creation strategies for all six question types; see [creation patterns](docs/creation-patterns.md).
+- Role and question creation live in their services; see [creation patterns](docs/creation-patterns.md).
 - SQL Server entity mappings and EF Core migrations.
 - A development API host with OpenAPI and Swagger UI.
 - A read-only public quiz catalog endpoint, `GET /api/public/quizzes`, for active quiz metadata without answers or grading keys.
@@ -128,6 +128,12 @@ dotnet run --project "$Api" --launch-profile http
 | HTTP listener    | http://localhost:5269                  |
 
 OpenAPI and Swagger UI are exposed **only in Development**. A `404` at `/` is expected — no root endpoint is mapped.
+
+## Password Recovery
+
+Password recovery uses `POST /api/auth/forgot-password` and `POST /api/auth/reset-password`.
+Apply the `AddPasswordResetTokens` migration and configure the frontend reset URL and SMTP before use.
+See [password reset setup and contract](docs/password-reset.md).
 
 ## Quiz Attempt Contract
 

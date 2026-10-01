@@ -12,14 +12,14 @@ import {
 import {ActivatedRoute, RouterLink} from '@angular/router';
 import {Location, NgOptimizedImage} from '@angular/common';
 import {ConfirmationService} from '../../../shared/ui/confirmation/confirmation.service';
-import {provideQuizAttempt} from '../infrastructure/attempt-content.provider';
+import {attemptContentProvider} from '../infrastructure/attempt-content.provider';
 import {ATTEMPT_CONFIG} from '../application/attempt-config';
 import {QuizAttemptStore} from './quiz-attempt.store';
 
 @Component({
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [RouterLink, NgOptimizedImage],
-    providers: [provideQuizAttempt(), QuizAttemptStore],
+    providers: [attemptContentProvider, QuizAttemptStore],
     selector: 'app-quiz-attempt-page',
     styleUrls: ['./quiz-attempt.page.css', './quiz-attempt.sidebar.css', './quiz-attempt.dialog.css'],
     templateUrl: './quiz-attempt.page.html',

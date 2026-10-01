@@ -1,5 +1,7 @@
 using FluentValidation;
 using Quizapp.Application.Abstractions.Authentication;
+using Microsoft.Extensions.Options;
+using Quizapp.Application.Abstractions.Messaging;
 using Quizapp.Application.Abstractions.Persistence;
 using Quizapp.Application.DTOs.Authentication;
 using Quizapp.Application.DTOs.UserManager;
@@ -8,7 +10,7 @@ using Quizapp.Domain.Exceptions;
 
 namespace Quizapp.Application.Services.Authentication;
 
-public sealed class AuthService(
+public sealed partial class AuthService(
     IUserRepository users,
     IUnitOfWork unitOfWork,
     UserProvisioning provisioning,
@@ -18,7 +20,12 @@ public sealed class AuthService(
     TimeProvider clock,
     IValidator<RegisterDto> registerValidator,
     IValidator<LoginDto> loginValidator,
-    IValidator<ChangePasswordDto> passwordValidator) : IAuthService
+    IValidator<ChangePasswordDto> passwordValidator,
+    IValidator<ForgotPasswordDto> forgotPasswordValidator,
+    IValidator<ResetPasswordDto> resetPasswordValidator,
+    IPasswordResetQueue resetQueue,
+    IEmailSender emailSender,
+    IOptions<PasswordResetOptions> resetOptions) : IAuthService
 {
     public async Task<UserDto> RegisterAsync(RegisterDto request, CancellationToken cancellationToken = default)
     {
