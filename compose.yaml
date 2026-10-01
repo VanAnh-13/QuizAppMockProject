@@ -25,7 +25,7 @@ services:
       MSSQL_SA_PASSWORD: ${SA_PASSWORD:?Set SA_PASSWORD in .env}
       MSSQL_PID: Developer
     ports:
-      - "${DB_PORT:-1433}:1433"
+      - "127.0.0.1:${DB_PORT:-1433}:1433"
     volumes:
       - sqlserver-data:/var/opt/mssql
     healthcheck:
@@ -90,9 +90,9 @@ services:
       Jwt__Audience: ${JWT_AUDIENCE:-quizapp-client}
       Jwt__SigningKey: ${JWT_SIGNING_KEY:?Set JWT_SIGNING_KEY in .env}
       Jwt__LifetimeMinutes: ${JWT_LIFETIME_MINUTES:-60}
-      SampleData__Enabled: ${SAMPLE_DATA_ENABLED:-true}
+      SampleData__Enabled: ${SAMPLE_DATA_ENABLED:-false}
     ports:
-      - "${API_PORT:-5269}:8080"
+      - "127.0.0.1:${API_PORT:-5269}:8080"
     depends_on:
       db:
         condition: service_healthy
@@ -110,7 +110,7 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
     ports:
-      - "${WEB_PORT:-4200}:80"
+      - "127.0.0.1:${WEB_PORT:-4200}:80"
     depends_on:
       - quizapp-api
     restart: unless-stopped

@@ -201,7 +201,9 @@ Keep an existing `.env` when updating your checkout. Before starting, edit `.env
 docker compose up -d --build
 ```
 
-Compose supplies the API and migration service with a SQL Server connection string targeting `db:1433`, using `DB_NAME` and `SA_PASSWORD` from `.env`. It defaults to `ASPNETCORE_ENVIRONMENT=Development` and `SAMPLE_DATA_ENABLED=true`; sample data is seeded only in Development. The published host ports default to 1433 for SQL Server, 5269 for the API, and 4200 for the frontend, and can be changed with `DB_PORT`, `API_PORT`, and `WEB_PORT`.
+Compose supplies the API and migration service with a SQL Server connection string targeting `db:1433`, using `DB_NAME` and `SA_PASSWORD` from `.env`. It defaults to `ASPNETCORE_ENVIRONMENT=Development` and `SAMPLE_DATA_ENABLED=false`. Sample data requires explicit opt-in and is seeded only in Development. The published host ports default to 1433 for SQL Server, 5269 for the API, and 4200 for the frontend, and can be changed with `DB_PORT`, `API_PORT`, and `WEB_PORT`. All three bind to `127.0.0.1` (localhost) for local development.
+
+To opt in to sample quizzes and demo accounts, set `SAMPLE_DATA_ENABLED=true` in `.env` and rerun `docker compose up -d --build`. This creates `demo_user` and `demo_admin` with a publicly known password; keep this setup local. Setting the flag back to `false` prevents further seeding but does not remove existing accounts from the persistent volume. For an existing setup, set the flag to `false` and rerun the startup command to apply the localhost bindings; disable or change the credentials of any existing demo accounts before exposing the application beyond localhost.
 
 Startup proceeds in this order:
 

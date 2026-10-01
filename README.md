@@ -47,7 +47,7 @@ docker compose up -d --build
 
 Compose starts SQL Server, runs database migrations, then starts the API and Angular frontend. The API waits for migrations to succeed, including on a fresh database volume and when sample data is disabled.
 
-Open `http://localhost:4200` for the frontend or `http://localhost:5269/swagger` for the API documentation. The default environment is Development, with sample data enabled. `.env` also controls the published ports and database name; SQL Server defaults to port 1433. See [Docker setup and troubleshooting](backend/README.md#docker) for startup order, logs, and persistent storage.
+Open `http://localhost:4200` for the frontend or `http://localhost:5269/swagger` for the API documentation. The default environment is Development, with sample data disabled. To create sample quizzes and demo accounts for local use, explicitly set `SAMPLE_DATA_ENABLED=true` in `.env` and rerun the startup command. All published ports bind to `127.0.0.1` (localhost). `.env` also controls the published ports and database name; SQL Server defaults to port 1433. See [Docker setup and troubleshooting](backend/README.md#docker) for startup order, logs, and persistent storage.
 
 ### Backend
 
