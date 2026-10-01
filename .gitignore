@@ -38,3 +38,5 @@ frontend/build/
 
 # Keep until development credentials are removed
 /backend/Quizapp/Quizapp.Api/appsettings.Development.json
+
+.github/

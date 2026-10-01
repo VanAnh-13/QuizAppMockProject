@@ -11,6 +11,7 @@ import {
 import {ViewportScroller} from '@angular/common';
 import {ReactiveFormsModule} from '@angular/forms';
 import {ActivatedRoute, Router, RouterLink} from '@angular/router';
+import {AuthSession} from '../../../core/auth/auth-session';
 import {SiteHeaderComponent} from '../../../shared/ui/site-header/site-header.component';
 import {SiteInfoDialogComponent} from '../../../shared/ui/site-info-dialog/site-info-dialog.component';
 import {authReturnUrl} from '../domain/auth-contracts';
@@ -29,6 +30,7 @@ export class AuthPage {
     protected readonly store = inject(AuthFormStore);
     private readonly route = inject(ActivatedRoute);
     private readonly router = inject(Router);
+    private readonly session = inject(AuthSession);
     private readonly element = inject<ElementRef<HTMLElement>>(ElementRef);
     private readonly changeDetector = inject(ChangeDetectorRef);
     private readonly viewport = inject(ViewportScroller);
@@ -79,7 +81,9 @@ export class AuthPage {
                 state: {registered: true},
             });
         } else {
-            await this.router.navigateByUrl(this.returnUrl);
+            await this.router.navigateByUrl(
+                this.returnUrl === '/' && this.session.isAdmin() ? '/admin/quizzes' : this.returnUrl,
+            );
         }
     }
 }

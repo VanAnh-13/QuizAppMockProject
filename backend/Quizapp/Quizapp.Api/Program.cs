@@ -93,6 +93,16 @@ builder.Services.AddInfrastructure(
 
 var app = builder.Build();
 
+if (DatabaseMigrator.IsMigrationCommand(args)
+    || string.Equals(Environment.GetEnvironmentVariable("DOTNET_RUN_MIGRATIONS_AND_EXIT"), "true", StringComparison.OrdinalIgnoreCase))
+{
+    await using var scope = app.Services.CreateAsyncScope();
+    var db = scope.ServiceProvider.GetRequiredService<QuizAppDbContext>();
+    var logger = scope.ServiceProvider.GetRequiredService<ILoggerFactory>().CreateLogger("DatabaseMigration");
+    await DatabaseMigrator.MigrateAsync(db, logger);
+    return;
+}
+
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
@@ -102,6 +112,7 @@ if (app.Environment.IsDevelopment())
     {
         await using var scope = app.Services.CreateAsyncScope();
         var db = scope.ServiceProvider.GetRequiredService<QuizAppDbContext>();
+        await DatabaseMigrator.MigrateAsync(db);
         await SampleQuizDataSeeder.SeedAsync(db);
     }
 }

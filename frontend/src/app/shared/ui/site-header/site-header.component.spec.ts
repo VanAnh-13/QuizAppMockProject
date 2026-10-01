@@ -53,6 +53,29 @@ describe('SiteHeaderComponent', () => {
         expect(TestBed.inject(Router).navigateByUrl).toHaveBeenCalledWith('/login');
     });
 
+    it('links only administrators to the admin screens from desktop and mobile account menus', () => {
+        TestBed.configureTestingModule({
+            imports: [SiteHeaderComponent],
+            providers: [provideRouter([]), {provide: ConfirmationService, useValue: new MockConfirmationService()}],
+        });
+        const session = TestBed.inject(AuthSession);
+        const fixture = TestBed.createComponent(SiteHeaderComponent);
+        const login = (role: string) => session.set({
+            token: `aaa.${btoa(JSON.stringify({role}))}.bbb`,
+            expiresAt: '2099-01-01T00:00:00Z',
+            userDto: {id: '1', username: role.toLowerCase(), fullName: null},
+        });
+        const adminLinks = () => (fixture.nativeElement as HTMLElement).querySelectorAll('a[href="/admin/quizzes"]');
+
+        login('Admin');
+        fixture.detectChanges();
+        expect(adminLinks()).toHaveLength(2);
+
+        login('Student');
+        fixture.detectChanges();
+        expect(adminLinks()).toHaveLength(0);
+    });
+
     it('renders user avatar menu and handles logout for signed in user when confirmed', async () => {
         const {clear} = configure({id: '1', username: 'learner', fullName: 'Quiz Learner'});
         const fixture = TestBed.createComponent(SiteHeaderComponent);
@@ -166,7 +189,7 @@ function configure(user: AuthResponse['userDto'] | null) {
         imports: [SiteHeaderComponent],
         providers: [
             {provide: ApiClient, useValue: {post: vi.fn()}},
-            {provide: AuthSession, useValue: {user: signal(user), clear}},
+            {provide: AuthSession, useValue: {user: signal(user), isAdmin: () => false, clear}},
             {provide: ConfirmationService, useValue: confirmation},
             provideRouter([]),
         ],

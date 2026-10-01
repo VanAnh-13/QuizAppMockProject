@@ -8,7 +8,7 @@ A quiz-management platform with a .NET backend and an Angular frontend.
 Quizapp/
 ├── backend/              # .NET 10 solution — API, domain, application, infrastructure
 ├── frontend/             # Angular + TypeScript web client
-├── compose.yaml          # Docker Compose — API container build
+├── compose.yaml          # Docker Compose — SQL Server, migrations, API, frontend
 ├── .editorconfig         # Shared editor settings
 ├── .gitignore            # Shared ignore rules
 ├── AGENTS.md             # Agent instructions and development guidelines
@@ -30,6 +30,24 @@ Quizapp/
 | Containerization | Docker, Docker Compose                                                  |
 
 ## Quick Start
+
+### Full Stack with Docker
+
+Install Docker with Compose and start Docker before running these commands from the repository root:
+
+```powershell
+Copy-Item '.env.example' '.env'
+```
+
+Edit `.env`: replace `SA_PASSWORD` with a valid SQL Server administrator password and `JWT_SIGNING_KEY` with a random signing key of at least 32 bytes. The template includes a PowerShell command to generate a key. Keep an existing `.env` when updating your checkout.
+
+```powershell
+docker compose up -d --build
+```
+
+Compose starts SQL Server, runs database migrations, then starts the API and Angular frontend. The API waits for migrations to succeed, including on a fresh database volume and when sample data is disabled.
+
+Open `http://localhost:4200` for the frontend or `http://localhost:5269/swagger` for the API documentation. The default environment is Development, with sample data disabled. To create sample quizzes and demo accounts for local use, explicitly set `SAMPLE_DATA_ENABLED=true` in `.env` and rerun the startup command. All published ports bind to `127.0.0.1` (localhost). `.env` also controls the published ports and database name; SQL Server defaults to port 1433. See [Docker setup and troubleshooting](backend/README.md#docker) for startup order, logs, and persistent storage.
 
 ### Backend
 

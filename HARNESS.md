@@ -19,6 +19,33 @@ The QuizApp Agent Harness is a multi-layered verification system designed to ens
 
 ---
 
+## Frontend agent runtime (WSL)
+
+Run frontend Node, pnpm, Angular, tests, and builds **inside WSL**, not in the Windows host shell.
+The frontend checkout is available at `/mnt/e/QuizAppMockProject/frontend` in WSL. From a Windows
+terminal already in `frontend/`, `wsl.exe --exec bash -lic 'pnpm test --watch=false'` inherits that
+working directory; use the same pattern for `pnpm build` and `pnpm run check:rules`. In Git Bash,
+set `MSYS_NO_PATHCONV=1` before `wsl.exe` when passing absolute Linux paths so Git Bash does not
+rewrite them. Do not use `pnpm.cmd` from the host shell for frontend verification.
+
+Check `command -v pnpm` and `pnpm --version` in WSL before testing. If the first `pnpm` on `PATH`
+reports `the global target of the pnpm shim points back at the shim`, run the pnpm executable from
+the active WSL Node/NVM installation instead of the self-referential shim. Do not reinstall
+packages or change the lockfile solely to work around that shim.
+
+On a memory-limited WSL instance, the unbounded full Vitest run may exit before executing any tests.
+Retry the full suite with a temporary runner config outside the checkout (no project config changes):
+
+```bash
+printf '%s\n' 'export default { test: { maxWorkers: 2, fileParallelism: false } };' > /tmp/quizapp-vitest.config.mjs
+pnpm test --watch=false --runner-config=/tmp/quizapp-vitest.config.mjs
+```
+
+Then run `pnpm run check:rules`, `pnpm build`, and `git diff --check` separately instead of
+`pnpm run verify` if that script's default test run exhausts memory.
+
+---
+
 ## 2. Automated Rule & Architecture Checker
 
 Script location: [`scripts/check-rules.mjs`](file:///d:/Homeworks/angular/quiz_app/scripts/check-rules.mjs)  
@@ -37,14 +64,13 @@ NPM command: `pnpm run check:rules` (inside `frontend/`)
 
 ### Running the Rule Checker
 
-```powershell
-# From repository root:
-node scripts/check-rules.mjs
+From `frontend/` inside WSL:
 
-# Or from frontend directory:
-cd frontend
+```bash
 pnpm run check:rules
 ```
+
+Alternatively, run `node scripts/check-rules.mjs` from the repository root inside WSL.
 
 ---
 
@@ -150,7 +176,9 @@ const progress = createTestAttemptProgress({remainingSeconds: 1200});
 
 ## 4. Verification Automation Scripts
 
-Automated PowerShell runners that agents should execute during Stage 5 of `PROCESS.md`:
+The PowerShell runners below are for Windows setups with `pnpm.cmd` available. For this WSL
+frontend environment, run `pnpm run verify` from `frontend/` inside WSL, then run
+`git diff --check`; the npm script does not include the whitespace check.
 
 ### 1. Frontend Verification ([
 `scripts/verify-frontend.ps1`](file:///d:/Homeworks/angular/quiz_app/scripts/verify-frontend.ps1))
@@ -161,11 +189,11 @@ Runs rule checking, Vitest test suite, production build, and git whitespace chec
 .\scripts\verify-frontend.ps1
 ```
 
-Or via NPM:
+Or from `frontend/` inside WSL:
 
-```powershell
-cd frontend
+```bash
 pnpm run verify
+git diff --check
 ```
 
 ### 2. Backend Verification ([
@@ -192,7 +220,7 @@ Verifies both frontend and backend subtrees sequentially:
 Before reporting completion or committing changes, an agent must verify:
 
 - [ ] `pnpm run check:rules` exits with `0` (Zero token, style, or boundary violations).
-- [ ] `pnpm.cmd test --watch=false` passes 100% of tests.
-- [ ] `pnpm.cmd build` completes without errors or bundle warnings.
+- [ ] `pnpm test --watch=false` in WSL passes 100% of tests.
+- [ ] `pnpm build` in WSL completes without errors or bundle warnings.
 - [ ] `git diff --check` reports zero whitespace or EOF newline anomalies.
 - [ ] All new components have corresponding `.spec.ts` files using `src/testing/` fixtures/mocks where applicable.

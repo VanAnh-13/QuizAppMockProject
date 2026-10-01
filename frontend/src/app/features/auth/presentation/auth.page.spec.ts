@@ -92,6 +92,29 @@ describe('AuthPage routes', () => {
         expect(navigate).toHaveBeenCalledWith(returnUrl);
     });
 
+    it.each(['/login', '/login?returnUrl=%2F'])('opens quiz management after an administrator logs in at %s', async (url) => {
+        const api = {register: vi.fn(), login: vi.fn().mockResolvedValue({
+            token: `aaa.${btoa(JSON.stringify({role: 'Admin'}))}.bbb`,
+            expiresAt: '2099-01-01T00:00:00Z',
+            userDto: {id: '1', username: 'admin', fullName: 'Admin User'},
+        })};
+        TestBed.configureTestingModule({
+            providers: [provideRouter(routes), {provide: AuthApi, useValue: api}, {
+                provide: ViewportScroller, useValue: {scrollToPosition: vi.fn()},
+            }],
+        });
+        const harness = await RouterTestingHarness.create();
+        await harness.navigateByUrl(url, AuthPage);
+        const navigate = vi.spyOn(TestBed.inject(Router), 'navigateByUrl').mockResolvedValue(true);
+        const element = harness.routeNativeElement!;
+        fill(element, 'username', 'admin');
+        fill(element, 'password', 'Password-123!');
+        element.querySelector<HTMLButtonElement>('button[type="submit"]')!.click();
+        await harness.fixture.whenStable();
+
+        expect(navigate).toHaveBeenCalledWith('/admin/quizzes');
+    });
+
     it('redirects an anonymous attempt visit to login before creating the attempt page', async () => {
         const returnUrl = '/quiz/abc/attempt?attemptId=attempt-123';
         const {element, router} = await setup(returnUrl);

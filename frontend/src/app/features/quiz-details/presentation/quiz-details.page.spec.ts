@@ -166,6 +166,30 @@ describe('QuizDetailsPage', () => {
         expect(navigateByUrl).toHaveBeenCalledWith('/login');
     });
 
+    it('shows quiz management in the account menu only for an administrator', async () => {
+        const fixture = await createFixture();
+        const session = TestBed.inject(AuthSession);
+        const adminLink = () => (fixture.nativeElement as HTMLElement).querySelector<HTMLAnchorElement>(
+            '.details-header__user-link[href="/admin/quizzes"]',
+        );
+
+        session.set({
+            token: `aaa.${btoa(JSON.stringify({role: 'Admin'}))}.bbb`,
+            expiresAt: '2099-01-01T00:00:00Z',
+            userDto: {id: 'admin-id', username: 'admin', fullName: null},
+        });
+        fixture.detectChanges();
+        expect(adminLink()?.textContent).toContain('Admin dashboard');
+
+        session.set({
+            token: `aaa.${btoa(JSON.stringify({role: 'Student'}))}.bbb`,
+            expiresAt: '2099-01-01T00:00:00Z',
+            userDto: {id: 'learner-id', username: 'learner', fullName: null},
+        });
+        fixture.detectChanges();
+        expect(adminLink()).toBeNull();
+    });
+
     it('does not log out when confirmation is cancelled on quiz details page', async () => {
         vi.spyOn(TestBed.inject(Router), 'navigateByUrl').mockResolvedValue(true);
         const fixture = await createFixture();

@@ -24,7 +24,7 @@ Controllers and application services implement authentication, user/role managem
 - [.NET 10 SDK](https://dotnet.microsoft.com/download/dotnet/10.0)
 - A SQL Server instance for business endpoints, database migrations, and persistence tests (database-independent tests do not need one)
 - [EF Core CLI **10.0.11**](https://learn.microsoft.com/en-us/ef/core/cli/dotnet) for migration commands
-- Optional: Docker with Docker Compose for building the container image
+- Docker with Docker Compose for the full-stack container setup (optional for local .NET development)
 
 ## Project Structure
 
@@ -108,7 +108,7 @@ Apply migrations:
 dotnet ef database update --project "$Infra" --startup-project "$Api"
 ```
 
-The API does **not** automatically apply migrations at startup.
+Compose applies migrations through a separate initialization service before starting the API. Outside Compose, apply migrations explicitly with the command above; Development startup also applies them when sample data is enabled.
 
 ### 4. Start the API Host
 
@@ -189,20 +189,32 @@ dotnet test "$Tests" --filter 'FullyQualifiedName~RequestValidationTests'
 
 ## Docker
 
-The repository includes a multi-stage Linux Dockerfile (`Quizapp/Quizapp.Api/Dockerfile`). Build the API image using the supplied Compose configuration:
+The repository includes a multi-stage Linux Dockerfile (`Quizapp/Quizapp.Api/Dockerfile`) and a full-stack Compose configuration. Install Docker with Compose, start Docker, and run from the repository root:
 
 ```powershell
-docker compose -f "D:/Homeworks/c#/Quizapp/compose.yaml" build
+Copy-Item '.env.example' '.env'
 ```
 
-The Compose configuration currently defines **only the API image/build**. It does not configure:
+Keep an existing `.env` when updating your checkout. Before starting, edit `.env` to replace `SA_PASSWORD` with a valid SQL Server administrator password and `JWT_SIGNING_KEY` with a random signing key of at least 32 bytes. The template includes a PowerShell command to generate the signing key.
 
-- A SQL Server service or connection string override
-- Published host ports
-- The Development environment required for Swagger
-- HTTPS certificate or TLS termination
+```powershell
+docker compose up -d --build
+```
 
-Configure those explicitly before using Compose as a runnable stack.
+Compose supplies the API and migration service with a SQL Server connection string targeting `db:1433`, using `DB_NAME` and `SA_PASSWORD` from `.env`. It defaults to `ASPNETCORE_ENVIRONMENT=Development` and `SAMPLE_DATA_ENABLED=false`. Sample data requires explicit opt-in and is seeded only in Development. The published host ports default to 1433 for SQL Server, 5269 for the API, and 4200 for the frontend, and can be changed with `DB_PORT`, `API_PORT`, and `WEB_PORT`. All three bind to `127.0.0.1` (localhost) for local development.
+
+To opt in to sample quizzes and demo accounts, set `SAMPLE_DATA_ENABLED=true` in `.env` and rerun `docker compose up -d --build`. This creates `demo_user` and `demo_admin` with a publicly known password; keep this setup local. Setting the flag back to `false` prevents further seeding but does not remove existing accounts from the persistent volume. For an existing setup, set the flag to `false` and rerun the startup command to apply the localhost bindings; disable or change the credentials of any existing demo accounts before exposing the application beyond localhost.
+
+Startup proceeds in this order:
+
+1. `db` starts SQL Server Developer edition and passes its health check.
+2. `quizapp-migration` runs the API image with `--migrate`, applies pending EF Core migrations to the configured database, and exits.
+3. `quizapp-api` starts only after migration exits successfully, then seeds sample data when enabled in Development.
+4. `quizapp-web` starts the Angular frontend served by nginx.
+
+The migration service runs even when `SAMPLE_DATA_ENABLED=false`. A fresh `sqlserver-data` volume therefore gets its schema before any API requests. Repeated migration runs preserve existing data and apply only pending migrations. If migration fails, Compose blocks API startup; inspect `docker compose logs quizapp-migration`, correct the problem, and rerun the startup command.
+
+Default URLs are `http://localhost:4200` for the frontend and `http://localhost:5269` for the API. Ports, database name, environment and credentials are configured in `.env`. The SQL Server volume persists across container restarts. HTTPS certificates and TLS termination require separate configuration.
 
 ## Useful Commands
 
@@ -232,6 +244,6 @@ Review the generated schema changes before applying.
 | Swagger is missing                                    | Use a Development launch profile and navigate to `/swagger`, not `/`                                                              |
 | API fails before startup with JWT configuration error | Check `Jwt__Issuer`, `Jwt__Audience`, `Jwt__SigningKey`, and `Jwt__LifetimeMinutes`                                               |
 | SQL Server connection fails                           | Check server name, credentials, network access, certificate settings, and the `ConnectionStrings__DefaultConnection` env variable |
-| Database tables missing                               | Run `dotnet ef database update` — startup does not migrate automatically                                                          |
+| Database tables missing                               | For Compose, inspect `docker compose logs quizapp-migration`; for local setup, run `dotnet ef database update`                                                          |
 | Persistence tests skipped                             | Set `QUIZAPP_TEST_SQLSERVER_CONNECTION_STRING` for a dedicated test instance                                                      |
 | HTTPS certificate errors                              | Trust the .NET dev certificate (`dotnet dev-certs https --trust`) or use the HTTP launch profile                                  |

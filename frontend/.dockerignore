@@ -1,0 +1,10 @@
+.angular/
+dist/
+node_modules/
+tmp/
+.git
+.gitignore
+.editorconfig
+.prettierrc
+.prettierignore
+*.md
