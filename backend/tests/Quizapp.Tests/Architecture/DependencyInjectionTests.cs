@@ -1,7 +1,10 @@
 using FluentValidation;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Options;
 using Quizapp.Application;
 using Quizapp.Application.Abstractions.Authentication;
 using Quizapp.Application.Abstractions.Messaging;
@@ -12,12 +15,25 @@ using Quizapp.Domain.Enums;
 using Quizapp.Infrastructure;
 using Quizapp.Infrastructure.Persistence;
 using Quizapp.Tests.Application.Services;
+using Quizapp.Tests.Api;
 using Quizapp.Tests.Data;
 
 namespace Quizapp.Tests.Architecture;
 
 public class DependencyInjectionTests
 {
+    [Fact]
+    public async Task Forwarded_headers_resolve_with_bounded_hops_and_trusted_proxy_defaults()
+    {
+        await using var factory = new QuizappApiFactory();
+        var options = factory.Services.GetRequiredService<IOptions<ForwardedHeadersOptions>>().Value;
+
+        Assert.Equal(1, options.ForwardLimit);
+        Assert.NotEmpty(options.KnownProxies);
+        Assert.NotEmpty(options.KnownIPNetworks);
+        Assert.Equal(ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto, options.ForwardedHeaders);
+    }
+
     // Registers no-op stubs for all infrastructure-provided contracts so
     // AddApplication() can be validated without a real database or HTTP context.
     private static void AddStubs(IServiceCollection services)

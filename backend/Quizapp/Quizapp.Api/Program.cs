@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.Extensions.Options;
 using System.Text;
+using System.Net;
 using System.Security.Claims;
 using Quizapp.Api.ExceptionHandlers;
 using Quizapp.Application;
@@ -16,6 +18,25 @@ using Quizapp.Infrastructure.Persistence;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
+
+builder.Services.AddOptions<ForwardedHeadersOptions>()
+    .Configure(options =>
+    {
+        var configuration = builder.Configuration.GetSection("ForwardedHeaders");
+        options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+        options.ForwardLimit = configuration.GetValue<int>("ForwardLimit", 1);
+
+        // Keep the framework's loopback trust defaults; add only explicitly configured proxies.
+        foreach (var proxy in configuration.GetSection("KnownProxies").Get<string[]>() ?? [])
+            options.KnownProxies.Add(IPAddress.Parse(proxy));
+        foreach (var network in configuration.GetSection("KnownIPNetworks").Get<string[]>() ?? [])
+            options.KnownIPNetworks.Add(System.Net.IPNetwork.Parse(network));
+    })
+    .Validate(options => options.ForwardLimit is > 0,
+        "ForwardedHeaders:ForwardLimit must be a positive number of trusted proxy hops.")
+    .Validate(options => options.KnownProxies.Count > 0 || options.KnownIPNetworks.Count > 0,
+        "Forwarded headers require at least one trusted proxy or network.")
+    .ValidateOnStart();
 
 builder.Services.AddOptions<PasswordResetOptions>()
     .Bind(builder.Configuration.GetSection(PasswordResetOptions.SectionName))
@@ -129,6 +150,8 @@ builder.Services.AddInfrastructure(
     builder.Configuration);
 
 var app = builder.Build();
+
+app.UseForwardedHeaders();
 
 if (app.Environment.IsDevelopment())
 {

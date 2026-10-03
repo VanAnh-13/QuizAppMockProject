@@ -26,6 +26,30 @@ Reuse the existing `Smtp` settings: `Host`, `Port`, `EnableSsl`, `UserName`, `Pa
 Supply credentials through environment variables (`Smtp__Password`) or the API's user-secret store;
 never commit credentials. Use TLS for real email delivery. Tests replace the sender and do not deliver real mail.
 
+## Reverse proxies and ingress
+
+The API processes `X-Forwarded-For` and `X-Forwarded-Proto` before HTTPS redirection and rate limiting.
+Only loopback proxies are trusted by default. For a reverse proxy or ingress, configure its actual
+peer IP address as seen by the API, or its dedicated proxy network in CIDR notation:
+
+```powershell
+# Example only: replace with the address of your trusted proxy.
+$env:ForwardedHeaders__KnownProxies__0 = '10.0.0.10'
+# Alternatively, trust a dedicated ingress network:
+$env:ForwardedHeaders__KnownIPNetworks__0 = '10.0.0.0/24'
+$env:ForwardedHeaders__ForwardLimit = '1'
+```
+
+Use only the proxy addresses or networks you control. Do not trust all networks or enable the
+unrestricted `ASPNETCORE_FORWARDEDHEADERS_ENABLED` shortcut. The proxy must overwrite incoming
+forwarded headers or append the verified connecting client address. For multiple proxy hops, list
+every trusted hop and set `ForwardLimit` to that positive hop count (the default is one).
+Headers are processed from right to left and processing stops at an untrusted hop. Unknown peers'
+headers are ignored, so direct clients cannot select their own rate-limit bucket.
+
+The middleware uses ASP.NET Core's trusted proxy handling; see the
+[deployment guidance](https://learn.microsoft.com/aspnet/core/host-and-deploy/proxy-load-balancer?view=aspnetcore-10.0).
+
 ## Public endpoints
 
 `POST /api/auth/forgot-password`
@@ -69,7 +93,7 @@ Neither endpoint requires a bearer token.
 
 ## Delivery and limits
 
-- Request limits per connection IP: 5 forgot-password requests and 10 reset-password requests per 15 minutes.
+- Request limits per client IP (after trusted forwarded headers): 5 forgot-password requests and 10 reset-password requests per 15 minutes.
   Exceeding a limit returns `429` and `Retry-After`. Limits are local to one API process.
 - The bounded queue holds 100 pending email jobs; a full request queue returns `503`.
 - A background worker performs account lookup and email delivery. Request response time does not wait for SMTP.
