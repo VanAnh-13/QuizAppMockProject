@@ -51,7 +51,7 @@ export const CONTACT_FAQS = [
     },
     {
         question: 'How do I reset my password?',
-        answer: 'Automatic password reset is not available in this version. If you forget your password, contact the administrator who provided your account.',
+        answer: 'Select "Forgot password?" on the login page and enter your account email to request a password reset link. Check your inbox and spam folder, then follow the link to choose a new password.',
     },
     {
         question: 'Are quizzes timed?',
