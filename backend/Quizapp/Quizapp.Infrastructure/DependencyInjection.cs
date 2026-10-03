@@ -28,6 +28,10 @@ public static class DependencyInjection
             services.AddOptions<SmtpOptions>();
 
         services.TryAddScoped<IEmailSender, SmtpEmailSender>();
+        services.AddLogging();
+        services.TryAddSingleton<PasswordResetWorker>();
+        services.TryAddSingleton<IPasswordResetQueue>(provider => provider.GetRequiredService<PasswordResetWorker>());
+        services.AddHostedService(provider => provider.GetRequiredService<PasswordResetWorker>());
 
         services.TryAddScoped<IUnitOfWork, EfUnitOfWork>();
         services.TryAddScoped<IContactMessageRepository, EfContactMessageRepository>();

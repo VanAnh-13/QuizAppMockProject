@@ -4,7 +4,6 @@ import {TestBed} from '@angular/core/testing';
 import {provideRouter, Router} from '@angular/router';
 import {App} from './app';
 import {appConfig} from './app.config';
-import {PrototypeQuizCatalog} from './features/quiz-explore/infrastructure/prototype-quiz-catalog';
 import {QUIZ_CATALOG} from './features/quiz-explore/infrastructure/quiz-catalog.provider';
 import {QuizExplorePage} from './features/quiz-explore/presentation/quiz-explore.page';
 import {QuizExploreStore} from './features/quiz-explore/presentation/quiz-explore.store';
@@ -19,7 +18,7 @@ describe('App', () => {
     it('scrolls to the catalog anchor when navigating to the quiz-list fragment', async () => {
         await TestBed.configureTestingModule({imports: [App], providers: [...appConfig.providers]})
             .overrideComponent(QuizExplorePage, {
-                set: {providers: [{provide: QUIZ_CATALOG, useClass: PrototypeQuizCatalog}, QuizExploreStore]},
+                set: {providers: [{provide: QUIZ_CATALOG, useValue: {listQuizzes: async () => []}}, QuizExploreStore]},
             })
             .compileComponents();
         const scroller = TestBed.inject(ViewportScroller);

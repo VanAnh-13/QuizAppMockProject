@@ -1,9 +1,22 @@
 import {TestBed} from '@angular/core/testing';
 import {provideRouter, Router} from '@angular/router';
-import {PrototypeQuizCatalog} from '../infrastructure/prototype-quiz-catalog';
+import {QuizSummary} from '../domain/quiz-summary';
 import {QUIZ_CATALOG} from '../infrastructure/quiz-catalog.provider';
 import {QuizExplorePage} from './quiz-explore.page';
 import {QuizExploreStore} from './quiz-explore.store';
+
+const catalog: readonly QuizSummary[] = [
+    quiz('csharp-co-ban-oop', 'csharp', 'C# / OOP', 'C# Fundamentals & OOP'),
+    quiz('sql-server-fundamentals', 'sql-server', 'SQL Server', 'SQL Server Fundamentals'),
+    quiz('angular-routing-forms', 'angular', 'Angular', 'Angular Routing & Forms'),
+    quiz('dotnet-core-api-architecture', 'api', '.NET / Web', '.NET Application Architecture'),
+    quiz('typescript-advanced-types', 'typescript', 'TypeScript', 'Advanced TypeScript Types'),
+    quiz('csharp-linq-collection-queries', 'csharp', 'C# / LINQ', 'LINQ & Collections in C#'),
+];
+
+function quiz(id: string, categoryId: QuizSummary['categoryId'], categoryLabel: string, title: string): QuizSummary {
+    return {id, categoryId, categoryLabel, title, description: title, questionCount: 1, durationMinutes: 5, status: 'open'};
+}
 
 describe('QuizExplorePage', () => {
     beforeEach(async () => {
@@ -13,7 +26,7 @@ describe('QuizExplorePage', () => {
         })
             .overrideComponent(QuizExplorePage, {
                 set: {
-                    providers: [{provide: QUIZ_CATALOG, useClass: PrototypeQuizCatalog}, QuizExploreStore],
+                    providers: [{provide: QUIZ_CATALOG, useValue: {listQuizzes: async () => catalog}}, QuizExploreStore],
                 },
             })
             .compileComponents();

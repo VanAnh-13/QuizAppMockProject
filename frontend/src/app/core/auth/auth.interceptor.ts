@@ -13,7 +13,7 @@ export const authInterceptor: HttpInterceptorFn = (request, next) => {
         url.origin === base.origin &&
         (url.pathname === prefix || url.pathname.startsWith(`${prefix}/`));
     const isPublicAuthEndpoint = isApi &&
-        (url.pathname === `${prefix}/auth/login` || url.pathname === `${prefix}/auth/register`);
+        ['login', 'register', 'forgot-password', 'reset-password'].some((route) => url.pathname === `${prefix}/auth/${route}`);
     const token = isApi && !isPublicAuthEndpoint ? session.token() : null;
     return next(
         token ? request.clone({setHeaders: {Authorization: `Bearer ${token}`}}) : request,

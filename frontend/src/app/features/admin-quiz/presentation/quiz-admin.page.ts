@@ -2,13 +2,13 @@ import {ChangeDetectionStrategy, Component, inject} from '@angular/core';
 import {ReactiveFormsModule} from '@angular/forms';
 import {ActivatedRoute} from '@angular/router';
 import {AdminShellComponent} from '../../admin-question-bank/presentation/admin-shell.component';
-import {provideAdminQuiz} from '../infrastructure/admin-quiz.provider';
+import {adminQuizProvider} from '../infrastructure/admin-quiz.provider';
 import {QuizAdminStore} from './quiz-admin.store';
 
 @Component({
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [AdminShellComponent, ReactiveFormsModule],
-    providers: [provideAdminQuiz(), QuizAdminStore],
+    providers: [adminQuizProvider, QuizAdminStore],
     selector: 'app-quiz-admin-page',
     styleUrl: './quiz-admin.page.css',
     templateUrl: './quiz-admin.page.html',

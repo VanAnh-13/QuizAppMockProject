@@ -11,12 +11,13 @@ import {
 import {DatePipe, NgOptimizedImage, NgTemplateOutlet} from '@angular/common';
 import {ActivatedRoute, Router, RouterLink, RouterLinkActive} from '@angular/router';
 import {ATTEMPT_API, AttemptResult} from '../../quiz-attempt/application/attempt-api';
+import {attemptContentProvider} from '../../quiz-attempt/infrastructure/attempt-content.provider';
 import {apiErrorMessage} from '../../../core/api/api-error';
 import {AuthSession} from '../../../core/auth/auth-session';
 import {ModalDirective} from '../../../shared/ui/dialog/modal.directive';
 import {ConfirmationService} from '../../../shared/ui/confirmation/confirmation.service';
 import {QuizDetailsSnapshot} from '../application/quiz-details-content';
-import {QUIZ_DETAILS_CONTENT, provideQuizDetails} from '../infrastructure/quiz-details-content.provider';
+import {QUIZ_DETAILS_CONTENT, quizDetailsContentProvider} from '../infrastructure/quiz-details-content.provider';
 import {QuizDetailsResolution} from './quiz-details.resolver';
 
 interface InfoMessage {
@@ -38,7 +39,7 @@ const INFO_MESSAGES = {
 @Component({
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [DatePipe, RouterLink, RouterLinkActive, ModalDirective, NgTemplateOutlet, NgOptimizedImage],
-    providers: [provideQuizDetails()],
+    providers: [quizDetailsContentProvider, attemptContentProvider],
     selector: 'app-quiz-details-page',
     styleUrls: [
         './quiz-details.page.css',

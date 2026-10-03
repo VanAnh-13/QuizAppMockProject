@@ -2,6 +2,7 @@ using Quizapp.Application.DTOs.Authentication;
 
 namespace Quizapp.Api.Controllers;
 
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Quizapp.Application.DTOs;
@@ -11,6 +12,26 @@ using Quizapp.Application.Services.Authentication;
 [Route("api/auth")]
 public class AuthController(IAuthService authService) : ControllerBase
 {
+    [AllowAnonymous]
+    [EnableRateLimiting("forgot-password")]
+    [HttpPost("forgot-password")]
+    public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto request,
+        CancellationToken cancellationToken)
+    {
+        await authService.RequestPasswordResetAsync(request, cancellationToken);
+        return Accepted(new { message = "If an active account matches this email, you will receive a password reset link." });
+    }
+
+    [AllowAnonymous]
+    [EnableRateLimiting("reset-password")]
+    [HttpPost("reset-password")]
+    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto request,
+        CancellationToken cancellationToken)
+    {
+        await authService.ResetPasswordAsync(request, cancellationToken);
+        return NoContent();
+    }
+
     [HttpPost("register")]
     public async Task<IActionResult> Register([FromBody] RegisterDto request, CancellationToken cancellationToken)
     {

@@ -3,6 +3,17 @@ export interface LoginRequest {
     readonly password: string;
 }
 
+export interface ForgotPasswordRequest {
+    readonly email: string;
+}
+
+export interface ResetPasswordRequest {
+    readonly userId: string;
+    readonly token: string;
+    readonly newPassword: string;
+    readonly confirmNewPassword: string;
+}
+
 export interface RegisterRequest extends LoginRequest {
     readonly email: string;
     readonly confirmPassword: string;

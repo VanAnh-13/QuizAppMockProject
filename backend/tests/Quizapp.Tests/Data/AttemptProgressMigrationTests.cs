@@ -13,11 +13,17 @@ public class AttemptProgressMigrationTests(SqlServerFixture database) : IClassFi
         await using var db = database.CreateContext();
         var migrator = db.GetService<IMigrator>();
         const string previousMigration = "20260908070341_PersistQuizAttemptLifecycle";
+        const string targetMigration = "20260909160949_AddAttemptPauseAndDraft";
         await migrator.MigrateAsync(previousMigration);
         var quiz = TestEntities.Quiz();
         var user = TestEntities.User();
-        db.AddRange(quiz, user);
+        db.Add(quiz);
         await db.SaveChangesAsync();
+        // Seed the historical schema without asking the current User model for newer columns.
+        await db.Database.ExecuteSqlInterpolatedAsync($"""
+            INSERT INTO [Users] ([Id], [Username], [Email], [Password], [Status], [SecurityStamp], [CreateAt], [UpdateAt])
+            VALUES ({user.Id}, {user.Username}, {user.Email}, {user.Password}, {(int)user.Status}, {user.SecurityStamp}, {user.CreateAt}, {user.UpdateAt});
+            """);
         var attemptId = Guid.NewGuid();
         var startedAt = DateTime.UtcNow;
         var expiresAt = startedAt.AddMinutes(10);
@@ -26,7 +32,8 @@ public class AttemptProgressMigrationTests(SqlServerFixture database) : IClassFi
             VALUES ({attemptId}, {quiz.Id}, {user.Id}, {startedAt}, {expiresAt}, NULL, {0.0});
             """);
 
-        await migrator.MigrateAsync();
+        await migrator.MigrateAsync(targetMigration);
+        var appliedBeforeRollback = await db.Database.GetAppliedMigrationsAsync();
 
         var attempt = await db.QuizAttempts.SingleAsync(a => a.Id == attemptId);
         Assert.Equal("[]", attempt.DraftAnswersJson);
@@ -36,6 +43,6 @@ public class AttemptProgressMigrationTests(SqlServerFixture database) : IClassFi
         Assert.Equal(expiresAt, attempt.ExpiresAt);
         var rejected = await Assert.ThrowsAsync<SqlException>(() => migrator.MigrateAsync(previousMigration));
         Assert.Contains("Cannot roll back while unsubmitted quiz attempts exist", rejected.Message);
-        Assert.Empty(await db.Database.GetPendingMigrationsAsync());
+        Assert.Equal(appliedBeforeRollback, await db.Database.GetAppliedMigrationsAsync());
     }
 }

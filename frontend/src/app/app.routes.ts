@@ -1,11 +1,22 @@
 import {Routes} from '@angular/router';
 import {leaveAttemptGuard} from './features/quiz-attempt/presentation/leave-attempt.guard';
-import {provideQuizDetails} from './features/quiz-details/infrastructure/quiz-details-content.provider';
+import {quizDetailsContentProvider} from './features/quiz-details/infrastructure/quiz-details-content.provider';
 import {quizDetailsResolver} from './features/quiz-details/presentation/quiz-details.resolver';
 import {requireAdminGuard} from './core/auth/require-admin.guard';
 import {requireAuthGuard} from './core/auth/require-auth.guard';
 
 export const routes: Routes = [
+    {
+        path: 'forgot-password',
+        title: 'Forgot password — QuizApp',
+        loadComponent: () => import('./features/auth/presentation/password-recovery.page').then((m) => m.PasswordRecoveryPage),
+    },
+    {
+        path: 'reset-password',
+        title: 'Reset password — QuizApp',
+        data: {resetting: true},
+        loadComponent: () => import('./features/auth/presentation/password-recovery.page').then((m) => m.PasswordRecoveryPage),
+    },
     {
         path: 'login',
         title: 'Log in — QuizApp',
@@ -65,7 +76,7 @@ export const routes: Routes = [
     },
     {
         path: 'quiz/:quizId',
-        providers: [provideQuizDetails()],
+        providers: [quizDetailsContentProvider],
         resolve: {snapshot: quizDetailsResolver},
         loadComponent: () =>
             import('./features/quiz-details/presentation/quiz-details.page').then(

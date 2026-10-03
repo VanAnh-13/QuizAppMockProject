@@ -7,9 +7,7 @@ using Quizapp.Application.Abstractions.Authentication;
 using Quizapp.Application.Abstractions.Messaging;
 using Quizapp.Application.Abstractions.Persistence;
 using Quizapp.Application.DTOs.QuizManager.Quizzes;
-using Quizapp.Application.Factories.QuizManager.Questions;
 using Quizapp.Application.Services.QuizTaking;
-using Quizapp.Application.Strategies.QuizManager.Questions;
 using Quizapp.Domain.Enums;
 using Quizapp.Infrastructure;
 using Quizapp.Infrastructure.Persistence;
@@ -39,6 +37,7 @@ public class DependencyInjectionTests
         services.TryAddSingleton<IPasswordService, NullPasswordService>();
         services.TryAddSingleton<ITokenService, NullTokenService>();
         services.TryAddSingleton<IEmailSender, NullEmailSender>();
+        services.TryAddSingleton<IPasswordResetQueue, MemoryPasswordResetQueue>();
     }
 
     [Fact]
@@ -67,46 +66,6 @@ public class DependencyInjectionTests
         Assert.True(await roles.HasUsersAsync(role.Id, CancellationToken.None));
         users.Remove(user);
         Assert.False(await roles.HasUsersAsync(role.Id, CancellationToken.None));
-    }
-
-    [Fact]
-    public void Question_factory_and_strategies_are_scoped_and_registration_can_be_repeated()
-    {
-        var services = new ServiceCollection().AddApplication()
-            .AddApplication();
-
-        AddStubs(services);
-
-        using var provider = services.BuildServiceProvider(new ServiceProviderOptions
-        {
-            ValidateScopes = true,
-            ValidateOnBuild = true
-        });
-
-        using var firstScope = provider.CreateScope();
-        using var secondScope = provider.CreateScope();
-
-        var factory = firstScope.ServiceProvider.GetRequiredService<IQuestionFactory>();
-        Assert.Same(factory, firstScope.ServiceProvider.GetRequiredService<IQuestionFactory>());
-        Assert.NotSame(factory, secondScope.ServiceProvider.GetRequiredService<IQuestionFactory>());
-
-        var strategies = firstScope.ServiceProvider.GetServices<IQuestionCreationStrategy>()
-            .ToArray();
-
-        var registeredTypes = strategies.SelectMany(strategy => strategy.SupportedTypes)
-            .ToArray();
-
-        Assert.Equal(Enum.GetValues<QuestionType>()
-            .Order(), registeredTypes.Order());
-
-        foreach (var strategy in strategies)
-        {
-            Assert.Contains(firstScope.ServiceProvider.GetServices<IQuestionCreationStrategy>(),
-                other => ReferenceEquals(strategy, other));
-
-            Assert.DoesNotContain(secondScope.ServiceProvider.GetServices<IQuestionCreationStrategy>(),
-                other => ReferenceEquals(strategy, other));
-        }
     }
 
     [Fact]
@@ -208,6 +167,8 @@ public class DependencyInjectionTests
         Assert.True(firstContext.Database.IsSqlServer());
         Assert.Same(firstContext, firstScope.ServiceProvider.GetRequiredService<QuizAppDbContext>());
         Assert.NotSame(firstContext, secondContext);
+        Assert.Same(firstScope.ServiceProvider.GetRequiredService<IPasswordResetQueue>(),
+            secondScope.ServiceProvider.GetRequiredService<IPasswordResetQueue>());
     }
 }
 

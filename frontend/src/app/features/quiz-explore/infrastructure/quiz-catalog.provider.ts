@@ -8,7 +8,3 @@ export const quizCatalogProvider: Provider = {
     provide: QUIZ_CATALOG,
     useClass: ApiQuizCatalog,
 };
-
-export function provideQuizCatalog(): Provider[] {
-    return [quizCatalogProvider];
-}

@@ -1,8 +1,21 @@
 ﻿import {TestBed} from '@angular/core/testing';
-import {PrototypeQuizCatalog} from '../infrastructure/prototype-quiz-catalog';
 import {QUIZ_CATALOG} from '../infrastructure/quiz-catalog.provider';
 import {QUIZ_EXPLORE_CONFIG} from './quiz-explore.config';
 import {QuizExploreStore} from './quiz-explore.store';
+import {QuizSummary} from '../domain/quiz-summary';
+
+const catalogQuizzes: readonly QuizSummary[] = [
+    quiz('csharp-co-ban-oop', 'csharp', 'C# / OOP', 'C# Fundamentals & OOP'),
+    quiz('sql-server-fundamentals', 'sql-server', 'SQL Server', 'SQL Server Fundamentals'),
+    quiz('angular-routing-forms', 'angular', 'Angular', 'Angular Routing & Forms'),
+    quiz('dotnet-core-api-architecture', 'api', '.NET / Web', '.NET Application Architecture'),
+    quiz('typescript-advanced-types', 'typescript', 'TypeScript', 'Advanced TypeScript Types'),
+    quiz('csharp-linq-collection-queries', 'csharp', 'C# / LINQ', 'LINQ & Collections in C#'),
+];
+
+function quiz(id: string, categoryId: QuizSummary['categoryId'], categoryLabel: string, title: string): QuizSummary {
+    return {id, categoryId, categoryLabel, title, description: title, questionCount: 1, durationMinutes: 5, status: 'open'};
+}
 
 const unicodeCatalog = {
     listQuizzes: async () => [{
@@ -12,7 +25,7 @@ const unicodeCatalog = {
     }],
 };
 
-async function createStore(pageSize = 6, catalog = new PrototypeQuizCatalog()): Promise<QuizExploreStore> {
+async function createStore(pageSize = 6, catalog: { listQuizzes: () => Promise<readonly QuizSummary[]> } = {listQuizzes: async () => catalogQuizzes}): Promise<QuizExploreStore> {
     TestBed.configureTestingModule({
         providers: [
             {provide: QUIZ_CATALOG, useValue: catalog},

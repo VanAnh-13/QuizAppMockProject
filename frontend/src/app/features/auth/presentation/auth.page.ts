@@ -38,6 +38,7 @@ export class AuthPage {
     protected readonly returnUrl = authReturnUrl(this.route.snapshot.queryParamMap.get('returnUrl'));
     protected readonly registered = !this.registering && this.router.currentNavigation()?.extras.state?.['registered'] === true;
     protected readonly fields = this.registering ? REGISTER_FIELDS : LOGIN_FIELDS;
+    protected readonly passwordReset = !this.registering && this.router.currentNavigation()?.extras.state?.['passwordReset'] === true;
     protected readonly year = new Date().getFullYear();
     protected readonly visiblePasswords = signal<ReadonlySet<string>>(new Set());
     private destroyed = false;
